@@ -596,148 +596,11 @@ function renderMedia(url) {
 }
 
 // ── MAP HELPERS ───────────────────────────────────────────────────
-
-// ── DISTRICT CENTROIDS (200+ major Indian districts) ──────────────
-var DC = {
-  // Delhi
-  'delhi':{lt:28.6139,lg:77.2090},'new delhi':{lt:28.6139,lg:77.2090},
-  'north delhi':{lt:28.7041,lg:77.1025},'south delhi':{lt:28.5244,lg:77.1855},
-  'east delhi':{lt:28.6600,lg:77.2900},'west delhi':{lt:28.6530,lg:77.0760},
-  'dwarka':{lt:28.5921,lg:77.0460},'rohini':{lt:28.7495,lg:77.0590},
-  'noida':{lt:28.5355,lg:77.3910},'ghaziabad':{lt:28.6692,lg:77.4538},
-  // Uttar Pradesh
-  'lucknow':{lt:26.8467,lg:80.9462},'kanpur':{lt:26.4499,lg:80.3319},
-  'agra':{lt:27.1767,lg:78.0081},'varanasi':{lt:25.3176,lg:82.9739},
-  'prayagraj':{lt:25.4358,lg:81.8463},'allahabad':{lt:25.4358,lg:81.8463},
-  'meerut':{lt:28.9845,lg:77.7064},'aligarh':{lt:27.8974,lg:78.0880},
-  'gorakhpur':{lt:26.7606,lg:83.3732},'mathura':{lt:27.4924,lg:77.6737},
-  'bareilly':{lt:28.3670,lg:79.4304},'moradabad':{lt:28.8386,lg:78.7733},
-  'saharanpur':{lt:29.9680,lg:77.5510},'firozabad':{lt:27.1592,lg:78.3957},
-  // Maharashtra
-  'mumbai':{lt:19.0760,lg:72.8777},'pune':{lt:18.5204,lg:73.8567},
-  'nagpur':{lt:21.1458,lg:79.0882},'nashik':{lt:19.9975,lg:73.7898},
-  'thane':{lt:19.2183,lg:72.9781},'aurangabad':{lt:19.8762,lg:75.3433},
-  'solapur':{lt:17.6599,lg:75.9064},'kolhapur':{lt:16.7050,lg:74.2433},
-  'amravati':{lt:20.9374,lg:77.7796},'nanded':{lt:19.1383,lg:77.3210},
-  'dhule':{lt:20.9042,lg:74.7749},'jalgaon':{lt:21.0077,lg:75.5626},
-  // Karnataka
-  'bengaluru':{lt:12.9716,lg:77.5946},'bangalore':{lt:12.9716,lg:77.5946},
-  'mysuru':{lt:12.2958,lg:76.6394},'mysore':{lt:12.2958,lg:76.6394},
-  'hubli':{lt:15.3647,lg:75.1240},'dharwad':{lt:15.4589,lg:75.0078},
-  'mangalore':{lt:12.9141,lg:74.8560},'belgaum':{lt:15.8497,lg:74.4977},
-  'bellary':{lt:15.1394,lg:76.9214},'gulbarga':{lt:17.3297,lg:76.8343},
-  'davanagere':{lt:14.4644,lg:75.9218},'shivamogga':{lt:13.9299,lg:75.5681},
-  // Tamil Nadu
-  'chennai':{lt:13.0827,lg:80.2707},'coimbatore':{lt:11.0168,lg:76.9558},
-  'madurai':{lt:9.9252,lg:78.1198},'trichy':{lt:10.7905,lg:78.7047},
-  'tiruchirappalli':{lt:10.7905,lg:78.7047},'salem':{lt:11.6643,lg:78.1460},
-  'tirunelveli':{lt:8.7139,lg:77.7567},'vellore':{lt:12.9165,lg:79.1325},
-  'erode':{lt:11.3410,lg:77.7172},'thoothukudi':{lt:8.7642,lg:78.1348},
-  // West Bengal
-  'kolkata':{lt:22.5726,lg:88.3639},'howrah':{lt:22.5958,lg:88.2636},
-  'durgapur':{lt:23.5204,lg:87.3119},'asansol':{lt:23.6739,lg:86.9524},
-  'siliguri':{lt:26.7271,lg:88.3953},'bardhaman':{lt:23.2324,lg:87.8615},
-  'kharagpur':{lt:22.3460,lg:87.2320},'haldia':{lt:22.0667,lg:88.0698},
-  // Bihar
-  'patna':{lt:25.5941,lg:85.1376},'gaya':{lt:24.7914,lg:84.9994},
-  'muzaffarpur':{lt:26.1197,lg:85.3910},'bhagalpur':{lt:25.2425,lg:86.9842},
-  'darbhanga':{lt:26.1542,lg:85.8918},'purnia':{lt:25.7771,lg:87.4753},
-  'sitamarhi':{lt:26.5911,lg:85.4897},'begusarai':{lt:25.4182,lg:86.1272},
-  // Rajasthan
-  'jaipur':{lt:26.9124,lg:75.7873},'jodhpur':{lt:26.2389,lg:73.0243},
-  'kota':{lt:25.2138,lg:75.8648},'ajmer':{lt:26.4499,lg:74.6399},
-  'bikaner':{lt:28.0229,lg:73.3119},'udaipur':{lt:24.5854,lg:73.7125},
-  'alwar':{lt:27.5530,lg:76.6346},'bharatpur':{lt:27.2152,lg:77.4941},
-  'sikar':{lt:27.6094,lg:75.1399},'nagaur':{lt:27.2015,lg:73.7355},
-  // Gujarat
-  'ahmedabad':{lt:23.0225,lg:72.5714},'surat':{lt:21.1702,lg:72.8311},
-  'vadodara':{lt:22.3072,lg:73.1812},'rajkot':{lt:22.3039,lg:70.8022},
-  'gandhinagar':{lt:23.2156,lg:72.6369},'bhavnagar':{lt:21.7645,lg:72.1519},
-  'jamnagar':{lt:22.4707,lg:70.0577},'junagadh':{lt:21.5222,lg:70.4579},
-  // Madhya Pradesh
-  'bhopal':{lt:23.2599,lg:77.4126},'indore':{lt:22.7196,lg:75.8577},
-  'jabalpur':{lt:23.1815,lg:79.9864},'gwalior':{lt:26.2183,lg:78.1828},
-  'ujjain':{lt:23.1793,lg:75.7849},'rewa':{lt:24.5362,lg:81.3036},
-  'sagar':{lt:23.8388,lg:78.7378},'satna':{lt:24.5694,lg:80.8322},
-  // Telangana
-  'hyderabad':{lt:17.3850,lg:78.4867},'warangal':{lt:17.9784,lg:79.5941},
-  'nizamabad':{lt:18.6725,lg:78.0941},'karimnagar':{lt:18.4386,lg:79.1288},
-  'khammam':{lt:17.2473,lg:80.1514},'mahbubnagar':{lt:16.7488,lg:77.9847},
-  // Andhra Pradesh
-  'visakhapatnam':{lt:17.6868,lg:83.2185},'vijayawada':{lt:16.5062,lg:80.6480},
-  'guntur':{lt:16.3067,lg:80.4365},'tirupati':{lt:13.6288,lg:79.4192},
-  'nellore':{lt:14.4426,lg:79.9865},'kurnool':{lt:15.8281,lg:78.0373},
-  // Kerala
-  'thiruvananthapuram':{lt:8.5241,lg:76.9366},'kochi':{lt:9.9312,lg:76.2673},
-  'kozhikode':{lt:11.2588,lg:75.7804},'thrissur':{lt:10.5276,lg:76.2144},
-  'kannur':{lt:11.8745,lg:75.3704},'kollam':{lt:8.8932,lg:76.6141},
-  'palakkad':{lt:10.7867,lg:76.6548},'malappuram':{lt:11.0510,lg:76.0711},
-  // Odisha
-  'bhubaneswar':{lt:20.2961,lg:85.8245},'cuttack':{lt:20.4625,lg:85.8830},
-  'rourkela':{lt:22.2604,lg:84.8536},'puri':{lt:19.8135,lg:85.8312},
-  'sambalpur':{lt:21.4669,lg:83.9756},'berhampur':{lt:19.3149,lg:84.7941},
-  // Jharkhand
-  'ranchi':{lt:23.3441,lg:85.3096},'jamshedpur':{lt:22.8046,lg:86.2029},
-  'dhanbad':{lt:23.7957,lg:86.4304},'bokaro':{lt:23.6693,lg:86.1511},
-  // Punjab
-  'ludhiana':{lt:30.9010,lg:75.8573},'amritsar':{lt:31.6340,lg:74.8723},
-  'jalandhar':{lt:31.3260,lg:75.5762},'patiala':{lt:30.3398,lg:76.3869},
-  'bathinda':{lt:30.2110,lg:74.9455},'mohali':{lt:30.7046,lg:76.7179},
-  // Haryana
-  'gurugram':{lt:28.4595,lg:77.0266},'gurgaon':{lt:28.4595,lg:77.0266},
-  'faridabad':{lt:28.4089,lg:77.3178},'panipat':{lt:29.3909,lg:76.9635},
-  'rohtak':{lt:28.8955,lg:76.6066},'hisar':{lt:29.1492,lg:75.7217},
-  'ambala':{lt:30.3782,lg:76.7767},'karnal':{lt:29.6857,lg:76.9905},
-  // Assam
-  'guwahati':{lt:26.1445,lg:91.7362},'dibrugarh':{lt:27.4728,lg:94.9120},
-  'silchar':{lt:24.8333,lg:92.7789},'jorhat':{lt:26.7509,lg:94.2037},
-  // Uttarakhand
-  'dehradun':{lt:30.3165,lg:78.0322},'haridwar':{lt:29.9457,lg:78.1642},
-  'roorkee':{lt:29.8543,lg:77.8880},'nainital':{lt:29.3919,lg:79.4542},
-  // Himachal Pradesh
-  'shimla':{lt:31.1048,lg:77.1734},'dharamsala':{lt:32.2190,lg:76.3234},
-  'mandi':{lt:31.7080,lg:76.9318},'solan':{lt:30.9045,lg:77.0967},
-  // Jammu & Kashmir
-  'srinagar':{lt:34.0837,lg:74.7973},'jammu':{lt:32.7266,lg:74.8570},
-  'baramulla':{lt:34.2080,lg:74.3436},'anantnag':{lt:33.7311,lg:75.1487},
-  // Chhattisgarh
-  'raipur':{lt:21.2514,lg:81.6296},'bilaspur':{lt:22.0797,lg:82.1409},
-  'durg':{lt:21.1904,lg:81.2849},'bhilai':{lt:21.2094,lg:81.3784},
-  // Goa
-  'panaji':{lt:15.4909,lg:73.8278},'margao':{lt:15.2832,lg:73.9862},
-  'vasco':{lt:15.3982,lg:73.8113},
-  // Chandigarh
-  'chandigarh':{lt:30.7333,lg:76.7794},
-  // Puducherry
-  'puducherry':{lt:11.9416,lg:79.8083},'pondicherry':{lt:11.9416,lg:79.8083},
-};
-
-function getDistrictCoords(district, state) {
-  if (!district) return null;
-  var key = district.toLowerCase().trim();
-  if (DC[key]) return { lat: DC[key].lt, lng: DC[key].lg };
-  // Try partial match
-  var keys = Object.keys(DC);
-  for (var i = 0; i < keys.length; i++) {
-    if (key.indexOf(keys[i]) >= 0 || keys[i].indexOf(key) >= 0) {
-      return { lat: DC[keys[i]].lt, lng: DC[keys[i]].lg };
-    }
-  }
-  return null;
-}
-
 function issueCoords(iss) {
-  // 1. Use exact GPS if available
   if (iss.lat && iss.lng) return { lat: iss.lat, lng: iss.lng };
-  // 2. Use district centroid if we know it
-  if (iss.district) {
-    var dc = getDistrictCoords(iss.district, iss.state);
-    if (dc) return { lat: dc.lat + (Math.random() - 0.5) * 0.3, lng: dc.lng + (Math.random() - 0.5) * 0.3 };
-  }
-  // 3. Fall back to state centroid + scatter
   var c = SC[iss.state];
   if (!c) return null;
-  return { lat: c.lt + (Math.random() - 0.5) * 2.0, lng: c.lg + (Math.random() - 0.5) * 2.5 };
+  return { lat: c.lt + (Math.random() - 0.5) * 2.5, lng: c.lg + (Math.random() - 0.5) * 3 };
 }
 
 function iColor(n) {
@@ -790,9 +653,7 @@ function renderIssues() {
     html += '<span>📍 ' + esc(iss.state + (iss.district ? ', ' + iss.district : '')) + '</span>';
     html += '<span>🏛️ ' + esc(iss.dept) + '</span>';
     html += '<span>' + esc(ago(iss.ts)) + '</span>';
-    var isNewIss = (Date.now() - iss.ts) < 300000;
     html += '<span class="sb2 ' + (iss.src === 'citizen' ? 'sb-cit' : 'sb-rss') + '">' + (iss.src === 'citizen' ? 'CITIZEN' : 'NEWS') + '</span>';
-    if (iss.src === 'citizen' && isNewIss) html += '<span style="background:#00c85320;border:1px solid #00c85340;color:#00c853;font-size:8px;padding:1px 5px;border-radius:3px;font-weight:700;animation:pu 1s infinite">NEW</span>';
     if (iss.link) html += '<a href="' + esc(iss.link) + '" target="_blank" rel="noopener noreferrer" style="color:#00b8e6;font-size:10px;text-decoration:none" onclick="event.stopPropagation()">↗</a>';
     html += '</div>';
     if (iss.imageUrl) html += renderMedia(iss.imageUrl);
@@ -847,9 +708,7 @@ function addIssueMarkers(issList) {
     var size = iss.sev === 'emergency' ? 14 : iss.sev === 'critical' ? 12 : iss.sev === 'high' ? 10 : 8;
     var col = CC[iss.cat] || '#aaa';
     var el = document.createElement('div');
-    var isNew = (Date.now() - iss.ts) < 300000; // new if < 5 min old
-    el.style.cssText = 'width:' + size + 'px;height:' + size + 'px;border-radius:50%;background:' + col + ';border:2px solid ' + col + '88;box-shadow:0 0 ' + size + 'px ' + col + '55;cursor:pointer;opacity:' + (iss.src === 'citizen' ? '1' : '.7') + ';transition:transform .2s;';
-    if (iss.src === 'citizen' && isNew) el.className = 'marker-new';
+    el.style.cssText = 'width:' + size + 'px;height:' + size + 'px;border-radius:50%;background:' + col + ';border:2px solid ' + col + '88;box-shadow:0 0 ' + size + 'px ' + col + '55;cursor:pointer;opacity:' + (iss.src === 'citizen' ? '1' : '.7') + ';';
     var popup = new maplibregl.Popup({offset:12, closeButton:false}).setHTML(
       '<div style="font-size:12px">' +
       '<div style="color:' + col + ';font-size:10px;font-weight:700;text-transform:uppercase;margin-bottom:3px">' + esc(CL[iss.cat]) + '</div>' +
@@ -941,30 +800,12 @@ function fetchAllFeeds() {
       return fresh;
     });
 
-  // Load GitHub citizen issues FIRST — they are public for all users
-  ghPromise.then(function(ghItems) {
-    if (ghItems.length) {
-      var openIds = {};
-      ghItems.forEach(function(i){ openIds[i.id] = true; });
-      var combined = {};
-      // Start with local reports
-      loadRep().forEach(function(i){ combined[i.id] = i; });
-      // Add GitHub issues (overwrite local copies)
-      ghItems.forEach(function(i){ combined[i.id] = i; });
-      issues = Object.values(combined).sort(function(a, b){ return b.ts - a.ts; });
-      updateCounters(); renderIssues(); updateChoropleth(); addIssueMarkers(issues);
-      document.getElementById('cc').style.color = '#00ddb8';
-    }
-  });
-
-  // Then show RSS news and merge everything together
+  // Show RSS first immediately
   rssPromise.then(function(rssItems) {
     var localReps = loadRep();
     var combined = {};
     localReps.forEach(function(i){ combined[i.id] = i; });
     rssItems.forEach(function(i){ combined[i.id] = i; });
-    // Keep existing GitHub issues
-    issues.forEach(function(i){ if (i.src === 'citizen') combined[i.id] = i; });
     issues = Object.values(combined).sort(function(a, b){ return b.ts - a.ts; });
     saveSeen(seenKeys);
     setFS('live', feedsLoaded + ' feeds live');
@@ -973,27 +814,40 @@ function fetchAllFeeds() {
     updateTicker();
   });
 
-  // After both done — clean up closed issues
-  Promise.all([ghPromise, rssPromise]).then(function(results) {
-    var ghItems = results[0];
+  // Then merge GitHub citizen reports non-blocking
+  // Also REMOVE issues that were closed/deleted on GitHub
+  ghPromise.then(function(ghItems) {
     var openIds = {};
     ghItems.forEach(function(i){ openIds[i.id] = true; });
+    var changed = false;
+    // Add new ones
+    ghItems.forEach(function(i) {
+      var exists = false;
+      for (var j = 0; j < issues.length; j++) { if (issues[j].id === i.id) { exists = true; break; } }
+      if (!exists) { issues.unshift(i); changed = true; }
+    });
+    // Remove citizen issues that are no longer open on GitHub
     var before = issues.length;
     issues = issues.filter(function(i) {
+      // Keep RSS items always
       if (i.src !== 'citizen') return true;
+      // Keep local-only reports (no ghUrl = not yet on GitHub)
       if (!i.ghUrl && !i.link) return true;
+      // If it was on GitHub, only keep if still open
       if (i.id && i.id.indexOf('gh-') === 0) return openIds[i.id] === true;
       return true;
     });
     if (issues.length !== before) {
+      changed = true;
+      // Also clean localStorage - remove closed issues
       var storedReps = loadRep().filter(function(r) {
         if (!r.ghUrl && !r.link) return true;
         if (r.id && r.id.indexOf('gh-') === 0) return openIds[r.id] === true;
         return true;
       });
       saveRep(storedReps);
-      updateCounters(); renderIssues(); updateChoropleth(); addIssueMarkers(issues);
     }
+    if (changed) { updateCounters(); renderIssues(); updateChoropleth(); addIssueMarkers(issues); }
   });
 }
 
@@ -1109,12 +963,10 @@ function renderVideos() {
   for (var i = 0; i < ytVids.length; i++) {
     var v = ytVids[i];
     html += '<div class="vcard">';
-    var thumbBg = v.live ? 'background:linear-gradient(135deg,#1a0a0a 0%,#2a0808 100%)' : 'background:linear-gradient(135deg,#0a0f1a 0%,#101d30 100%)';
-    html += '<div class="vthumb" data-vid="' + v.id + '" data-live="' + (v.live ? '1' : '0') + '" style="' + thumbBg + ';display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px">';
-    html += '<div style="width:52px;height:52px;background:rgba(255,107,0,.15);border:2px solid rgba(255,107,0,.4);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:22px">&#9654;</div>';
-    html += '<div style="font-size:11px;color:#c8d8e8;text-align:center;padding:0 12px;line-height:1.4">' + esc(v.title) + '</div>';
-    if (v.live) html += '<div style="background:#ff1744;border-radius:3px;padding:2px 8px;font-size:9px;font-weight:700;letter-spacing:1px;color:#fff">● LIVE</div>';
-    else html += '<div style="font-size:10px;color:#4a6080">Click to play</div>';
+    html += '<div class="vthumb" data-vid="' + v.id + '" data-live="' + (v.live ? '1' : '0') + '">';
+    html += '<img src="https://img.youtube.com/vi/' + v.id + '/mqdefault.jpg" alt="' + esc(v.title) + '" loading="lazy" onerror="this.src=\'https://img.youtube.com/vi/' + v.id + '/default.jpg\'"/>';
+    html += '<div class="vplay">&#9654;</div>';
+    if (v.live) html += '<div class="vlive-badge">LIVE</div>';
     html += '</div>';
     html += '<div class="vmeta"><div class="vtitle">' + esc(v.title) + '</div><div class="vsrc">📺 ' + esc(v.src) + '</div></div>';
     html += '</div>';

@@ -17,7 +17,7 @@ html,body{height:100%;font-family:'DM Sans',sans-serif;background:var(--bg);colo
 #app{display:flex;flex-direction:column;height:100vh}
 /* HEADER */
 #hdr{height:52px;background:var(--panel);border-bottom:1px solid var(--b1);display:flex;align-items:center;justify-content:space-between;padding:0 14px;flex-shrink:0;z-index:200;gap:10px}
-.logo{font-family:'Baloo 2',cursive;font-weight:800;font-size:19px;color:var(--w);display:flex;align-items:center;gap:6px;white-space:nowrap}
+.logo{font-family:Baloo2,cursive;font-weight:800;font-size:19px;color:var(--w);display:flex;align-items:center;gap:6px;white-space:nowrap}
 .logo span{color:var(--saf)}
 .hc{display:flex;align-items:center;gap:7px;font-size:12px;color:var(--mt);flex:1;justify-content:center;flex-wrap:wrap}
 .ld{width:7px;height:7px;border-radius:50%;background:var(--grn);animation:pu 1.5s infinite;flex-shrink:0}
@@ -28,7 +28,7 @@ html,body{height:100%;font-family:'DM Sans',sans-serif;background:var(--bg);colo
 #fs.live .fsd{background:var(--grn);animation:pu 2s infinite}
 #fs.error .fsd{background:var(--red)}
 #fs.loading .fsd{background:var(--gld);animation:pu 1s infinite}
-.btnr{background:var(--saf);color:var(--w);border:none;border-radius:7px;padding:7px 14px;-webkit-tap-highlight-color:transparent;font-family:'Baloo 2',cursive;font-weight:700;font-size:13px;cursor:pointer;white-space:nowrap}
+.btnr{background:var(--saf);color:var(--w);border:none;border-radius:7px;padding:7px 14px;-webkit-tap-highlight-color:transparent;font-family:Baloo2,cursive;font-weight:700;font-size:13px;cursor:pointer;white-space:nowrap}
 .btnr:hover{background:var(--saf2)}
 /* BODY */
 #body{flex:1;display:flex;overflow:hidden;min-height:0}
@@ -37,7 +37,7 @@ html,body{height:100%;font-family:'DM Sans',sans-serif;background:var(--bg);colo
 #mst{position:absolute;top:12px;left:52px;display:flex;gap:8px;z-index:10;pointer-events:none}
 .sc{background:rgba(12,21,38,.94);border:1px solid var(--b1);border-radius:7px;padding:5px 11px;border-left:2px solid var(--saf)}
 .sc.g{border-left-color:var(--grn)}.sc.s{border-left-color:var(--sky)}
-.sv{font-family:'Baloo 2',cursive;font-weight:700;font-size:14px;color:var(--saf);line-height:1}
+.sv{font-family:Baloo2,cursive;font-weight:700;font-size:14px;color:var(--saf);line-height:1}
 .sc.g .sv{color:var(--grn)}.sc.s .sv{color:var(--sky)}
 .sl{font-size:9px;color:var(--mt);text-transform:uppercase;letter-spacing:.8px}
 #mlg{position:absolute;bottom:32px;left:12px;background:rgba(8,15,28,.9);border:1px solid var(--b1);border-radius:8px;padding:7px 12px;font-size:10px;display:flex;gap:10px;z-index:10;pointer-events:none}
@@ -49,15 +49,15 @@ html,body{height:100%;font-family:'DM Sans',sans-serif;background:var(--bg);colo
 /* SIDEBAR */
 #sb{width:350px;background:var(--panel);border-left:1px solid var(--b1);display:flex;flex-direction:column;overflow:hidden;flex-shrink:0}
 .tabs{display:flex;border-bottom:1px solid var(--b1);flex-shrink:0;overflow-x:auto}
-.tbn{flex:1;min-width:60px;padding:10px 4px;background:transparent;border:none;border-bottom:2px solid transparent;color:var(--mt);font-family:'Baloo 2',cursive;font-weight:600;font-size:10px;cursor:pointer;text-transform:uppercase;letter-spacing:.3px;transition:all .15s;white-space:nowrap}
+.tbn{flex:1;min-width:60px;padding:10px 4px;background:transparent;border:none;border-bottom:2px solid transparent;color:var(--mt);font-family:Baloo2,cursive;font-weight:600;font-size:10px;cursor:pointer;text-transform:uppercase;letter-spacing:.3px;transition:all .15s;white-space:nowrap}
 .tbn:hover{color:var(--tx)}.tbn.active{color:var(--saf);border-bottom-color:var(--saf)}
 .tpn{display:none;flex:1;overflow:hidden;flex-direction:column;min-height:0}
 .tpn.active{display:flex}
 /* STATE INFO */
 #sti{background:var(--p2);border-bottom:1px solid var(--b1);padding:12px 14px;display:none;flex-shrink:0}
 #sti.show{display:block}
-.stn{font-family:'Baloo 2',cursive;font-weight:700;font-size:16px;color:var(--w)}
-.stc{font-family:'Baloo 2',cursive;font-weight:800;font-size:22px;color:var(--saf);line-height:1}
+.stn{font-family:Baloo2,cursive;font-weight:700;font-size:16px;color:var(--w)}
+.stc{font-family:Baloo2,cursive;font-weight:800;font-size:22px;color:var(--saf);line-height:1}
 .sts{font-size:11px;color:var(--mt);margin-bottom:8px}
 .cbr{display:flex;align-items:center;gap:7px;margin-bottom:5px}
 .cbl{font-size:11px;width:72px;flex-shrink:0}.cbt{flex:1;height:4px;background:var(--b2);border-radius:2px;overflow:hidden}
@@ -120,7 +120,7 @@ html,body{height:100%;font-family:'DM Sans',sans-serif;background:var(--bg);colo
 .fi::placeholder,.fta::placeholder{color:var(--mt)}
 .fsl option{background:var(--panel)}
 .fta{min-height:68px;resize:vertical}
-.bts{width:100%;padding:10px;background:var(--saf);color:var(--w);border:none;border-radius:7px;font-family:'Baloo 2',cursive;font-weight:700;font-size:14px;cursor:pointer;transition:background .15s}
+.bts{width:100%;padding:10px;background:var(--saf);color:var(--w);border:none;border-radius:7px;font-family:Baloo2,cursive;font-weight:700;font-size:14px;cursor:pointer;transition:background .15s}
 .bts:hover{background:var(--saf2)}.bts:disabled{background:var(--mt2);cursor:not-allowed}
 .cc{font-size:10px;color:var(--mt);text-align:right;margin-top:2px}
 /* MY REPORTS */
@@ -128,7 +128,7 @@ html,body{height:100%;font-family:'DM Sans',sans-serif;background:var(--bg);colo
 #myp::-webkit-scrollbar{width:3px}
 .tc{background:var(--p2);border:1px solid var(--b1);border-radius:8px;padding:11px 12px;margin-bottom:10px}
 .tt2{display:flex;justify-content:space-between;align-items:center;margin-bottom:5px}
-.tid{font-family:'Baloo 2',cursive;font-weight:700;font-size:14px;color:var(--gld)}
+.tid{font-family:Baloo2,cursive;font-weight:700;font-size:14px;color:var(--gld)}
 .tst{font-size:9px;font-weight:700;padding:2px 7px;border-radius:10px;background:#00b8e620;color:#00b8e6;border:1px solid #00b8e640}
 .ttl{font-size:12px;color:var(--tx);line-height:1.4;margin-bottom:5px}
 .tmt{font-size:10px;color:var(--mt);display:flex;gap:8px;flex-wrap:wrap;margin-bottom:8px}
@@ -147,18 +147,15 @@ html,body{height:100%;font-family:'DM Sans',sans-serif;background:var(--bg);colo
 .scl{font-size:9px;color:var(--mt);text-transform:uppercase;letter-spacing:.8px;margin-bottom:3px}
 .bse{width:100%;padding:9px;background:transparent;border:1px solid var(--b1);border-radius:7px;color:var(--mt);font-size:12px;cursor:pointer;font-family:inherit;margin-top:6px}
 .bse:hover{border-color:var(--b2);color:var(--tx)}
+.ncard{display:flex;align-items:flex-start;gap:11px;padding:11px 13px;background:var(--p2);border:1px solid var(--b1);border-radius:8px;margin-bottom:7px;color:var(--tx);text-decoration:none;transition:border-color .15s,background .15s;cursor:pointer}
+.ncard:hover{border-color:var(--b2);background:#0f1e34}
 /* VIDEO PANEL */
 #vp{padding:10px;overflow-y:auto;flex:1;scrollbar-width:thin;scrollbar-color:var(--b1) transparent;min-height:0}
 #vp::-webkit-scrollbar{width:3px}
 .vsec{margin-bottom:14px}
-.vsec-hd{font-family:'Baloo 2',cursive;font-weight:700;font-size:11px;color:var(--mt);text-transform:uppercase;letter-spacing:.8px;padding:4px 0 8px;border-bottom:1px solid var(--b1);margin-bottom:8px}
+.vsec-hd{font-family:Baloo2,cursive;font-weight:700;font-size:11px;color:var(--mt);text-transform:uppercase;letter-spacing:.8px;padding:4px 0 8px;border-bottom:1px solid var(--b1);margin-bottom:8px}
 .vcard{background:var(--p2);border:1px solid var(--b1);border-radius:8px;overflow:hidden;margin-bottom:8px}
-.vthumb{position:relative;padding-top:56.25%;cursor:pointer;background:#000;overflow:hidden}
-.vthumb img{position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover}
-.vthumb:hover img{opacity:.8}
-.vplay{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:44px;height:44px;background:rgba(255,107,0,.9);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:16px;pointer-events:none;color:#fff}
-.vframe{position:relative;padding-top:56.25%}
-.vframe iframe{position:absolute;top:0;left:0;width:100%;height:100%;border:none}
+/* embed styles removed — YouTube blocks live stream embedding */
 .vmeta{padding:8px 10px}
 .vtitle{font-size:12px;color:var(--tx);line-height:1.4;margin-bottom:4px}
 .vsrc{font-size:10px;color:var(--mt)}
@@ -182,11 +179,11 @@ html,body{height:100%;font-family:'DM Sans',sans-serif;background:var(--bg);colo
 #adminBar{display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(4,8,16,.92);z-index:9999;align-items:center;justify-content:center}
 #adminBar.show{display:flex}
 .adminBox{background:var(--panel);border:1px solid #FF6B0060;border-radius:12px;padding:24px;width:340px;max-width:95vw}
-.adminTitle{font-family:'Baloo 2',cursive;font-weight:800;font-size:18px;color:var(--saf);margin-bottom:4px}
+.adminTitle{font-family:Baloo2,cursive;font-weight:800;font-size:18px;color:var(--saf);margin-bottom:4px}
 .adminSub{font-size:11px;color:var(--mt);margin-bottom:16px}
 .adminInput{width:100%;background:var(--p2);border:1px solid var(--b1);border-radius:7px;padding:8px 12px;color:var(--tx);font-family:inherit;font-size:13px;outline:none;margin-bottom:10px}
 .adminInput:focus{border-color:var(--saf)}
-.adminBtn{width:100%;padding:9px;background:var(--saf);color:#fff;border:none;border-radius:7px;font-family:'Baloo 2',cursive;font-weight:700;font-size:14px;cursor:pointer;margin-bottom:8px}
+.adminBtn{width:100%;padding:9px;background:var(--saf);color:#fff;border:none;border-radius:7px;font-family:Baloo2,cursive;font-weight:700;font-size:14px;cursor:pointer;margin-bottom:8px}
 .adminBtn:hover{background:var(--saf2)}
 .adminClose{width:100%;padding:7px;background:transparent;border:1px solid var(--b1);border-radius:7px;color:var(--mt);font-family:inherit;font-size:12px;cursor:pointer}
 .adminClose:hover{border-color:var(--b2);color:var(--tx)}
@@ -364,7 +361,7 @@ html,body{height:100%;font-family:'DM Sans',sans-serif;background:var(--bg);colo
         <div id="aip">
           <div class="ae">
             <div style="font-size:34px">&#128203;</div>
-            <div style="font-family:'Baloo 2',cursive;font-size:13px;color:var(--tx)">Issue Analyser</div>
+            <div style="font-family:Baloo2,cursive;font-size:13px;color:var(--tx)">Issue Analyser</div>
             <div style="font-size:12px;color:var(--mt);line-height:1.6;max-width:240px">Pick any issue from Live Feed then click <strong style="color:var(--saf)">Analyse Issue</strong> for root cause, responsible authority &amp; action steps.</div>
           </div>
         </div>
@@ -1080,91 +1077,197 @@ function renderVideos() {
   videosLoaded = true;
   var el = document.getElementById('vContent');
 
-  var govCh = [
-    ['Lok Sabha TV',   'Official Parliament live sessions, debates, committees', 'https://www.youtube.com/@loksabhatv/streams',   'LIVE',     '#ff1744', '🏛️'],
-    ['Rajya Sabha TV', 'Upper house live proceedings and archived sessions',      'https://www.youtube.com/@rajyasabhatv/streams', 'LIVE',     '#ff1744', '🏛️'],
-    ['DD News',        'Doordarshan national broadcaster — live news',            'https://www.youtube.com/@DDNewsHindi/streams',  'LIVE',     '#ff1744', '📺'],
-    ['PIB India',      'Official government press releases and announcements',    'https://www.youtube.com/@PIBIndia',             'OFFICIAL', '#FF6B00', '📢']
+  // ── DATA ────────────────────────────────────────────────────────
+  var govChannels = [
+    {
+      name: 'Lok Sabha TV',
+      desc: 'Live Parliament sessions, Question Hour, committee debates, budget proceedings',
+      url:  'https://www.youtube.com/@loksabhatv/streams',
+      tag: 'LIVE', col: '#ff1744', icon: '🏛️'
+    },
+    {
+      name: 'Rajya Sabha TV',
+      desc: 'Upper house live sessions, private member bills, zero hour discussions',
+      url:  'https://www.youtube.com/@rajyasabhatv/streams',
+      tag: 'LIVE', col: '#ff1744', icon: '🏛️'
+    },
+    {
+      name: 'DD News',
+      desc: 'Doordarshan national broadcaster — government news, rural issues, regional coverage',
+      url:  'https://www.youtube.com/@DDNewsHindi/live',
+      tag: 'LIVE', col: '#ff1744', icon: '📺'
+    },
+    {
+      name: 'PIB India',
+      desc: 'Press Information Bureau — official government announcements, scheme launches, press briefings',
+      url:  'https://www.youtube.com/@PIBIndia',
+      tag: 'OFFICIAL', col: '#FF6B00', icon: '📢'
+    }
   ];
 
-  var journoCh = [
-    ['The Wire',       'Independent investigative journalism — politics, policy, accountability', 'https://www.youtube.com/@TheWireNews',   'INDEPENDENT', '#a855f7', '🔎'],
-    ['Newslaundry',    'Subscriber-funded, no ads, no corporate influence',                       'https://www.youtube.com/@newslaundry',   'INDEPENDENT', '#a855f7', '📰'],
-    ['The Print',      'Policy and politics reporting — founded by journalists',                  'https://www.youtube.com/@ThePrintIndia', 'JOURNALISM',  '#00b8e6', '🗞️'],
-    ['The Quint',      'Digital news — civic issues, fact checks, ground reporting',              'https://www.youtube.com/@TheQuint',      'JOURNALISM',  '#00b8e6', '🗞️'],
-    ['NDTV',           'National daily news — parliament, policy, state reporting',               'https://www.youtube.com/@ndtv',          'MAINSTREAM',  '#22c55e', '📡'],
-    ['India Today',    'National daily news and investigative reports',                           'https://www.youtube.com/@IndiaToday',    'MAINSTREAM',  '#22c55e', '📡']
+  var journoChannels = [
+    {
+      name: 'The Wire',
+      desc: 'Donor-funded independent journalism. Covers corruption, civil rights, policy failures, minority issues',
+      url:  'https://www.youtube.com/@TheWireNews',
+      tag: 'INDEPENDENT', col: '#a855f7', icon: '🔎'
+    },
+    {
+      name: 'Newslaundry',
+      desc: 'Subscription-funded, no ads, no corporate owners. Media watchdog + original ground reporting',
+      url:  'https://www.youtube.com/@newslaundry',
+      tag: 'INDEPENDENT', col: '#a855f7', icon: '🔬'
+    },
+    {
+      name: 'The Print',
+      desc: 'Founded by senior journalists. Strong parliament, judiciary and policy coverage',
+      url:  'https://www.youtube.com/@ThePrintIndia',
+      tag: 'JOURNALISM', col: '#00b8e6', icon: '🗞️'
+    },
+    {
+      name: 'The Quint',
+      desc: 'Ground reporting, civic issues, fact-checks. Strong on urban infrastructure and rights',
+      url:  'https://www.youtube.com/@TheQuint',
+      tag: 'JOURNALISM', col: '#00b8e6', icon: '🗞️'
+    },
+    {
+      name: 'NDTV',
+      desc: 'Established national broadcaster. Covers Parliament, Supreme Court, state government failures',
+      url:  'https://www.youtube.com/@ndtv',
+      tag: 'MAINSTREAM', col: '#22c55e', icon: '📡'
+    },
+    {
+      name: 'India Today',
+      desc: 'National daily — investigative series, sting operations, government accountability',
+      url:  'https://www.youtube.com/@IndiaToday',
+      tag: 'MAINSTREAM', col: '#22c55e', icon: '📡'
+    },
+    {
+      name: 'Scroll.in',
+      desc: 'Long-form journalism on civic, social and political issues in India',
+      url:  'https://www.youtube.com/@ScrollinIndia',
+      tag: 'JOURNALISM', col: '#00ddb8', icon: '📜'
+    }
   ];
 
   var portals = [
-    ['CPGRAMS',        'File a complaint with any Central Govt ministry',          'https://cpgrams.gov.in',          '#FF6B00', '📝'],
-    ['RTI Online',     'File Right to Information with Central Government',         'https://rtionline.gov.in',        '#ffd700', '📂'],
-    ['PIB Fact Check', 'Official govt fact-check on misinformation',               'https://factcheck.pib.gov.in',    '#22c55e', '✅'],
-    ['The Wire',       'Independent investigative reporting',                       'https://thewire.in',              '#a855f7', '🔎'],
-    ['Scroll.in',      'Long-form civic and policy journalism',                     'https://scroll.in/india',         '#00ddb8', '📜'],
-    ['Newslaundry',    'Media accountability and original reporting',               'https://newslaundry.com',         '#a855f7', '📰'],
-    ['FactChecker.in', 'Independent data journalism on govt claims',               'https://factchecker.in',          '#22c55e', '🔬'],
-    ['The Hindu',      'Established newspaper — policy and parliament coverage',   'https://thehindu.com/news/national','#00b8e6','📰'],
-    ['PIB India',      'Official government press releases',                        'https://pib.gov.in',              '#FF6B00', '🏛️'],
-    ['MyGov India',    'Participate in government consultations',                   'https://mygov.in',                '#22c55e', '🗳️']
+    {
+      name: 'CPGRAMS',
+      desc: 'Centralised Public Grievance Redress — file a complaint with any Central Govt ministry or department',
+      url:  'https://cpgrams.gov.in',
+      col: '#FF6B00', icon: '📝', tag: 'GRIEVANCE'
+    },
+    {
+      name: 'RTI Online',
+      desc: 'File Right to Information requests with any Central Government ministry — free, online, official',
+      url:  'https://rtionline.gov.in',
+      col: '#ffd700', icon: '📂', tag: 'RTI'
+    },
+    {
+      name: 'PIB Fact Check',
+      desc: 'Official government unit for debunking fake news about government schemes and policies',
+      url:  'https://factcheck.pib.gov.in',
+      col: '#22c55e', icon: '✅', tag: 'FACT CHECK'
+    },
+    {
+      name: 'FactChecker.in',
+      desc: 'Independent data journalism — fact-checks government statistics, claims, budget announcements',
+      url:  'https://factchecker.in',
+      col: '#22c55e', icon: '🔬', tag: 'FACT CHECK'
+    },
+    {
+      name: 'The Hindu',
+      desc: 'One of India&#39;s oldest newspapers. Strong Parliament, judiciary and policy reporting',
+      url:  'https://thehindu.com/news/national',
+      col: '#00b8e6', icon: '📰', tag: 'NEWS'
+    },
+    {
+      name: 'Scroll.in',
+      desc: 'Civic, social and rights-based long-form journalism',
+      url:  'https://scroll.in/india',
+      col: '#00ddb8', icon: '📜', tag: 'NEWS'
+    },
+    {
+      name: 'PRS Legislative Research',
+      desc: 'Non-partisan analysis of Parliament bills, committee reports and government budgets',
+      url:  'https://prsindia.org',
+      col: '#a855f7', icon: '📊', tag: 'RESEARCH'
+    },
+    {
+      name: 'MyGov India',
+      desc: 'Participate in government consultations, surveys and citizen feedback initiatives',
+      url:  'https://mygov.in',
+      col: '#22c55e', icon: '🗳️', tag: 'CITIZEN'
+    },
+    {
+      name: 'PIB India',
+      desc: 'Official press releases, government scheme updates and ministry announcements',
+      url:  'https://pib.gov.in',
+      col: '#FF6B00', icon: '🏛️', tag: 'OFFICIAL'
+    }
   ];
 
-  function chCard(row) {
-    var name = row[0], desc = row[1], url = row[2], tag = row[3], col = row[4], icon = row[5];
-    var parts = [
-      '<a href="' + esc(url) + '" target="_blank" rel="noopener" class="ncard">',
-      '<div style="font-size:20px;flex-shrink:0;line-height:1.3">' + icon + '</div>',
-      '<div style="flex:1;min-width:0">',
-      '<div style="display:flex;align-items:center;gap:6px;margin-bottom:3px">',
-      '<span style="font-family:Baloo2,cursive;font-weight:700;font-size:13px;color:#fff">' + esc(name) + '</span>',
-      '<span style="font-size:8px;font-weight:700;letter-spacing:.8px;padding:1px 5px;border-radius:3px;background:' + col + '20;color:' + col + ';border:1px solid ' + col + '40">' + esc(tag) + '</span>',
-      '</div>',
-      '<div style="font-size:10.5px;color:var(--mt);line-height:1.4">' + esc(desc) + '</div>',
-      '</div>',
-      '<div style="color:var(--mt);font-size:12px;flex-shrink:0;align-self:center">↗</div>',
+  // ── RENDER ──────────────────────────────────────────────────────
+  function channelCard(ch) {
+    return [
+      '<a href="' + esc(ch.url) + '" target="_blank" rel="noopener" class="ncard">',
+        '<div style="font-size:22px;flex-shrink:0;line-height:1">' + ch.icon + '</div>',
+        '<div style="flex:1;min-width:0">',
+          '<div style="display:flex;align-items:center;gap:6px;margin-bottom:3px;flex-wrap:wrap">',
+            '<span style="font-family:Baloo2,cursive;font-weight:700;font-size:13px;color:#fff">' + esc(ch.name) + '</span>',
+            '<span style="font-size:8px;font-weight:700;letter-spacing:.8px;padding:1px 6px;border-radius:3px;background:' + ch.col + '20;color:' + ch.col + ';border:1px solid ' + ch.col + '40">' + ch.tag + '</span>',
+          '</div>',
+          '<div style="font-size:10.5px;color:var(--mt);line-height:1.5">' + esc(ch.desc) + '</div>',
+        '</div>',
+        '<div style="color:var(--mt);font-size:14px;flex-shrink:0;align-self:center">↗</div>',
       '</a>'
-    ];
-    return parts.join('');
+    ].join('');
   }
 
-  function ptCard(row) {
-    var label = row[0], desc = row[1], url = row[2], col = row[3], icon = row[4];
-    var parts = [
-      '<a href="' + esc(url) + '" target="_blank" rel="noopener" class="ncard" style="border-left:3px solid ' + col + '">',
-      '<div style="font-size:20px;flex-shrink:0;line-height:1.3">' + icon + '</div>',
-      '<div style="flex:1;min-width:0">',
-      '<div style="font-family:Baloo2,cursive;font-weight:700;font-size:12.5px;color:#fff;margin-bottom:2px">' + esc(label) + '</div>',
-      '<div style="font-size:10.5px;color:var(--mt);line-height:1.4">' + esc(desc) + '</div>',
-      '</div>',
-      '<div style="color:var(--mt);font-size:12px;flex-shrink:0;align-self:center">↗</div>',
+  function portalCard(p) {
+    return [
+      '<a href="' + esc(p.url) + '" target="_blank" rel="noopener" class="ncard" style="border-left:3px solid ' + p.col + '">',
+        '<div style="font-size:22px;flex-shrink:0;line-height:1">' + p.icon + '</div>',
+        '<div style="flex:1;min-width:0">',
+          '<div style="display:flex;align-items:center;gap:6px;margin-bottom:3px;flex-wrap:wrap">',
+            '<span style="font-family:Baloo2,cursive;font-weight:700;font-size:13px;color:#fff">' + esc(p.name) + '</span>',
+            '<span style="font-size:8px;font-weight:700;letter-spacing:.8px;padding:1px 6px;border-radius:3px;background:' + p.col + '20;color:' + p.col + ';border:1px solid ' + p.col + '40">' + p.tag + '</span>',
+          '</div>',
+          '<div style="font-size:10.5px;color:var(--mt);line-height:1.5">' + esc(p.desc) + '</div>',
+        '</div>',
+        '<div style="color:var(--mt);font-size:14px;flex-shrink:0;align-self:center">↗</div>',
       '</a>'
-    ];
-    return parts.join('');
+    ].join('');
   }
 
   var out = [];
 
-  out.push('<div style="margin:8px 8px 12px;padding:9px 12px;background:#ffd70010;border:1px solid #ffd70030;border-radius:7px;font-size:10.5px;color:#a89030;line-height:1.6">');
-  out.push('YouTube blocks direct embedding for live streams. All links open on YouTube in a new tab for full quality playback.');
+  // Notice
+  out.push('<div style="margin:8px 8px 14px;padding:10px 13px;background:#00b8e608;border:1px solid #00b8e620;border-radius:8px;font-size:10.5px;color:#4a8090;line-height:1.6">');
+  out.push('<strong style="color:#00b8e6">Note:</strong> YouTube does not allow live stream embedding on third-party sites. All channels open directly on YouTube for full quality playback. Links go to the live/latest tab of each channel.');
   out.push('</div>');
 
+  // Government
   out.push('<div class="vsec">');
-  out.push('<div class="vsec-hd" style="display:flex;align-items:center;gap:7px"><span style="width:7px;height:7px;border-radius:50%;background:#ff1744;animation:pu 1.5s infinite;display:inline-block"></span> Official Government Channels</div>');
-  for (var i = 0; i < govCh.length; i++) out.push(chCard(govCh[i]));
+  out.push('<div class="vsec-hd"><span style="display:inline-block;width:7px;height:7px;border-radius:50%;background:#ff1744;animation:pu 1.5s infinite;margin-right:6px;vertical-align:middle"></span>Official Government Channels</div>');
+  for (var i = 0; i < govChannels.length; i++) out.push(channelCard(govChannels[i]));
   out.push('</div>');
 
+  // Independent journalism
   out.push('<div class="vsec">');
   out.push('<div class="vsec-hd">📰 Independent &amp; Investigative Journalism</div>');
-  for (var j = 0; j < journoCh.length; j++) out.push(chCard(journoCh[j]));
+  for (var j = 0; j < journoChannels.length; j++) out.push(channelCard(journoChannels[j]));
   out.push('</div>');
 
+  // Portals
   out.push('<div class="vsec">');
-  out.push('<div class="vsec-hd">🔗 Civic Portals &amp; Fact-check Tools</div>');
-  for (var k = 0; k < portals.length; k++) out.push(ptCard(portals[k]));
+  out.push('<div class="vsec-hd">🔗 Civic Portals, RTI &amp; Fact-Check Tools</div>');
+  for (var k = 0; k < portals.length; k++) out.push(portalCard(portals[k]));
   out.push('</div>');
 
   el.innerHTML = out.join('');
 }
+
 
 // ── TABS ──────────────────────────────────────────────────────────
 function switchTab(t) {
@@ -1299,8 +1402,8 @@ function finishSubmit(r, cat, state, dist, title, desc, media, kw) {
     : '<div style="font-size:11px;color:var(--mt);margin-bottom:8px;padding:8px;background:var(--p2);border-radius:7px">Add GITHUB_TOKEN + GITHUB_REPO in Vercel for cross-user tracking.</div>';
   succ.innerHTML = '<div class="sbox">'
     + '<div style="font-size:38px;margin-bottom:6px">✅</div>'
-    + '<div style="font-family:\'Baloo 2\',cursive;font-weight:700;font-size:16px;color:#00c853;margin-bottom:3px">Registered!</div>'
-    + '<div style="font-family:\'Baloo 2\',cursive;font-weight:800;font-size:20px;color:#ffd700;margin-bottom:10px">' + esc(ni.id) + '</div>'
+    + '<div style="font-family:Baloo2,cursive;font-weight:700;font-size:16px;color:#00c853;margin-bottom:3px">Registered!</div>'
+    + '<div style="font-family:Baloo2,cursive;font-weight:800;font-size:20px;color:#ffd700;margin-bottom:10px">' + esc(ni.id) + '</div>'
     + '<div class="sgrid">'
     + '<div class="scel"><div class="scl">Severity</div><span class="sv2 s-' + esc(r.severity||kw.sev) + '">' + esc((r.severity||kw.sev).toUpperCase()) + '</span></div>'
     + '<div class="scel"><div class="scl">Dept</div><div style="font-size:10px;color:#00b8e6;font-weight:600;line-height:1.3">' + esc(r.department||DEPT[cat]) + '</div></div>'

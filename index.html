@@ -1034,42 +1034,53 @@ function addIssueMarkers(issList) {
       'box-shadow:0 0 ' + (sz + 3) + 'px ' + col + '55',
       'cursor:pointer',
       'opacity:' + (isCitizen ? '1' : '0.6'),
-      'transition:transform .15s,opacity .15s'
+      'transform-origin:center center',         /* FIX: scale from center so dot stays in place */
+      'transition:transform .15s,opacity .15s,box-shadow .15s'
     ].join(';');
     if (isNew && isCitizen) el.className = 'marker-new';
 
-    (function(qi, qel, qcol) {
+    (function(qi, qel, qcol, qlng, qlat) {
+      // Popup — created once per marker, shown on hover not click
+      var popup = new maplibregl.Popup({
+        offset: Math.round(sz / 2) + 6,
+        closeButton: false,
+        closeOnClick: false,
+        maxWidth: '260px',
+        anchor: 'bottom'
+      }).setHTML(
+        '<div style="font-size:12px">' +
+        '<div style="color:' + qcol + ';font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px">' +
+          esc(CL[qi.cat] || qi.cat) + ' &nbsp;·&nbsp; ' + (qi.sev || '').toUpperCase() +
+        '</div>' +
+        '<div style="line-height:1.45;margin-bottom:5px;color:#cde">' + esc((qi.title || '').slice(0, 100)) + '</div>' +
+        '<div style="color:#5a7090;font-size:10px">📍 ' + esc(qi.state + (qi.district ? ', ' + qi.district : '')) + '</div>' +
+        (qi.src === 'citizen'
+          ? '<div style="margin-top:5px;font-size:9px;color:#00ddb8;font-weight:700">🟢 CITIZEN REPORT</div>'
+          : '<div style="margin-top:5px;font-size:9px;color:#4a7090">📰 NEWS FEED</div>') +
+        '</div>'
+      );
+
+      // FIX: show popup on hover, NOT on click — dots never move, tooltip appears above
       qel.addEventListener('mouseenter', function() {
-        qel.style.transform = 'scale(1.8)';
-        qel.style.opacity   = '1';
-        qel.style.zIndex    = '999';
+        qel.style.transform  = 'scale(1.8)';
+        qel.style.opacity    = '1';
+        qel.style.zIndex     = '999';
+        qel.style.boxShadow  = '0 0 ' + (sz * 3) + 'px ' + qcol + '99';
+        popup.setLngLat([qlng, qlat]).addTo(map);
       });
       qel.addEventListener('mouseleave', function() {
-        qel.style.transform = '';
-        qel.style.opacity   = qi.src === 'citizen' ? '1' : '0.6';
-        qel.style.zIndex    = '';
+        qel.style.transform  = '';
+        qel.style.opacity    = qi.src === 'citizen' ? '1' : '0.6';
+        qel.style.zIndex     = '';
+        qel.style.boxShadow  = '0 0 ' + (sz + 3) + 'px ' + qcol + '55';
+        popup.remove();
       });
 
-      var popup = new maplibregl.Popup({ offset: 10, closeButton: false, maxWidth: '240px' })
-        .setHTML(
-          '<div style="font-size:12px">' +
-          '<div style="color:' + qcol + ';font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px">' +
-            esc(CL[qi.cat] || qi.cat) + ' &nbsp;·&nbsp; ' + (qi.sev || '').toUpperCase() +
-          '</div>' +
-          '<div style="line-height:1.45;margin-bottom:5px;color:#cde">' + esc((qi.title || '').slice(0, 90)) + '</div>' +
-          '<div style="color:#5a7090;font-size:10px">📍 ' + esc(qi.state + (qi.district ? ', ' + qi.district : '')) + '</div>' +
-          (qi.src === 'citizen'
-            ? '<div style="margin-top:5px;font-size:9px;color:#00ddb8;font-weight:700">🟢 CITIZEN REPORT</div>'
-            : '<div style="margin-top:5px;font-size:9px;color:#4a7090">📰 NEWS FEED</div>') +
-          '</div>'
-        );
-
-      var mk = new maplibregl.Marker({ element: qel })
-        .setLngLat([coords.lng, coords.lat])
-        .setPopup(popup)
+      var mk = new maplibregl.Marker({ element: qel, anchor: 'center' })
+        .setLngLat([qlng, qlat])
         .addTo(map);
       markerPool.push(mk);
-    })(iss, el, col);
+    })(iss, el, col, coords.lng, coords.lat);  /* pass coords directly into closure */
 
     rendered++;
   }

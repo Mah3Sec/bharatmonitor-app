@@ -10,7 +10,7 @@
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{--bg:#080f1c;--panel:#0c1526;--p2:#101d30;--b1:#182d48;--b2:#1e3a5f;--saf:#FF6B00;--saf2:#cc5200;--grn:#00c853;--sky:#00b8e6;--gld:#ffd700;--red:#ff1744;--tel:#00ddb8;--pur:#a855f7;--tx:#c8d8e8;--mt:#4a6080;--mt2:#2a3f5a;--w:#fff}
 html,body{height:100%;font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--tx);overflow:hidden}
-#app{display:flex;flex-direction:column;height:100vh}
+#app{display:flex;flex-direction:column;height:100vh;overflow:hidden}
 #hdr{height:52px;background:var(--panel);border-bottom:1px solid var(--b1);display:flex;align-items:center;justify-content:space-between;padding:0 14px;flex-shrink:0;z-index:200;gap:10px}
 .logo{font-family:'Baloo 2',cursive;font-weight:800;font-size:19px;color:var(--w);display:flex;align-items:center;gap:6px;white-space:nowrap}
 .logo span{color:var(--saf)}
@@ -153,6 +153,13 @@ html,body{height:100%;font-family:'DM Sans',sans-serif;background:var(--bg);colo
 /* media preview */
 .vwrap{position:relative;padding-top:56.25%;margin-top:7px;border-radius:6px;overflow:hidden}
 .vwrap iframe{position:absolute;top:0;left:0;width:100%;height:100%;border:none}
+
+/* footer */
+#footer{flex-shrink:0;background:var(--panel);border-top:1px solid var(--b1);padding:7px 16px;display:flex;align-items:center;justify-content:space-between;font-size:10px;color:var(--mt);z-index:100}
+#footer a{color:var(--mt);text-decoration:none;transition:color .15s}
+#footer a:hover{color:var(--saf)}
+.fc{display:flex;align-items:center;gap:6px}
+.fgithub{color:var(--mt);font-size:10px;display:flex;align-items:center;gap:4px}
 /* maplibre */
 .maplibregl-popup-content{background:var(--panel)!important;border:1px solid var(--b2)!important;border-radius:8px!important;padding:10px 12px!important;color:var(--tx)!important;font-family:'DM Sans',sans-serif!important;max-width:240px!important}
 .maplibregl-popup-tip{border-top-color:var(--panel)!important}
@@ -290,6 +297,18 @@ html,body{height:100%;font-family:'DM Sans',sans-serif;background:var(--bg);colo
       </div>
     </div>
   </div>
+  <footer id="footer">
+    <div class="fc">
+      <span>🇮🇳 <strong style="color:var(--tx)">BharatMonitor</strong> — India Civic Intelligence</span>
+    </div>
+    <div class="fc" style="gap:12px">
+      <a href="https://chat.whatsapp.com/BvuaVkb3ZY1KuSr7V8wi74" target="_blank" rel="noopener" style="display:flex;align-items:center;gap:4px;color:#25D366">
+        <span>📲</span><span>WhatsApp Community</span>
+      </a>
+      <span style="color:var(--b2)">|</span>
+      <span>Built by <a href="https://github.com/Mah3Sec" target="_blank" rel="noopener" style="color:var(--saf);font-weight:600">Mahendra Purbia</a> <a href="https://github.com/Mah3Sec" target="_blank" rel="noopener" style="color:var(--mt)">(Mah3Sec)</a></span>
+    </div>
+  </footer>
 </div>
 <script src="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.js"></script>
 <script>
@@ -483,7 +502,7 @@ function renderIssues(){
   f.slice(0,100).forEach(function(iss){
     var sel=iss.id===selId,card=document.createElement('div');
     card.className='ic'+(sel?' sel':'');card.setAttribute('data-id',iss.id);
-    if(iss.src==='citizen')card.style.borderLeftColor='var(--tel)';
+    if(iss.src==='citizen')card.style.borderLeftColor='#00ddb8';
     var col=CC[iss.cat]||'#aaa';
     var h='<div class="ir"><div class="it">'+esc(CI[iss.cat]||'📋')+' '+esc(iss.title)+'</div><span class="sv2 s-'+esc(iss.sev)+'">'+esc(iss.sev)+'</span></div>';
     h+='<div class="im"><span>📍 '+esc(iss.state+(iss.district?', '+iss.district:''))+'</span><span>🏛️ '+esc(iss.dept)+'</span><span>'+esc(ago(iss.ts))+'</span>';
@@ -595,16 +614,11 @@ function fetchAllFeeds(){
     var fresh=[];results.forEach(function(r){if(r.status==='fulfilled'&&Array.isArray(r.value))fresh=fresh.concat(r.value);});
     return fresh;
   });
-  Promise.all([rssPromise,ghPromise]).then(function(all){
-    var rssItems=all[0],ghItems=all[1];
-    // Merge: GitHub citizen reports + RSS, deduplicate by ID
+  // Show RSS immediately — don't block on GitHub
+  rssPromise.then(function(rssItems){
     var localReps=loadRep();
     var combined={};
-    // GitHub reports first (source of truth)
-    ghItems.forEach(function(i){combined[i.id]=i;});
-    // Local-only reports not yet on GitHub
-    localReps.forEach(function(i){if(!combined[i.id])combined[i.id]=i;});
-    // RSS
+    localReps.forEach(function(i){combined[i.id]=i;});
     rssItems.forEach(function(i){combined[i.id]=i;});
     issues=Object.values(combined).sort(function(a,b){return b.ts-a.ts;});
     saveSeen(seenKeys);
@@ -613,6 +627,17 @@ function fetchAllFeeds(){
     updateCounters();renderIssues();updateChoropleth();
     addIssueMarkers(issues);
     updateTicker();
+  });
+  // Merge GitHub citizen reports after — non-blocking
+  ghPromise.then(function(ghItems){
+    if(!ghItems.length)return;
+    var changed=false;
+    ghItems.forEach(function(i){
+      if(!issues.find(function(x){return x.id===i.id;})){
+        issues.unshift(i);changed=true;
+      }
+    });
+    if(changed){updateCounters();renderIssues();updateChoropleth();addIssueMarkers(issues);}
   });
 }
 
@@ -663,7 +688,7 @@ document.getElementById('btnSub').addEventListener('click',function(){
     document.getElementById('rForm').style.display='none';
     var s=document.getElementById('rSucc');s.style.display='block';
     var ghSection=r.issueUrl?'<a href="'+esc(r.issueUrl)+'" target="_blank" rel="noopener" style="display:block;padding:8px;background:#6e40c918;border:1px solid #6e40c940;border-radius:7px;color:#a78bfa;font-size:12px;text-decoration:none;margin-bottom:6px">⚙️ Track on GitHub Issues →</a>':'<div style="font-size:11px;color:var(--mt);margin-bottom:8px;padding:8px;background:var(--p2);border-radius:7px">To enable cross-user tracking, add <code style="color:var(--saf)">GITHUB_TOKEN</code> + <code style="color:var(--saf)">GITHUB_REPO</code> to Vercel.</div>';
-    s.innerHTML='<div class="sbox"><div style="font-size:38px;margin-bottom:6px">✅</div><div style="font-family:\'Baloo 2\',cursive;font-weight:700;font-size:16px;color:var(--grn);margin-bottom:3px">Registered!</div><div style="font-family:\'Baloo 2\',cursive;font-weight:800;font-size:20px;color:var(--gld);margin-bottom:10px">'+esc(r.ticket||ticket)+'</div><div class="sgrid"><div class="scel"><div class="scl">Severity</div><span class="sv2 s-'+esc(r.severity||kw.sev)+'">'+esc((r.severity||kw.sev).toUpperCase())+'</span></div><div class="scel"><div class="scl">Dept</div><div style="font-size:10px;color:var(--sky);font-weight:600;line-height:1.3">'+esc(r.department||DEPT[cat])+'</div></div><div class="scel"><div class="scl">SLA</div><div style="font-size:14px;color:var(--gld);font-weight:700">'+(r.sla_hours||48)+'h</div></div><div class="scel"><div class="scl">Status</div><div style="font-size:12px;color:var(--grn);font-weight:600">Active</div></div></div>'+ghSection+'<button class="bts" style="margin-bottom:8px;background:#25D366" onclick="window.open(\'https://wa.me/?text='+wm+'\',\'_blank\')">📲 Escalate on WhatsApp →</button><button class="bse" id="btnVR">📋 View My Reports</button><button class="bse" id="btnAg" style="margin-top:6px">+ Another Issue</button></div>';
+    s.innerHTML='<div class="sbox"><div style="font-size:38px;margin-bottom:6px">✅</div><div style="font-family:\'Baloo 2\',cursive;font-weight:700;font-size:16px;color:var(--grn);margin-bottom:3px">Registered!</div><div style="font-family:\'Baloo 2\',cursive;font-weight:800;font-size:20px;color:var(--gld);margin-bottom:10px">'+esc(r.ticket||ticket)+'</div><div class="sgrid"><div class="scel"><div class="scl">Severity</div><span class="sv2 s-'+esc(r.severity||kw.sev)+'">'+esc((r.severity||kw.sev).toUpperCase())+'</span></div><div class="scel"><div class="scl">Dept</div><div style="font-size:10px;color:var(--sky);font-weight:600;line-height:1.3">'+esc(r.department||DEPT[cat])+'</div></div><div class="scel"><div class="scl">SLA</div><div style="font-size:14px;color:var(--gld);font-weight:700">'+(r.sla_hours||48)+'h</div></div><div class="scel"><div class="scl">Status</div><div style="font-size:12px;color:var(--grn);font-weight:600">Active</div></div></div>'+ghSection+'<button class="bts" style="margin-bottom:8px;background:#25D366" onclick="window.open(\'https://wa.me/?text='+wm+'\',\'_blank\')">📲 Escalate on WhatsApp →</button><a href="https://chat.whatsapp.com/BvuaVkb3ZY1KuSr7V8wi74" target="_blank" rel="noopener" style="display:flex;align-items:center;justify-content:center;gap:6px;padding:9px;background:#25D36615;border:1px solid #25D36640;border-radius:7px;color:#25D366;font-size:12px;font-weight:600;text-decoration:none;margin-bottom:6px">💬 Join BharatMonitor WhatsApp Community</a><button class="bse" id="btnVR">📋 View My Reports</button><button class="bse" id="btnAg" style="margin-top:6px">+ Another Issue</button></div>';
     document.getElementById('btnVR').onclick=function(){document.getElementById('rForm').style.display='block';s.style.display='none';switchTab('mine');};
     document.getElementById('btnAg').onclick=function(){document.getElementById('rForm').style.display='block';s.style.display='none';['rTitle','rDesc','rDist','rName','rPhone','rMedia'].forEach(function(id){document.getElementById(id).value='';});document.getElementById('dc').textContent='0';document.getElementById('mediaPreview').innerHTML='';};
   }
@@ -710,7 +735,7 @@ map.on('load',function(){
 function updateTicker(){
   if(!issues.length)return;
   var iss=issues[tickIdx++%issues.length],el=document.getElementById('tt'),s=document.getElementById('tsrc');
-  el.style.opacity='0';setTimeout(function(){el.textContent=(CI[iss.cat]||'📋')+' '+iss.state+(iss.district?', '+iss.district:'')+' — '+iss.title;s.textContent=iss.src==='citizen'?'🟢 Citizen':'📰 News';el.style.color=iss.src==='citizen'?'var(--tel)':'var(--tx)';el.style.opacity='1';},300);
+  el.style.opacity='0';setTimeout(function(){el.textContent=(CI[iss.cat]||'📋')+' '+iss.state+(iss.district?', '+iss.district:'')+' — '+iss.title;s.textContent=iss.src==='citizen'?'🟢 Citizen':'📰 News';el.style.color=iss.src==='citizen'?'#00ddb8':'#c8d8e8';el.style.opacity='1';},300);
 }
 setInterval(updateTicker,5000);
 setInterval(setLU,30000);

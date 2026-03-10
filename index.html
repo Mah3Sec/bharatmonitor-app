@@ -1215,17 +1215,12 @@ function renderVideos() {
   // Magic: youtube.com/embed/live_stream?channel=ID always plays
   // the channel's CURRENT live stream. No video ID needed.
   var CHANNELS = [
-    { id:'aajtak',     name:'Aaj Tak',      lang:'HI', chId:'UCt4t-jeY85JegMlZ-E5UWuQ', color:'#FF6B00', icon:'🔴' },
-    { id:'ndtv',       name:'NDTV India',   lang:'HI', chId:'UCZFMm1mMw0F81Z37aaEzTUA', color:'#e53935', icon:'🔴' },
-    { id:'abp',        name:'ABP News',     lang:'HI', chId:'UCIvaYmXn9-MK1SbCLUHWBGQ', color:'#1565C0', icon:'🔴' },
-    { id:'zee',        name:'Zee News',     lang:'HI', chId:'UCpgDp9Ym-kLfzqMa0TLHBNw', color:'#6A1B9A', icon:'🔴' },
-    { id:'indiatoday', name:'India Today',  lang:'EN', chId:'UCYPvAwZP8pZhSMW8qs7cVCw', color:'#00838F', icon:'🔴' },
-    { id:'republic',   name:'Republic TV',  lang:'EN', chId:'UCKRQRWtHHGllhO2HvSR9WNw', color:'#BF360C', icon:'🔴' },
-    { id:'indiatv',    name:'India TV',     lang:'HI', chId:'UCRWFSbif-RCIfAHWW7ot8Lg', color:'#2E7D32', icon:'🔴' },
-    { id:'news18',     name:'News18',       lang:'HI', chId:'UC9CYT9gSNbGgMeVL7gqSNsA', color:'#0277BD', icon:'🔴' },
-    { id:'timesnow',   name:'Times Now',    lang:'EN', chId:'UCK9LgPtk8EvWCJWHC0CzVKA', color:'#F57F17', icon:'🔴' },
-    { id:'loksabha',   name:'Lok Sabha TV', lang:'PA', chId:'UCnxnS3sS8OEYu1oLQ-VhTkQ', color:'#1A237E', icon:'🏛️' },
-    { id:'ddnews',     name:'DD News',      lang:'EN', chId:'UCt6M35OdgDlNtBiKHMiMvOg', color:'#004D40', icon:'📺' },
+    { id:'aajtak',     name:'Aaj Tak',           lang:'HI', chId:'UCt4t-jeY85JegMlZ-E5UWtA', color:'#FF6B00', icon:'🔴' },
+    { id:'abp',        name:'ABP News',           lang:'HI', chId:'UCRWFSbif-RFENbBrSiez1DA', color:'#1565C0', icon:'🔴' },
+    { id:'indiatoday', name:'India Today',        lang:'EN', chId:'UCYPvAwZP8pZhSMW8qs7cVCw', color:'#00838F', icon:'🔴' },
+    { id:'firstpost',  name:'Firstpost',          lang:'EN', chId:'UCz8QaiQxApLq8sLNcszYyJw', color:'#BF360C', icon:'🔴' },
+    { id:'timesnownb', name:'Times Now Navbharat',lang:'HI', chId:'UCMk9Tdc-d1BIcAFaSppiVkw', color:'#F57F17', icon:'🔴' },
+    { id:'cnbctv18',   name:'CNBC-TV18',          lang:'EN', chId:'UCmRbHAgG2k2vDUvb3xsEunQ', color:'#0277BD', icon:'📈' },
   ];
 
   var activeIdx = 0;

@@ -395,10 +395,8 @@ html,body{height:100%;font-family:-apple-system, BlinkMacSystemFont, system-ui, 
 
       <!-- VIDEOS TAB -->
       <div class="tpn" id="panel-videos">
-        <div id="vp">
-          <div id="vContent">
-            <div style="text-align:center;padding:20px;color:var(--mt);font-size:12px">&#128250; Loading news &amp; videos...</div>
-          </div>
+        <div id="vContent" style="display:flex;flex-direction:column;flex:1;min-height:0;overflow:hidden">
+          <div style="text-align:center;padding:20px;color:var(--mt);font-size:12px">&#128250; Loading news &amp; videos...</div>
         </div>
       </div>
     </div>
@@ -1292,166 +1290,117 @@ var videosLoaded = false;
 function renderVideos() {
   if (videosLoaded) return;
   videosLoaded = true;
-
   var el = document.getElementById('vContent');
 
-  // ── CHANNELS ─────────────────────────────────────────────────────
-  // Magic: youtube.com/embed/live_stream?channel=ID always plays
-  // the channel's CURRENT live stream. No video ID needed.
+  // ── Channel list — 8 channels, all playable simultaneously ──────
   var CHANNELS = [
-    { id:'aajtak',     name:'Aaj Tak',           lang:'HI', chId:'UCt4t-jeY85JegMlZ-E5UWtA', color:'#FF6B00', icon:'🔴' },
-    { id:'abp',        name:'ABP News',           lang:'HI', chId:'UCRWFSbif-RFENbBrSiez1DA', color:'#1565C0', icon:'🔴' },
-    { id:'indiatoday', name:'India Today',        lang:'EN', chId:'UCYPvAwZP8pZhSMW8qs7cVCw', color:'#00838F', icon:'🔴' },
-    { id:'firstpost',  name:'Firstpost',          lang:'EN', chId:'UCz8QaiQxApLq8sLNcszYyJw', color:'#BF360C', icon:'🔴' },
-    { id:'timesnownb', name:'Times Now Navbharat',lang:'HI', chId:'UCMk9Tdc-d1BIcAFaSppiVkw', color:'#F57F17', icon:'🔴' },
-    { id:'cnbctv18',   name:'CNBC-TV18',          lang:'EN', chId:'UCmRbHAgG2k2vDUvb3xsEunQ', color:'#0277BD', icon:'📈' },
+    { id:'abp',        name:'ABP News',            lang:'HI', chId:'UCRWFSbif-RFENbBrSiez1DA', color:'#1565C0' },
+    { id:'indiatoday', name:'India Today',          lang:'EN', chId:'UCYPvAwZP8pZhSMW8qs7cVCw', color:'#00838F' },
+    { id:'firstpost',  name:'Firstpost',            lang:'EN', chId:'UCz8QaiQxApLq8sLNcszYyJw', color:'#BF360C' },
+    { id:'zee',        name:'Zee News',             lang:'HI', chId:'UCIvaYmXn910QMdemBG3v1pQ', color:'#7B1FA2' },
+    { id:'toi',        name:'Times of India',       lang:'EN', chId:'UCckHqySbfy5FcPP6MD_S-Yg', color:'#C62828' },
+    { id:'aajtak',     name:'Aaj Tak',              lang:'HI', chId:'UCt4t-jeY85JegMlZ-E5UWtA', color:'#FF6B00' },
+    { id:'timesnownb', name:'Times Now Navbharat',  lang:'HI', chId:'UCMk9Tdc-d1BIcAFaSppiVkw', color:'#F57F17' },
+    { id:'cnbctv18',   name:'CNBC-TV18',            lang:'EN', chId:'UCmRbHAgG2k2vDUvb3xsEunQ', color:'#0277BD' },
   ];
 
-  var activeIdx = 0;
-  var ytPlayer = null;
-  var ytReady = false;
+  // Track which windows are currently playing
+  var playing = {};
 
   function buildUI() {
     var html = '';
 
-    // ── Tab bar ───────────────────────────────────────────────────
-    html += '<div id="liveTabs" style="display:flex;gap:4px;flex-wrap:wrap;padding:8px 8px 0;background:var(--p2);border-bottom:1px solid var(--b1)">';
+    // ── Header bar ────────────────────────────────────────────────
+    html += '<div style="display:flex;align-items:center;justify-content:space-between;padding:8px 12px;background:var(--p2);border-bottom:1px solid var(--b1);flex-shrink:0">';
+    html += '<div style="display:flex;align-items:center;gap:6px">';
+    html += '<span style="background:#ff1744;border-radius:3px;padding:2px 7px;font-size:9px;font-weight:700;letter-spacing:1px;color:#fff;animation:pu 1.5s infinite">● LIVE</span>';
+    html += '<span style="font-size:12px;font-weight:700;color:var(--tx)">' + CHANNELS.length + ' News Channels</span>';
+    html += '<span style="font-size:10px;color:var(--mt)">— Click any window to play</span>';
+    html += '</div>';
+    html += '<button id="playAllBtn" onclick="playAll()" style="font-size:10px;padding:4px 10px;background:var(--saf);color:#fff;border:none;border-radius:5px;cursor:pointer;font-weight:700">▶ Play All</button>';
+    html += '</div>';
+
+    // ── Grid of channel windows ───────────────────────────────────
+    html += '<div id="newsGrid" style="display:grid;grid-template-columns:1fr 1fr;gap:6px;padding:8px;overflow-y:auto;flex:1;min-height:0">';
+
     for (var i = 0; i < CHANNELS.length; i++) {
       var ch = CHANNELS[i];
-      html += '<button class="ltab" data-idx="' + i + '" style="'
-        + 'font-size:10px;padding:4px 9px;border-radius:4px 4px 0 0;border:1px solid var(--b1);'
-        + 'border-bottom:none;cursor:pointer;white-space:nowrap;font-family:-apple-system, BlinkMacSystemFont, system-ui, Roboto, Arial, sans-serif;font-weight:700;'
-        + 'background:var(--panel);color:var(--mt);transition:all .15s'
-        + '" data-color="' + ch.color + '">'
-        + '<span style="color:' + ch.color + ';font-size:8px;vertical-align:middle;margin-right:3px">●</span>'
-        + esc(ch.name)
-        + '<span style="margin-left:4px;font-size:8px;opacity:.6">' + ch.lang + '</span>'
-        + '</button>';
+      html += '<div class="newsWin" id="win-' + ch.id + '" style="'
+        + 'background:#050d1a;border:1px solid ' + ch.color + '55;border-radius:8px;'
+        + 'overflow:hidden;position:relative;display:flex;flex-direction:column'
+        + '">';
+
+      // Channel header strip
+      html += '<div style="display:flex;align-items:center;gap:5px;padding:4px 7px;background:' + ch.color + '18;border-bottom:1px solid ' + ch.color + '30;flex-shrink:0">';
+      html += '<span style="width:6px;height:6px;border-radius:50%;background:' + ch.color + ';flex-shrink:0;animation:pu 1.5s infinite"></span>';
+      html += '<span style="font-size:9px;font-weight:700;color:' + ch.color + ';flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">' + esc(ch.name) + '</span>';
+      html += '<span style="font-size:7px;color:#3a5060;font-weight:600">' + ch.lang + '</span>';
+      html += '<a href="https://youtube.com/@' + ch.id + '/streams" target="_blank" rel="noopener" '
+        + 'style="font-size:8px;color:var(--mt);text-decoration:none;opacity:.6;flex-shrink:0" '
+        + 'onclick="event.stopPropagation()">↗</a>';
+      html += '</div>';
+
+      // Video area — 16:9
+      html += '<div style="position:relative;padding-top:56.25%;background:#000;flex-shrink:0">';
+
+      // Placeholder (shown before click)
+      html += '<div id="ph-' + ch.id + '" class="winPh" data-id="' + ch.id + '" data-chid="' + ch.chId + '" '
+        + 'style="position:absolute;top:0;left:0;width:100%;height:100%;display:flex;flex-direction:column;'
+        + 'align-items:center;justify-content:center;gap:6px;cursor:pointer;background:#040b16">';
+      html += '<div style="width:34px;height:34px;border-radius:50%;background:' + ch.color + ';display:flex;align-items:center;justify-content:center;font-size:14px">▶</div>';
+      html += '<div style="font-size:9px;color:#4a6080;text-align:center;line-height:1.4">Click to watch live</div>';
+      html += '</div>';
+
+      // iFrame slot (empty until clicked)
+      html += '<div id="fr-' + ch.id + '" style="position:absolute;top:0;left:0;width:100%;height:100%;display:none"></div>';
+      html += '</div>'; // end video area
+
+      html += '</div>'; // end newsWin
     }
-    html += '</div>';
 
-    // ── Player area ───────────────────────────────────────────────
-    html += '<div style="position:relative;width:100%;padding-top:56.25%;background:#000">';
-    html += '<div id="ytPlayerWrap" style="position:absolute;top:0;left:0;width:100%;height:100%">';
-    // Click-to-play placeholder shown before YT API loads
-    html += '<div id="ytPlaceholder" style="width:100%;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;cursor:pointer;background:#080f1c" data-idx="0">';
-    html += '<div style="width:60px;height:60px;border-radius:50%;background:#FF6B00;display:flex;align-items:center;justify-content:center;font-size:24px">▶</div>';
-    html += '<div style="color:#c8d8e8;font-size:13px" id="ytPlaceholderLabel">' + esc(CHANNELS[0].name) + ' — Click to watch live</div>';
-    html += '<div style="color:#506070;font-size:10px">Powered by YouTube IFrame API</div>';
-    html += '</div>';
-    html += '<div id="yt-player" style="width:100%;height:100%;display:none"></div>';
-    html += '</div>';
+    html += '</div>'; // end grid
 
-    // LIVE badge
-    html += '<div id="ytLiveBadge" style="display:none;position:absolute;top:10px;left:10px;z-index:10;background:#ff1744;border-radius:3px;padding:2px 8px;font-size:9px;font-weight:700;letter-spacing:1px;color:#fff">● LIVE</div>';
-    html += '</div>';
-
-    // ── Channel info strip ────────────────────────────────────────
-    html += '<div id="ytChannelInfo" style="padding:8px 12px;background:var(--p2);border-bottom:1px solid var(--b1);display:flex;align-items:center;gap:8px">';
-    html += '<div id="ytChDot" style="width:8px;height:8px;border-radius:50%;background:' + CHANNELS[0].color + ';animation:pu 1.5s infinite;flex-shrink:0"></div>';
-    html += '<div id="ytChName" style="font-family:-apple-system, BlinkMacSystemFont, system-ui, Roboto, Arial, sans-serif;font-weight:700;font-size:13px;color:var(--tx)">' + esc(CHANNELS[0].name) + '</div>';
-    html += '<div style="color:var(--mt);font-size:10px">24/7 Live Stream &mdash; via YouTube</div>';
-    html += '<a id="ytChLink" href="https://youtube.com/channel/' + CHANNELS[0].chId + '/live" target="_blank" rel="noopener" style="margin-left:auto;font-size:10px;color:var(--saf);text-decoration:none">Open on YouTube ↗</a>';
-    html += '</div>';
-
-    // ── Info notice ───────────────────────────────────────────────
-    html += '<div style="padding:6px 12px;font-size:10px;color:#506070;background:var(--p2);line-height:1.5">';
-    html += '💡 If a channel shows "Sign in to confirm" — open it on YouTube directly using the link above. YouTube occasionally bot-checks embedded streams.';
+    // ── Notice ────────────────────────────────────────────────────
+    html += '<div style="padding:5px 12px;font-size:9.5px;color:#3a5060;background:var(--p2);border-top:1px solid var(--b1);flex-shrink:0;line-height:1.5">';
+    html += '💡 YouTube may ask "Sign in to confirm age" for some streams — click ↗ to open directly on YouTube.';
     html += '</div>';
 
     el.innerHTML = html;
 
-    // Wire tabs
-    el.querySelectorAll('.ltab').forEach(function(btn) {
-      btn.addEventListener('click', function() {
-        switchChannel(parseInt(this.getAttribute('data-idx')));
+    // Wire placeholder clicks
+    el.querySelectorAll('.winPh').forEach(function(ph) {
+      ph.addEventListener('click', function() {
+        loadWindow(this.getAttribute('data-id'), this.getAttribute('data-chid'));
       });
     });
-
-    // Wire placeholder click
-    document.getElementById('ytPlaceholder').addEventListener('click', function() {
-      loadYTApi(parseInt(this.getAttribute('data-idx')));
-    });
-
-    setActiveTab(0);
   }
 
-  function setActiveTab(idx) {
-    document.querySelectorAll('.ltab').forEach(function(btn, i) {
-      var col = btn.getAttribute('data-color');
-      if (i === idx) {
-        btn.style.background = col;
-        btn.style.color = '#fff';
-        btn.style.borderColor = col;
-      } else {
-        btn.style.background = 'var(--panel)';
-        btn.style.color = 'var(--mt)';
-        btn.style.borderColor = 'var(--b1)';
-      }
-    });
-    var ch = CHANNELS[idx];
-    var dot = document.getElementById('ytChDot');
-    var nm  = document.getElementById('ytChName');
-    var lk  = document.getElementById('ytChLink');
-    if (dot) dot.style.background = ch.color;
-    if (nm)  nm.textContent = ch.name;
-    if (lk)  { lk.href = 'https://youtube.com/channel/' + ch.chId + '/live'; }
-  }
-
-  function switchChannel(idx) {
-    activeIdx = idx;
-    setActiveTab(idx);
-    var ch = CHANNELS[idx];
-
-    if (ytReady && ytPlayer) {
-      // Load new channel live stream
-      var url = 'https://www.youtube.com/embed/live_stream?channel=' + ch.chId
-        + '&autoplay=1&rel=0&modestbranding=1&enablejsapi=1';
-      ytPlayer.loadVideoByUrl({ mediaContentUrl: url });
-      showPlayer();
-    } else if (document.getElementById('yt-player').style.display !== 'none') {
-      // Reload iframe directly
-      loadPlayerIframe(idx);
-    } else {
-      // Update placeholder
-      var ph = document.getElementById('ytPlaceholder');
-      var lb = document.getElementById('ytPlaceholderLabel');
-      if (ph) ph.setAttribute('data-idx', idx);
-      if (lb) lb.textContent = ch.name + ' \u2014 Click to watch live';
-    }
-  }
-
-  function showPlayer() {
-    var ph = document.getElementById('ytPlaceholder');
-    var yt = document.getElementById('yt-player');
-    var badge = document.getElementById('ytLiveBadge');
-    if (ph) ph.style.display = 'none';
-    if (yt) yt.style.display = 'block';
-    if (badge) badge.style.display = 'block';
-  }
-
-  function loadPlayerIframe(idx) {
-    var ch = CHANNELS[idx];
-    var wrap = document.getElementById('ytPlayerWrap');
-    if (!wrap) return;
-    var src = 'https://www.youtube.com/embed/live_stream?channel=' + ch.chId
+  // Load iframe into a window
+  function loadWindow(id, chId) {
+    if (playing[id]) return;
+    playing[id] = true;
+    var ph = document.getElementById('ph-' + id);
+    var fr = document.getElementById('fr-' + id);
+    if (!ph || !fr) return;
+    ph.style.display = 'none';
+    fr.style.display = 'block';
+    var src = 'https://www.youtube.com/embed/live_stream?channel=' + chId
       + '&autoplay=1&rel=0&modestbranding=1';
-    wrap.innerHTML = '<iframe src="' + src + '" style="width:100%;height:100%;border:none;position:absolute;top:0;left:0"'
-      + ' allow="autoplay;fullscreen;encrypted-media" allowfullscreen></iframe>';
-    var badge = document.getElementById('ytLiveBadge');
-    if (badge) badge.style.display = 'block';
+    fr.innerHTML = '<iframe src="' + src + '" style="width:100%;height:100%;border:none"'
+      + ' allow="autoplay;encrypted-media;fullscreen" allowfullscreen></iframe>';
   }
 
-  function loadYTApi(idx) {
-    activeIdx = idx;
-    // Try direct iframe first — simpler & works in most cases
-    loadPlayerIframe(idx);
-    showPlayer();
-  }
+  // Expose playAll globally
+  window.playAll = function() {
+    for (var i = 0; i < CHANNELS.length; i++) {
+      loadWindow(CHANNELS[i].id, CHANNELS[i].chId);
+    }
+    var btn = document.getElementById('playAllBtn');
+    if (btn) { btn.textContent = '⏸ All Playing'; btn.style.background = '#2a5040'; }
+  };
 
   buildUI();
 }
-
 
 // ── TABS ──────────────────────────────────────────────────────────
 function switchTab(t) {

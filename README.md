@@ -1,175 +1,108 @@
 # 🇮🇳 BharatMonitor
 
-**Real-time India civic issue intelligence dashboard** — Track roads, water, power, health, and corruption issues across all 36 states and union territories.
+> A real-time civic issue tracker for India — built so citizens can report, track and escalate public service failures across all 36 states and UTs.
 
-Inspired by [WorldMonitor](https://worldmonitor.app). Built for India.
+**Live site:** https://bharatmonitor-app.vercel.app
+**Public issue board:** https://github.com/Mah3Sec/bharatmonitor-issues
+**WhatsApp Community:** https://chat.whatsapp.com/BvuaVkb3ZY1KuSr7V8wi74
 
-[![Live Demo](https://img.shields.io/badge/Live%20Demo-bharatmonitor.vercel.app-orange?style=flat)](https://bharatmonitor.vercel.app)
-[![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](https://opensource.org/licenses/MIT)
-
-![BharatMonitor Screenshot](./public/screenshot.png)
-
----
-
-## What It Does
-
-| Feature | Details |
-|---|---|
-| 🗺️ **India Choropleth Map** | All 28 states + 8 UTs color-coded by issue severity using real GeoJSON |
-| ⚠️ **Live Issue Feed** | Filterable feed across 5 categories with citizen reports |
-| 🤖 **AI Analysis** | Claude AI analyzes any issue — root cause, action steps, responsible authority |
-| 📝 **Citizen Reporting** | Submit civic issues → AI classifies severity and routes to correct department |
-| 📡 **RSS Ingestion** | Pulls from 12 real Indian news feeds via proxied edge functions |
-| 🔄 **Hybrid Classification** | Keyword classifier (instant) + LLM override (async), same pattern as WorldMonitor |
+Built by [Mahendra Purbia](https://github.com/Mah3Sec) · MIT License
 
 ---
 
-## Quick Start
+## Overview
 
-```bash
-git clone https://github.com/YOUR_USERNAME/bharatmonitor.git
-cd bharatmonitor
-npm install
-npm run dev
-```
-
-Open http://localhost:5173
-
-> **Note:** The map and issue feed work without any API keys. AI features require `ANTHROPIC_API_KEY`.
+BharatMonitor aggregates real-time civic news from Indian RSS feeds and lets citizens submit their own issue reports. Every submission creates a public GitHub Issue as a trackable ticket — visible to all visitors on the live feed, not just the person who reported it. The site includes a clickable India map, category filters, AI-powered issue analysis, a news/video panel, and a WhatsApp community for discussion.
 
 ---
 
-## Tech Stack
+## Features
 
-| Layer | Technology |
-|---|---|
-| Frontend | TypeScript + Vite |
-| Map | MapLibre GL (WebGL, open-source) |
-| AI | Claude claude-sonnet-4-20250514 (analysis) + claude-haiku-4-5-20251001 (classification) |
-| API | Vercel Edge Functions |
-| Data | 12 Indian RSS feeds + citizen reports |
-| Hosting | Vercel (free tier) |
+- **Live Feed** — real-time civic news from 11 RSS sources (Google News civic queries, PIB India, Reddit r/india), filtered by category and state
+- **Citizen Reports** — anyone can submit an issue; it gets a ticket number (e.g. `BM-26-52602`) and appears publicly for all users
+- **India Map** — clickable choropleth map showing issue density by state, with dot markers for individual reports
+- **Issue Analysis** — AI analysis using Claude Haiku (falls back to keyword analysis if no API key)
+- **📺 News Tab** — Government TV channels (Lok Sabha TV, DD News, Rajya Sabha TV), civic YouTube search links, trusted news portals
+- **WhatsApp** — share ticket to community or escalate directly
+- **Admin Panel** — hidden password-protected panel to remove spam (click footer 5× to open)
+- **Responsive** — works on mobile, tablet, and desktop
+
+---
+
+## Limitations
+
+- No user accounts or login of any kind
+- No real Twitter/X or Instagram integration (their APIs require paid access)
+- WhatsApp messages must be sent manually — no automated govt routing
+- Map markers use state centroid + random offset, not real GPS coordinates
+- News filter is keyword-based and not perfect
 
 ---
 
 ## Project Structure
 
 ```
-bharatmonitor/
-├── index.html              # Entry point
-├── src/
-│   ├── main.ts             # App logic, UI, event handlers
-│   ├── map.ts              # MapLibre GL map + choropleth
-│   ├── style.css           # All styles
-│   ├── types.ts            # TypeScript types
-│   ├── lib/
-│   │   └── classifier.ts   # Keyword + LLM hybrid classifier
-│   └── data/
-│       ├── states.ts       # All 36 states + UTs data
-│       ├── feeds.ts        # RSS feed definitions + keywords
-│       └── issues.ts       # Demo issues (pre-RSS load)
-├── api/
-│   ├── classify.ts         # Edge function: AI issue classification
-│   └── rss.ts              # Edge function: RSS proxy (CORS safe)
-├── data/                   # Static data files
-├── docs/                   # Documentation
-├── public/                 # Static assets
+bharatmonitor-app/
+├── index.html            # Full frontend — single file, no framework
 ├── package.json
 ├── tsconfig.json
-└── vite.config.ts
+├── vercel.json
+└── api/
+    ├── rss.ts            # RSS proxy with domain allowlist
+    ├── submit.ts         # Creates GitHub Issue on every report
+    ├── issues.ts         # Reads open GitHub Issues for public feed
+    ├── analyze.ts        # AI or keyword issue analysis
+    ├── classify.ts       # Severity + department classifier
+    └── admin.ts          # Close/remove issues (password protected)
 ```
 
 ---
 
-## Deploy to Vercel (Free)
+## Environment Variables
+
+| Variable | Required | Description |
+|---|---|---|
+| `GITHUB_TOKEN` | ✅ Yes | Fine-grained PAT — Issues: Read & Write |
+| `GITHUB_REPO` | ✅ Yes | e.g. `Mah3Sec/bharatmonitor-issues` |
+| `ADMIN_PASSWORD` | ✅ Yes | Password for hidden admin panel |
+| `ANTHROPIC_API_KEY` | ⬜ Optional | Claude Haiku for AI analysis |
+
+Without `GITHUB_TOKEN` + `GITHUB_REPO` citizen reports only save locally in the reporter's browser and are not visible to other users.
+
+---
+
+## Deploy
 
 ```bash
-npm install -g vercel
-vercel
+# 1. Fork this repo
+# 2. Create a public GitHub repo for tickets e.g. yourname/bharatmonitor-issues
+# 3. Generate a GitHub fine-grained PAT with Issues: Read & Write on that repo
+# 4. Deploy
+vercel --prod
+
+# 5. Add env vars in Vercel Dashboard → Settings → Environment Variables
+# 6. Redeploy after adding env vars
 ```
 
-Set environment variable:
-```
-ANTHROPIC_API_KEY=sk-ant-...
-```
+---
 
-That's it. Your BharatMonitor instance is live.
+## Tech Stack
+
+| | |
+|---|---|
+| Frontend | Vanilla JS + HTML + CSS, single file |
+| Map | MapLibre GL v4.7 + CartoDB dark tiles |
+| Backend | Vercel Edge Functions (TypeScript) |
+| Ticket database | GitHub Issues (free, public) |
+| News sources | Google News RSS + Reddit RSS |
+| AI | Anthropic Claude Haiku (optional) |
+| Hosting | Vercel free tier |
 
 ---
 
-## Deploy to GitHub Pages (Static only, no AI API)
+## Moderation
 
-```bash
-npm run build
-# Push dist/ folder contents to gh-pages branch
-```
+Close any spam report in two ways:
 
-> Map and issue feed work without API key. AI analysis requires Vercel deployment.
-
----
-
-## Data Sources
-
-### Government (Official)
-- NHAI — Road infrastructure updates
-- Jal Shakti / DOWR — Water ministry releases
-- MoPNG — Power & gas updates
-- MoHFW — Health ministry alerts
-- CBI — Anti-corruption case updates
-
-### News (Tier 1/2)
-- The Hindu, Times of India — General civic news
-- The Wire, The Print — Governance & policy
-- Economic Times Energy — Power sector
-
-### Citizens
-- In-app report form → AI classified + routed
-
----
-
-## How Issue Classification Works
-
-Same hybrid approach as WorldMonitor:
-
-1. **Keyword classifier** (instant, no API) — pattern-matches ~80 civic keywords, returns severity + category immediately
-2. **LLM classifier** (async, Claude Haiku) — fires in background, overrides keyword result only if more confident
-3. UI shows keyword result instantly. LLM result updates within ~1 second.
-
----
-
-## Roadmap
-
-- [ ] Hindi + 10 regional language support
-- [ ] WhatsApp bot for citizen reporting  
-- [ ] Real-time CPGRAMS API integration
-- [ ] Twitter/X scraping for issue detection
-- [ ] Historical trend charts per state
-- [ ] Mobile-optimized PWA
-- [ ] Government department notification system
-- [ ] Docker self-hosted image
-
----
-
-## Contributing
-
-PRs welcome! Especially for:
-- Adding more Indian RSS feeds
-- Improving state GeoJSON accuracy
-- Hindi UI translation
-- New issue categories
-
----
-
-## License
-
-MIT License — free to use, modify, and deploy.
-
----
-
-## Author
-
-Built with ❤️ for India. If this helps even one civic problem get solved faster, it's worth it.
-
----
-
-*"Jan Bhagidari — Citizen Participation"*
+1. Go to `github.com/Mah3Sec/bharatmonitor-issues` → open the issue → click **Close issue**. It disappears from the website within 60 seconds.
+2. On the website — click the footer **5 times quickly** → enter admin password → **🚫 Spam** or **🗑️ Remove** buttons appear on each citizen report card.

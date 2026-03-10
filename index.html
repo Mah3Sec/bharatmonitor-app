@@ -1024,23 +1024,30 @@ function addIssueMarkers(issList) {
                   : iss.sev === 'critical'  ? 11
                   : iss.sev === 'high'      ? 9 : 7;
 
+    // CRITICAL: MapLibre applies its own transform:translate(X,Y) to the marker element
+    // for positioning. If we apply scale() to that same element, it OVERWRITES the
+    // translate and the dot flies to 0,0 (top-right corner).
+    // Solution: outer wrapper = positioning only (MapLibre owns this transform)
+    //           inner dot     = visual only (we scale this, never the outer)
     var el = document.createElement('div');
-    el.style.cssText = [
-      'width:'  + sz + 'px',
-      'height:' + sz + 'px',
+    el.style.cssText = 'width:' + sz + 'px;height:' + sz + 'px;cursor:pointer';
+
+    var dot = document.createElement('div');
+    dot.style.cssText = [
+      'width:100%',
+      'height:100%',
       'border-radius:50%',
       'background:' + col,
       'border:' + (isCitizen ? '2px solid rgba(255,255,255,0.55)' : '1px solid ' + col + '70'),
       'box-shadow:0 0 ' + (sz + 3) + 'px ' + col + '55',
-      'cursor:pointer',
       'opacity:' + (isCitizen ? '1' : '0.6'),
-      'transform-origin:center center',         /* FIX: scale from center so dot stays in place */
+      'transform-origin:center center',
       'transition:transform .15s,opacity .15s,box-shadow .15s'
     ].join(';');
-    if (isNew && isCitizen) el.className = 'marker-new';
+    if (isNew && isCitizen) dot.className = 'marker-new';
+    el.appendChild(dot);
 
-    (function(qi, qel, qcol, qlng, qlat) {
-      // Popup — created once per marker, shown on hover not click
+    (function(qi, qwrap, qdot, qcol, qlng, qlat) {
       var popup = new maplibregl.Popup({
         offset: Math.round(sz / 2) + 6,
         closeButton: false,
@@ -1060,27 +1067,27 @@ function addIssueMarkers(issList) {
         '</div>'
       );
 
-      // FIX: show popup on hover, NOT on click — dots never move, tooltip appears above
-      qel.addEventListener('mouseenter', function() {
-        qel.style.transform  = 'scale(1.8)';
-        qel.style.opacity    = '1';
-        qel.style.zIndex     = '999';
-        qel.style.boxShadow  = '0 0 ' + (sz * 3) + 'px ' + qcol + '99';
+      // Scale the INNER dot only — outer wrapper transform (MapLibre positioning) untouched
+      qwrap.addEventListener('mouseenter', function() {
+        qdot.style.transform = 'scale(1.8)';
+        qdot.style.opacity   = '1';
+        qdot.style.boxShadow = '0 0 ' + (sz * 3) + 'px ' + qcol + '99';
+        qwrap.style.zIndex   = '999';
         popup.setLngLat([qlng, qlat]).addTo(map);
       });
-      qel.addEventListener('mouseleave', function() {
-        qel.style.transform  = '';
-        qel.style.opacity    = qi.src === 'citizen' ? '1' : '0.6';
-        qel.style.zIndex     = '';
-        qel.style.boxShadow  = '0 0 ' + (sz + 3) + 'px ' + qcol + '55';
+      qwrap.addEventListener('mouseleave', function() {
+        qdot.style.transform = '';
+        qdot.style.opacity   = qi.src === 'citizen' ? '1' : '0.6';
+        qdot.style.boxShadow = '0 0 ' + (sz + 3) + 'px ' + qcol + '55';
+        qwrap.style.zIndex   = '';
         popup.remove();
       });
 
-      var mk = new maplibregl.Marker({ element: qel, anchor: 'center' })
+      var mk = new maplibregl.Marker({ element: qwrap, anchor: 'center' })
         .setLngLat([qlng, qlat])
         .addTo(map);
       markerPool.push(mk);
-    })(iss, el, col, coords.lng, coords.lat);  /* pass coords directly into closure */
+    })(iss, el, dot, col, coords.lng, coords.lat);
 
     rendered++;
   }

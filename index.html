@@ -967,13 +967,14 @@ function renderIssues() {
 var markerPool = [];
 
 function spiralOffset(index, total) {
-  // Place dots in a tight outward spiral around the centre point
-  if (total === 1 || index === 0) return { dlat: 0, dlng: 0 };
-  var angle = index * 2.4; // golden-angle-ish spread
-  var radius = 0.018 * Math.ceil(index / 6); // grows every 6 dots
+  if (index === 0) return { dlat: 0, dlng: 0 };
+  // Sunflower / Fermat spiral — evenly spaces any number of dots
+  // radius grows with sqrt(index) so outer rings fill in nicely
+  var angle = index * 2.3999; // ~137.5° golden angle in radians
+  var radius = 0.055 * Math.sqrt(index); // 0.055° ≈ 6 km per step
   return {
     dlat: Math.sin(angle) * radius,
-    dlng: Math.cos(angle) * radius
+    dlng: Math.cos(angle) * radius * 1.4 // wider lng spread (India is wider than tall)
   };
 }
 
@@ -982,42 +983,59 @@ function addIssueMarkers(issList) {
   markerPool.forEach(function(m){ m.remove(); });
   markerPool = [];
 
-  // Filter: citizen always shown; RSS only if we matched a real city
+  // Filter: citizen always shown; RSS only if title mentions a known city
   var eligible = issList.filter(function(iss) {
     if (iss.src === 'citizen') return true;
     var city = extractCityFromText((iss.title || '') + ' ' + (iss.state || ''));
     return city && DC[city];
   });
 
-  // Build base coords for each issue
-  var withCoords = [];
-  for (var i = 0; i < eligible.length; i++) {
-    var coords = issueCoords(eligible[i]);
-    if (coords) withCoords.push({ iss: eligible[i], lat: coords.lat, lng: coords.lng });
-  }
-
-  // Group by rounded position key (0.05° ≈ 5 km grid)
+  // ── Group by location name (state + district) ──────────────────
+  // This is the key fix: group by NAME not by coords.
+  // stableOffset makes every coord unique so coord-based grouping
+  // always gives groups of 1 → spiral never fires → all dots stack.
   var groups = {};
-  for (var j = 0; j < withCoords.length; j++) {
-    var item = withCoords[j];
-    var key = (Math.round(item.lat / 0.05) * 0.05).toFixed(2) + ',' + (Math.round(item.lng / 0.05) * 0.05).toFixed(2);
-    if (!groups[key]) groups[key] = [];
-    groups[key].push(item);
+  for (var i = 0; i < eligible.length; i++) {
+    var iss0 = eligible[i];
+    // Get the BASE coords (centroid only, no per-issue offset)
+    var baseCoords = null;
+    if (iss0.lat && iss0.lng) {
+      baseCoords = { lat: +iss0.lat, lng: +iss0.lng };
+    } else if (iss0.district) {
+      var dc0 = getDistrictCoords(iss0.district, iss0.state);
+      if (dc0) baseCoords = { lat: dc0.lat, lng: dc0.lng };
+    }
+    if (!baseCoords && iss0.src !== 'citizen') {
+      var city0 = extractCityFromText((iss0.title || '') + ' ' + (iss0.state || ''));
+      if (city0 && DC[city0]) baseCoords = { lat: DC[city0].lt, lng: DC[city0].lg };
+    }
+    if (!baseCoords) {
+      var sc0 = SC[iss0.state];
+      if (sc0) baseCoords = { lat: sc0.lt, lng: sc0.lg };
+    }
+    if (!baseCoords) continue;
+
+    // Group key = district name OR state name (same place = same group)
+    var gKey = (iss0.district && iss0.district.length > 1)
+      ? (iss0.state || '') + '|' + iss0.district
+      : (iss0.state || 'India');
+    if (!groups[gKey]) groups[gKey] = { base: baseCoords, items: [] };
+    groups[gKey].items.push(iss0);
   }
 
-  // Render each group with spiral offsets
+  // ── Render each group with spiral offsets ──────────────────────
   var rendered = 0;
   var keys = Object.keys(groups);
   for (var k = 0; k < keys.length; k++) {
     var grp = groups[keys[k]];
-    var total = grp.length;
-    for (var m = 0; m < grp.length; m++) {
-      if (rendered >= 250) break;
-      var item2 = grp[m];
-      var iss = item2.iss;
+    var total = grp.items.length;
+    var base = grp.base;
+    for (var m = 0; m < total; m++) {
+      if (rendered >= 300) break;
+      var iss = grp.items[m];
       var off = spiralOffset(m, total);
-      var lat = item2.lat + off.dlat;
-      var lng = item2.lng + off.dlng;
+      var lat = base.lat + off.dlat;
+      var lng = base.lng + off.dlng;
 
       var isCitizen = iss.src === 'citizen';
       var isNew = (Date.now() - (iss.ts || 0)) < 300000;
@@ -1071,10 +1089,10 @@ function addIssueMarkers(issList) {
           .addTo(map);
       })(iss, el, col);
 
-      markerPool.push({ remove: function(){} }); // track count only
+      markerPool.push({ remove: function(){} });
       rendered++;
     }
-    if (rendered >= 250) break;
+    if (rendered >= 300) break;
   }
 }
 

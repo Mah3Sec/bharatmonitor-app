@@ -800,12 +800,30 @@ function fetchAllFeeds() {
       return fresh;
     });
 
-  // Show RSS first immediately
+  // Load GitHub citizen issues FIRST — they are public for all users
+  ghPromise.then(function(ghItems) {
+    if (ghItems.length) {
+      var openIds = {};
+      ghItems.forEach(function(i){ openIds[i.id] = true; });
+      var combined = {};
+      // Start with local reports
+      loadRep().forEach(function(i){ combined[i.id] = i; });
+      // Add GitHub issues (overwrite local copies)
+      ghItems.forEach(function(i){ combined[i.id] = i; });
+      issues = Object.values(combined).sort(function(a, b){ return b.ts - a.ts; });
+      updateCounters(); renderIssues(); updateChoropleth(); addIssueMarkers(issues);
+      document.getElementById('cc').style.color = '#00ddb8';
+    }
+  });
+
+  // Then show RSS news and merge everything together
   rssPromise.then(function(rssItems) {
     var localReps = loadRep();
     var combined = {};
     localReps.forEach(function(i){ combined[i.id] = i; });
     rssItems.forEach(function(i){ combined[i.id] = i; });
+    // Keep existing GitHub issues
+    issues.forEach(function(i){ if (i.src === 'citizen') combined[i.id] = i; });
     issues = Object.values(combined).sort(function(a, b){ return b.ts - a.ts; });
     saveSeen(seenKeys);
     setFS('live', feedsLoaded + ' feeds live');
@@ -814,40 +832,27 @@ function fetchAllFeeds() {
     updateTicker();
   });
 
-  // Then merge GitHub citizen reports non-blocking
-  // Also REMOVE issues that were closed/deleted on GitHub
-  ghPromise.then(function(ghItems) {
+  // After both done — clean up closed issues
+  Promise.all([ghPromise, rssPromise]).then(function(results) {
+    var ghItems = results[0];
     var openIds = {};
     ghItems.forEach(function(i){ openIds[i.id] = true; });
-    var changed = false;
-    // Add new ones
-    ghItems.forEach(function(i) {
-      var exists = false;
-      for (var j = 0; j < issues.length; j++) { if (issues[j].id === i.id) { exists = true; break; } }
-      if (!exists) { issues.unshift(i); changed = true; }
-    });
-    // Remove citizen issues that are no longer open on GitHub
     var before = issues.length;
     issues = issues.filter(function(i) {
-      // Keep RSS items always
       if (i.src !== 'citizen') return true;
-      // Keep local-only reports (no ghUrl = not yet on GitHub)
       if (!i.ghUrl && !i.link) return true;
-      // If it was on GitHub, only keep if still open
       if (i.id && i.id.indexOf('gh-') === 0) return openIds[i.id] === true;
       return true;
     });
     if (issues.length !== before) {
-      changed = true;
-      // Also clean localStorage - remove closed issues
       var storedReps = loadRep().filter(function(r) {
         if (!r.ghUrl && !r.link) return true;
         if (r.id && r.id.indexOf('gh-') === 0) return openIds[r.id] === true;
         return true;
       });
       saveRep(storedReps);
+      updateCounters(); renderIssues(); updateChoropleth(); addIssueMarkers(issues);
     }
-    if (changed) { updateCounters(); renderIssues(); updateChoropleth(); addIssueMarkers(issues); }
   });
 }
 
@@ -963,10 +968,12 @@ function renderVideos() {
   for (var i = 0; i < ytVids.length; i++) {
     var v = ytVids[i];
     html += '<div class="vcard">';
-    html += '<div class="vthumb" data-vid="' + v.id + '" data-live="' + (v.live ? '1' : '0') + '">';
-    html += '<img src="https://img.youtube.com/vi/' + v.id + '/mqdefault.jpg" alt="' + esc(v.title) + '" loading="lazy" onerror="this.src=\'https://img.youtube.com/vi/' + v.id + '/default.jpg\'"/>';
-    html += '<div class="vplay">&#9654;</div>';
-    if (v.live) html += '<div class="vlive-badge">LIVE</div>';
+    var thumbBg = v.live ? 'background:linear-gradient(135deg,#1a0a0a 0%,#2a0808 100%)' : 'background:linear-gradient(135deg,#0a0f1a 0%,#101d30 100%)';
+    html += '<div class="vthumb" data-vid="' + v.id + '" data-live="' + (v.live ? '1' : '0') + '" style="' + thumbBg + ';display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px">';
+    html += '<div style="width:52px;height:52px;background:rgba(255,107,0,.15);border:2px solid rgba(255,107,0,.4);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:22px">&#9654;</div>';
+    html += '<div style="font-size:11px;color:#c8d8e8;text-align:center;padding:0 12px;line-height:1.4">' + esc(v.title) + '</div>';
+    if (v.live) html += '<div style="background:#ff1744;border-radius:3px;padding:2px 8px;font-size:9px;font-weight:700;letter-spacing:1px;color:#fff">● LIVE</div>';
+    else html += '<div style="font-size:10px;color:#4a6080">Click to play</div>';
     html += '</div>';
     html += '<div class="vmeta"><div class="vtitle">' + esc(v.title) + '</div><div class="vsrc">📺 ' + esc(v.src) + '</div></div>';
     html += '</div>';

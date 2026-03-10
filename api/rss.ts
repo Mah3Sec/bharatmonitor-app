@@ -1,226 +1,111 @@
 // api/rss.ts — Vercel Edge Function
-// Server-side RSS proxy for Indian civic news feeds
-// • Domain allowlist — rejects any unlisted source
-// • 5-minute cache (Cache-Control)
-// • Per-domain circuit breaker (in-memory)
-// • XSS-safe output — all strings sanitized before return
-// • Rate limited: 60 requests per IP per hour
-
+// Proxy for RSS feeds + image extraction
+// Added: news.google.com, reddit.com, hindustantimes.com, scroll.in
 export const config = { runtime: 'edge' }
 
-// ── Allowed Indian news & govt domains ───────────────────────────
 const ALLOWED_DOMAINS = new Set([
-  'thehindu.com',
-  'timesofindia.indiatimes.com',
-  'ndtv.com',
-  'indianexpress.com',
-  'theprint.in',
-  'thewire.in',
-  'economictimes.indiatimes.com',
-  'energy.economictimes.indiatimes.com',
-  'hindustantimes.com',
-  'business-standard.com',
-  'livemint.com',
-  'scroll.in',
-  'newslaundry.com',
-  'nhai.gov.in',
-  'mohfw.gov.in',
-  'jalshakti-dowr.gov.in',
-  'mopng.gov.in',
-  'powergrid.in',
-  'cbi.gov.in',
-  'pib.gov.in',
-  'pmindia.gov.in',
-  'feedburner.com',
-  'feeds.feedburner.com',
+  // Google News (returns real-time results from all sources)
+  'news.google.com',
+  // Reddit (community civic reports)
+  'www.reddit.com','reddit.com',
+  // Indian national news
+  'thehindu.com','ndtv.com','indianexpress.com','hindustantimes.com',
+  'timesofindia.indiatimes.com','livemint.com','business-standard.com',
+  'scroll.in','theprint.in','thewire.in','newslaundry.com',
+  // Government feeds
+  'pib.gov.in','pmindia.gov.in','nhai.gov.in','mohfw.gov.in',
+  'jalshakti-dowr.gov.in','mygov.in',
+  // Feedburner proxy
+  'feeds.feedburner.com','feedburner.com',
 ])
 
-// ── Rate limiter ──────────────────────────────────────────────────
-const rateLimitMap = new Map<string, { count: number; resetAt: number }>()
-function checkRateLimit(key: string, limit: number, windowMs: number): boolean {
-  const now = Date.now()
-  const entry = rateLimitMap.get(key)
-  if (!entry || now > entry.resetAt) {
-    rateLimitMap.set(key, { count: 1, resetAt: now + windowMs })
-    return true
-  }
-  if (entry.count >= limit) return false
-  entry.count++
-  return true
+const rateMap = new Map<string, {count:number;resetAt:number}>()
+function rateOk(ip:string,limit:number,ms:number):boolean{
+  const now=Date.now(),e=rateMap.get(ip)
+  if(!e||now>e.resetAt){rateMap.set(ip,{count:1,resetAt:now+ms});return true}
+  if(e.count>=limit)return false;e.count++;return true
 }
 
-// ── Circuit breaker (per domain) ─────────────────────────────────
-const circuitBreaker = new Map<string, { failures: number; openUntil: number }>()
-const CIRCUIT_OPEN_MS = 5 * 60 * 1000 // 5 minute cooldown
+const circuit = new Map<string,{fail:number;openUntil:number}>()
+function circuitOpen(d:string):boolean{const c=circuit.get(d);if(!c)return false;if(Date.now()<c.openUntil)return true;circuit.delete(d);return false}
+function fail(d:string){const c=circuit.get(d)??{fail:0,openUntil:0};c.fail++;if(c.fail>=3)c.openUntil=Date.now()+300000;circuit.set(d,c)}
+function ok(d:string){circuit.delete(d)}
 
-function isCircuitOpen(domain: string): boolean {
-  const cb = circuitBreaker.get(domain)
-  if (!cb) return false
-  if (Date.now() < cb.openUntil) return true
-  circuitBreaker.delete(domain)
-  return false
-}
+function safe(s:string,n=500):string{return String(s??'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').trim().slice(0,n)}
 
-function recordFailure(domain: string): void {
-  const cb = circuitBreaker.get(domain) ?? { failures: 0, openUntil: 0 }
-  cb.failures++
-  if (cb.failures >= 3) cb.openUntil = Date.now() + CIRCUIT_OPEN_MS
-  circuitBreaker.set(domain, cb)
-}
+function parseRSS(xml:string) {
+  const items:any[]=[]
+  const blocks = [...xml.matchAll(/<item[^>]*>([\s\S]*?)<\/item>/g)]
 
-function recordSuccess(domain: string): void {
-  circuitBreaker.delete(domain)
-}
-
-// ── XSS-safe string escaping ──────────────────────────────────────
-function escapeHtml(str: string): string {
-  return str
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;')
-    .replace(/'/g, '&#x27;')
-}
-
-function safeStr(str: string, maxLen = 500): string {
-  return escapeHtml(String(str ?? '').trim().slice(0, maxLen))
-}
-
-// ── RSS XML → JSON parser ─────────────────────────────────────────
-function parseRSS(xml: string): Array<{
-  title: string
-  link: string
-  pubDate: string
-  description: string
-  guid: string
-}> {
-  const items: Array<{ title: string; link: string; pubDate: string; description: string; guid: string }> = []
-  const itemMatches = xml.matchAll(/<item[^>]*>([\s\S]*?)<\/item>/g)
-
-  for (const match of itemMatches) {
-    const block = match[1]
-
-    const get = (tag: string): string => {
-      // Try CDATA first
-      const cdata = block.match(new RegExp(`<${tag}[^>]*><!\\[CDATA\\[([\\s\\S]*?)\\]\\]><\\/${tag}>`))
-      if (cdata) return cdata[1].trim()
-      // Then plain text
-      const plain = block.match(new RegExp(`<${tag}[^>]*>([^<]*)<\\/${tag}>`))
-      return plain ? plain[1].trim() : ''
+  for(const m of blocks){
+    const b=m[1]
+    const get=(tag:string)=>{
+      const cd=b.match(new RegExp(`<${tag}[^>]*><!\\[CDATA\\[([\\s\\S]*?)\\]\\]><\\/${tag}>`))
+      if(cd)return cd[1].trim()
+      const pl=b.match(new RegExp(`<${tag}[^>]*>([^<]*)<\\/${tag}>`))
+      return pl?pl[1].trim():''
     }
-
-    // Special handling for link (sometimes in CDATA, sometimes bare)
-    const linkCdata = block.match(/<link><!\[CDATA\[([\s\S]*?)\]\]><\/link>/)
-    const linkPlain = block.match(/<link>([^<]*)<\/link>/)
-    const link = linkCdata?.[1]?.trim() || linkPlain?.[1]?.trim() || ''
+    // Link extraction
+    const lk = b.match(/<link><!\[CDATA\[([\s\S]*?)\]\]><\/link>/)?.[1]?.trim()
+            || b.match(/<link>([^<]*)<\/link>/)?.[1]?.trim()
+            || b.match(/<feedburner:origLink>([^<]*)<\/feedburner:origLink>/)?.[1]?.trim()
+            || ''
+    // Image extraction: media:content, media:thumbnail, enclosure, og in description
+    const imgSrc = b.match(/media:content[^>]+url="([^"]+)"[^>]+medium="image"/)?.[1]
+                || b.match(/media:thumbnail[^>]+url="([^"]+)"/)?.[1]
+                || b.match(/enclosure[^>]+url="([^"]+)"[^>]+type="image/)?.[1]
+                || b.match(/<img[^>]+src="([^"]+)"/)?.[1]
+                || ''
+    // Strip HTML from description
+    const rawDesc = get('description').replace(/<[^>]+>/g,'').replace(/&nbsp;/g,' ').replace(/\s+/g,' ')
 
     const item = {
-      title: safeStr(get('title'), 200),
-      link: safeStr(link, 500),
-      pubDate: safeStr(get('pubDate'), 100),
-      description: safeStr(get('description').replace(/<[^>]*>/g, ''), 400),
-      guid: safeStr(get('guid'), 300),
+      title: safe(get('title'),200),
+      link: safe(lk,500),
+      pubDate: safe(get('pubDate'),100),
+      description: safe(rawDesc,400),
+      guid: safe(get('guid'),300),
+      imageUrl: imgSrc ? safe(imgSrc,500) : '',
+      source: safe(get('source')||get('dc:creator')||'',100),
     }
-
-    if (item.title) items.push(item)
-    if (items.length >= 20) break
+    if(item.title&&item.title.length>10) items.push(item)
+    if(items.length>=25)break
   }
-
   return items
 }
 
-// ── Domain checker ────────────────────────────────────────────────
-function isAllowedUrl(url: string): { ok: boolean; domain: string } {
-  try {
-    const parsed = new URL(url)
-    const host = parsed.hostname.replace(/^www\./, '')
-    const ok = ALLOWED_DOMAINS.has(host) || [...ALLOWED_DOMAINS].some(d => host.endsWith('.' + d))
-    return { ok, domain: host }
-  } catch {
-    return { ok: false, domain: '' }
-  }
+function allowedUrl(url:string):{ok:boolean;domain:string}{
+  try{
+    const h=new URL(url).hostname.replace(/^www\./,'')
+    const ok2=ALLOWED_DOMAINS.has(h)||ALLOWED_DOMAINS.has('www.'+h)||[...ALLOWED_DOMAINS].some(d=>h.endsWith('.'+d))
+    return{ok:ok2,domain:h}
+  }catch{return{ok:false,domain:''}}
 }
 
-// ── CORS ──────────────────────────────────────────────────────────
-const ALLOWED_ORIGINS = [
-  'https://bharatmonitor.vercel.app',
-  'http://localhost:5173',
-  'http://localhost:3000',
-]
+const CORS=['https://bharatmonitor.vercel.app','http://localhost:5173','http://localhost:3000']
+function cors(o:string|null){const a=o&&CORS.includes(o)?o:CORS[0];return{'Access-Control-Allow-Origin':a}}
 
-function corsHeaders(origin: string | null): Record<string, string> {
-  const allowed = origin && ALLOWED_ORIGINS.includes(origin) ? origin : ALLOWED_ORIGINS[0]
-  return { 'Access-Control-Allow-Origin': allowed }
-}
-
-// ── Handler ───────────────────────────────────────────────────────
-export default async function handler(req: Request): Promise<Response> {
-  const origin = req.headers.get('origin')
-  const cors = corsHeaders(origin)
-
-  if (req.method === 'OPTIONS') return new Response(null, { status: 204, headers: cors })
-
-  const feedUrl = new URL(req.url).searchParams.get('url')
-  if (!feedUrl) {
-    return new Response(JSON.stringify({ ok: false, error: 'Missing url param' }), {
-      status: 400, headers: { ...cors, 'Content-Type': 'application/json' },
+export default async function handler(req:Request):Promise<Response>{
+  const origin=req.headers.get('origin'),c=cors(origin)
+  if(req.method==='OPTIONS')return new Response(null,{status:204,headers:c})
+  const feedUrl=new URL(req.url).searchParams.get('url')
+  if(!feedUrl)return new Response(JSON.stringify({ok:false,error:'Missing url'}),{status:400,headers:{...c,'Content-Type':'application/json'}})
+  const{ok:allowed,domain}=allowedUrl(feedUrl)
+  if(!allowed)return new Response(JSON.stringify({ok:false,error:'Domain not allowed: '+domain}),{status:403,headers:{...c,'Content-Type':'application/json'}})
+  const ip=req.headers.get('x-forwarded-for')?.split(',')[0]?.trim()??'unknown'
+  if(!rateOk(ip,120,3600000))return new Response(JSON.stringify({ok:false,error:'Rate limit'}),{status:429,headers:{...c,'Content-Type':'application/json'}})
+  if(circuitOpen(domain))return new Response(JSON.stringify({ok:false,error:'Circuit open'}),{status:503,headers:{...c,'Content-Type':'application/json'}})
+  try{
+    const res=await fetch(feedUrl,{
+      headers:{'User-Agent':'Mozilla/5.0 BharatMonitor/2.0 (+https://bharatmonitor.vercel.app)','Accept':'application/rss+xml,application/xml,text/xml,*/*'},
+      signal:AbortSignal.timeout(9000)
     })
-  }
-
-  const { ok, domain } = isAllowedUrl(feedUrl)
-  if (!ok) {
-    return new Response(JSON.stringify({ ok: false, error: 'Domain not in allowlist' }), {
-      status: 403, headers: { ...cors, 'Content-Type': 'application/json' },
+    if(!res.ok){fail(domain);return new Response(JSON.stringify({ok:false,error:`Feed ${res.status}`}),{status:502,headers:{...c,'Content-Type':'application/json'}})}
+    const xml=await res.text()
+    const items=parseRSS(xml)
+    ok(domain)
+    return new Response(JSON.stringify({ok:true,items,fetchedAt:new Date().toISOString()}),{
+      headers:{...c,'Content-Type':'application/json','Cache-Control':'public, max-age=180, stale-while-revalidate=60'}
     })
-  }
-
-  // Rate limit by IP
-  const ip = req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ?? 'unknown'
-  if (!checkRateLimit(ip, 60, 60 * 60 * 1000)) {
-    return new Response(JSON.stringify({ ok: false, error: 'Rate limit exceeded' }), {
-      status: 429, headers: { ...cors, 'Content-Type': 'application/json' },
-    })
-  }
-
-  // Check circuit breaker
-  if (isCircuitOpen(domain)) {
-    return new Response(JSON.stringify({ ok: false, error: 'Feed temporarily unavailable', circuitOpen: true }), {
-      status: 503, headers: { ...cors, 'Content-Type': 'application/json' },
-    })
-  }
-
-  try {
-    const res = await fetch(feedUrl, {
-      headers: {
-        'User-Agent': 'BharatMonitor/1.0 (https://bharatmonitor.vercel.app)',
-        'Accept': 'application/rss+xml, application/xml, text/xml, */*',
-      },
-      signal: AbortSignal.timeout(8000),
-    })
-
-    if (!res.ok) {
-      recordFailure(domain)
-      return new Response(JSON.stringify({ ok: false, error: `Feed returned ${res.status}` }), {
-        status: 502, headers: { ...cors, 'Content-Type': 'application/json' },
-      })
-    }
-
-    const xml = await res.text()
-    const items = parseRSS(xml)
-
-    recordSuccess(domain)
-
-    return new Response(JSON.stringify({ ok: true, items, fetchedAt: new Date().toISOString() }), {
-      headers: {
-        ...cors,
-        'Content-Type': 'application/json',
-        'Cache-Control': 'public, max-age=300, stale-while-revalidate=60', // 5 min cache
-      },
-    })
-  } catch (err) {
-    recordFailure(domain)
-    return new Response(JSON.stringify({ ok: false, error: String(err) }), {
-      status: 502, headers: { ...cors, 'Content-Type': 'application/json' },
-    })
-  }
+  }catch(e){fail(domain);return new Response(JSON.stringify({ok:false,error:String(e)}),{status:502,headers:{...c,'Content-Type':'application/json'}})}
 }

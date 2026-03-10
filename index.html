@@ -4,6 +4,14 @@
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
 <title>BharatMonitor — India Civic Intelligence</title>
+<link rel="icon" type="image/x-icon" href="/favicon.ico"/>
+<link rel="icon" type="image/svg+xml" href="/logo.svg"/>
+<link rel="apple-touch-icon" href="/logo-192.png"/>
+<meta name="theme-color" content="#080f1c"/>
+<meta name="description" content="Real-time India civic issue tracker — report roads, water, power, corruption and more across all 36 states and UTs."/>
+<meta property="og:title" content="BharatMonitor — India Civic Intelligence"/>
+<meta property="og:description" content="Real-time civic issue tracker for India. Report and track public service failures across all 36 states."/>
+<meta property="og:image" content="/logo-512.png"/>
 <link rel="stylesheet" href="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.css"/>
 <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700;800&family=DM+Sans:wght@400;500&display=swap" rel="stylesheet"/>
 <style>
@@ -155,7 +163,20 @@ html,body{height:100%;font-family:'DM Sans',sans-serif;background:var(--bg);colo
 .vsec{margin-bottom:14px}
 .vsec-hd{font-family:Baloo2,cursive;font-weight:700;font-size:11px;color:var(--mt);text-transform:uppercase;letter-spacing:.8px;padding:4px 0 8px;border-bottom:1px solid var(--b1);margin-bottom:8px}
 .vcard{background:var(--p2);border:1px solid var(--b1);border-radius:8px;overflow:hidden;margin-bottom:8px}
-/* embed styles removed — YouTube blocks live stream embedding */
+/* Video card styles */
+.vcard{background:var(--p2);border:1px solid var(--b1);border-radius:8px;overflow:hidden;margin-bottom:8px}
+.vthumb{position:relative;padding-top:56.25%;cursor:pointer;overflow:hidden;background:#0a0f1a}
+.vthumb-inner{position:absolute;top:0;left:0;width:100%;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;padding:12px;text-align:center}
+.vthumb-inner img{position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover;transition:opacity .2s}
+.vthumb:hover .vthumb-inner img{opacity:.75}
+.vplay-btn{position:relative;z-index:2;width:52px;height:52px;border-radius:50%;background:rgba(255,107,0,.92);display:flex;align-items:center;justify-content:center;font-size:20px;color:#fff;box-shadow:0 2px 16px rgba(255,107,0,.5);flex-shrink:0}
+.vthumb-label{position:relative;z-index:2;background:rgba(8,15,28,.75);border-radius:5px;padding:4px 10px;font-size:10.5px;color:#c8d8e8;line-height:1.4;max-width:100%}
+.vframe{position:relative;padding-top:56.25%}
+.vframe iframe{position:absolute;top:0;left:0;width:100%;height:100%;border:none}
+.vlive-badge{position:absolute;top:8px;left:8px;z-index:3;background:#ff1744;border-radius:3px;padding:2px 7px;font-size:9px;font-weight:700;letter-spacing:1px;color:#fff}
+.vmeta{padding:9px 12px}
+.vtitle{font-size:12px;color:var(--tx);line-height:1.4;margin-bottom:3px}
+.vsrc{font-size:10px;color:var(--mt)}
 .vmeta{padding:8px 10px}
 .vtitle{font-size:12px;color:var(--tx);line-height:1.4;margin-bottom:4px}
 .vsrc{font-size:10px;color:var(--mt)}
@@ -389,7 +410,8 @@ html,body{height:100%;font-family:'DM Sans',sans-serif;background:var(--bg);colo
         <button class="adminClose" id="adminCancelBtn">Cancel</button>
       </div>
       <div id="adminUnlocked" style="display:none">
-        <div style="background:#00c85320;border:1px solid #00c85340;border-radius:7px;padding:8px 12px;font-size:12px;color:#00c853;margin-bottom:12px">✅ Admin mode active — delete buttons visible on all issues</div>
+        <div style="background:#00c85320;border:1px solid #00c85340;border-radius:7px;padding:8px 12px;font-size:12px;color:#00c853;margin-bottom:12px">✅ Admin mode active — delete buttons visible on all citizen reports</div>
+        <button class="adminBtn" style="background:#ff1744;margin-bottom:8px" id="adminClearBtn">🧹 Clear All Cached Issues</button>
         <button class="adminClose" id="adminLockBtn">🔒 Lock Admin</button>
       </div>
     </div>
@@ -419,6 +441,54 @@ function ago(ts) {
   if (s < 3600) return Math.floor(s / 60) + 'm ago';
   if (s < 86400) return Math.floor(s / 3600) + 'h ago';
   return Math.floor(s / 86400) + 'd ago';
+}
+
+
+// ── CONTENT SAFETY FILTER ─────────────────────────────────────────
+var BLOCKED_URLS = [
+  'pornhub','xvideos','xnxx','xhamster','redtube','youporn','brazzers',
+  'onlyfans','chaturbate','cam4','stripchat','livejasmin','camsoda',
+  'sexvid','porn.com','sex.com','adult','nsfw','lewd',
+  'bit.ly','tinyurl.com','rb.gy','t.ly','cutt.ly','short.gy',
+  'grabify','iplogger','blasze','canarytokens',
+  'javascript:','data:text','vbscript:','file://',
+  'phish','malware','ransomware','exploit','payload','shellcode'
+];
+
+var BLOCKED_WORDS = [
+  // sexual
+  'sex','porn','nude','naked','xxx','erotic','adult content','boobs','penis','vagina',
+  'rape','molest','harass','obscene','vulgar','fuck','shit','bastard','bitch','asshole',
+  // hate speech
+  'terrorist','jihad','kill all','genocide','bomb blast how to','make bomb',
+  // spam patterns
+  'click here to earn','free money','win prize','casino','betting','lottery','crypto scam',
+  'whatsapp hack','facebook hack','account hack','password steal'
+];
+
+function contentSafe(text, url) {
+  var t = (text || '').toLowerCase();
+  var u = (url || '').toLowerCase();
+
+  // Check URL
+  if (u && u.length > 4) {
+    for (var i = 0; i < BLOCKED_URLS.length; i++) {
+      if (u.indexOf(BLOCKED_URLS[i]) >= 0) return { ok: false, reason: 'This URL is not allowed.' };
+    }
+    // Must start with https://
+    if (u.length > 4 && !u.startsWith('https://') && !u.startsWith('http://')) {
+      return { ok: false, reason: 'URL must start with https://' };
+    }
+  }
+
+  // Check text for blocked words (whole word matching where possible)
+  for (var j = 0; j < BLOCKED_WORDS.length; j++) {
+    if (t.indexOf(BLOCKED_WORDS[j]) >= 0) {
+      return { ok: false, reason: 'Your report contains content that is not allowed on this platform.' };
+    }
+  }
+
+  return { ok: true };
 }
 
 // ── CONSTANTS ──────────────────────────────────────────────────────
@@ -527,7 +597,7 @@ var mapMarkers = [], mapLoaded = false, map;
 var fcircuit = {};
 
 // ── STORAGE ───────────────────────────────────────────────────────
-var STORE = 'bm_v4', SEEN_ST = 'bm_seen_v2';
+var STORE = 'bm_v5', SEEN_ST = 'bm_seen_v2';
 function loadRep() { try { return JSON.parse(localStorage.getItem(STORE) || '[]'); } catch(e) { return []; } }
 function saveRep(r) { try { localStorage.setItem(STORE, JSON.stringify(r.filter(function(x){return x.src==='citizen';}).slice(0,100))); } catch(e) {} }
 function loadSeen() { try { return new Set(JSON.parse(localStorage.getItem(SEEN_ST) || '[]')); } catch(e) { return new Set(); } }
@@ -1077,195 +1147,125 @@ function renderVideos() {
   videosLoaded = true;
   var el = document.getElementById('vContent');
 
-  // ── DATA ────────────────────────────────────────────────────────
+  // YouTube video IDs for embeddable civic/news content (non-live, embeddable)
+  var embeds = [
+    { id: 'QrNl5MUEFHQ', title: 'How RTI Can Help You Fight Corruption', src: 'TheQuint', cat: 'RTI' },
+    { id: 'AqF8FkgCOSk', title: 'India Pothole Problem — Ground Report', src: 'NDTV', cat: 'Roads' },
+    { id: 'WqGkTBq3MTs', title: 'India Water Crisis — States Running Dry', src: 'India Today', cat: 'Water' },
+    { id: 'vGqe_DGTQN4', title: 'Power Cuts & Electricity Failures Explained', src: 'The Wire', cat: 'Power' },
+    { id: 'Y2HFSmkXMzI', title: 'Corruption in Government Schemes — Report', src: 'Newslaundry', cat: 'Corruption' },
+    { id: '5e1gB0QLWcY', title: 'India Public Health System — Ground Reality', src: 'The Print', cat: 'Health' },
+  ];
+
   var govChannels = [
-    {
-      name: 'Lok Sabha TV',
-      desc: 'Live Parliament sessions, Question Hour, committee debates, budget proceedings',
-      url:  'https://www.youtube.com/@loksabhatv/streams',
-      tag: 'LIVE', col: '#ff1744', icon: '🏛️'
-    },
-    {
-      name: 'Rajya Sabha TV',
-      desc: 'Upper house live sessions, private member bills, zero hour discussions',
-      url:  'https://www.youtube.com/@rajyasabhatv/streams',
-      tag: 'LIVE', col: '#ff1744', icon: '🏛️'
-    },
-    {
-      name: 'DD News',
-      desc: 'Doordarshan national broadcaster — government news, rural issues, regional coverage',
-      url:  'https://www.youtube.com/@DDNewsHindi/live',
-      tag: 'LIVE', col: '#ff1744', icon: '📺'
-    },
-    {
-      name: 'PIB India',
-      desc: 'Press Information Bureau — official government announcements, scheme launches, press briefings',
-      url:  'https://www.youtube.com/@PIBIndia',
-      tag: 'OFFICIAL', col: '#FF6B00', icon: '📢'
-    }
+    { name:'Lok Sabha TV',   desc:'Live Parliament sessions, Question Hour, debates',          url:'https://www.youtube.com/@loksabhatv/streams',   tag:'LIVE',     col:'#ff1744', icon:'🏛️' },
+    { name:'Rajya Sabha TV', desc:'Upper house live proceedings, private member bills',         url:'https://www.youtube.com/@rajyasabhatv/streams', tag:'LIVE',     col:'#ff1744', icon:'🏛️' },
+    { name:'DD News',        desc:'Doordarshan national broadcaster — live news',               url:'https://www.youtube.com/@DDNewsHindi/live',     tag:'LIVE',     col:'#ff1744', icon:'📺' },
+    { name:'PIB India',      desc:'Official press releases, scheme launches, briefings',        url:'https://www.youtube.com/@PIBIndia',             tag:'OFFICIAL', col:'#FF6B00', icon:'📢' },
   ];
 
   var journoChannels = [
-    {
-      name: 'The Wire',
-      desc: 'Donor-funded independent journalism. Covers corruption, civil rights, policy failures, minority issues',
-      url:  'https://www.youtube.com/@TheWireNews',
-      tag: 'INDEPENDENT', col: '#a855f7', icon: '🔎'
-    },
-    {
-      name: 'Newslaundry',
-      desc: 'Subscription-funded, no ads, no corporate owners. Media watchdog + original ground reporting',
-      url:  'https://www.youtube.com/@newslaundry',
-      tag: 'INDEPENDENT', col: '#a855f7', icon: '🔬'
-    },
-    {
-      name: 'The Print',
-      desc: 'Founded by senior journalists. Strong parliament, judiciary and policy coverage',
-      url:  'https://www.youtube.com/@ThePrintIndia',
-      tag: 'JOURNALISM', col: '#00b8e6', icon: '🗞️'
-    },
-    {
-      name: 'The Quint',
-      desc: 'Ground reporting, civic issues, fact-checks. Strong on urban infrastructure and rights',
-      url:  'https://www.youtube.com/@TheQuint',
-      tag: 'JOURNALISM', col: '#00b8e6', icon: '🗞️'
-    },
-    {
-      name: 'NDTV',
-      desc: 'Established national broadcaster. Covers Parliament, Supreme Court, state government failures',
-      url:  'https://www.youtube.com/@ndtv',
-      tag: 'MAINSTREAM', col: '#22c55e', icon: '📡'
-    },
-    {
-      name: 'India Today',
-      desc: 'National daily — investigative series, sting operations, government accountability',
-      url:  'https://www.youtube.com/@IndiaToday',
-      tag: 'MAINSTREAM', col: '#22c55e', icon: '📡'
-    },
-    {
-      name: 'Scroll.in',
-      desc: 'Long-form journalism on civic, social and political issues in India',
-      url:  'https://www.youtube.com/@ScrollinIndia',
-      tag: 'JOURNALISM', col: '#00ddb8', icon: '📜'
-    }
+    { name:'The Wire',       desc:'Donor-funded independent journalism — corruption, rights, policy',     url:'https://www.youtube.com/@TheWireNews',   tag:'INDEPENDENT', col:'#a855f7', icon:'🔎' },
+    { name:'Newslaundry',    desc:'Subscription-funded, no ads, no corporate owners. Media + ground reporting', url:'https://www.youtube.com/@newslaundry', tag:'INDEPENDENT', col:'#a855f7', icon:'🔬' },
+    { name:'The Print',      desc:'Founded by senior journalists. Parliament, judiciary, policy',          url:'https://www.youtube.com/@ThePrintIndia', tag:'JOURNALISM',  col:'#00b8e6', icon:'🗞️' },
+    { name:'The Quint',      desc:'Ground reporting, civic issues, RTI guides, fact-checks',               url:'https://www.youtube.com/@TheQuint',      tag:'JOURNALISM',  col:'#00b8e6', icon:'🗞️' },
+    { name:'NDTV',           desc:'Established national broadcaster — Parliament, SC, state failures',     url:'https://www.youtube.com/@ndtv',          tag:'MAINSTREAM',  col:'#22c55e', icon:'📡' },
+    { name:'India Today',    desc:'National daily — investigative series, sting operations',               url:'https://www.youtube.com/@IndiaToday',    tag:'MAINSTREAM',  col:'#22c55e', icon:'📡' },
+    { name:'Scroll.in',      desc:'Long-form civic and rights-based journalism',                            url:'https://www.youtube.com/@ScrollinIndia', tag:'JOURNALISM',  col:'#00ddb8', icon:'📜' },
   ];
 
   var portals = [
-    {
-      name: 'CPGRAMS',
-      desc: 'Centralised Public Grievance Redress — file a complaint with any Central Govt ministry or department',
-      url:  'https://cpgrams.gov.in',
-      col: '#FF6B00', icon: '📝', tag: 'GRIEVANCE'
-    },
-    {
-      name: 'RTI Online',
-      desc: 'File Right to Information requests with any Central Government ministry — free, online, official',
-      url:  'https://rtionline.gov.in',
-      col: '#ffd700', icon: '📂', tag: 'RTI'
-    },
-    {
-      name: 'PIB Fact Check',
-      desc: 'Official government unit for debunking fake news about government schemes and policies',
-      url:  'https://factcheck.pib.gov.in',
-      col: '#22c55e', icon: '✅', tag: 'FACT CHECK'
-    },
-    {
-      name: 'FactChecker.in',
-      desc: 'Independent data journalism — fact-checks government statistics, claims, budget announcements',
-      url:  'https://factchecker.in',
-      col: '#22c55e', icon: '🔬', tag: 'FACT CHECK'
-    },
-    {
-      name: 'The Hindu',
-      desc: 'One of India&#39;s oldest newspapers. Strong Parliament, judiciary and policy reporting',
-      url:  'https://thehindu.com/news/national',
-      col: '#00b8e6', icon: '📰', tag: 'NEWS'
-    },
-    {
-      name: 'Scroll.in',
-      desc: 'Civic, social and rights-based long-form journalism',
-      url:  'https://scroll.in/india',
-      col: '#00ddb8', icon: '📜', tag: 'NEWS'
-    },
-    {
-      name: 'PRS Legislative Research',
-      desc: 'Non-partisan analysis of Parliament bills, committee reports and government budgets',
-      url:  'https://prsindia.org',
-      col: '#a855f7', icon: '📊', tag: 'RESEARCH'
-    },
-    {
-      name: 'MyGov India',
-      desc: 'Participate in government consultations, surveys and citizen feedback initiatives',
-      url:  'https://mygov.in',
-      col: '#22c55e', icon: '🗳️', tag: 'CITIZEN'
-    },
-    {
-      name: 'PIB India',
-      desc: 'Official press releases, government scheme updates and ministry announcements',
-      url:  'https://pib.gov.in',
-      col: '#FF6B00', icon: '🏛️', tag: 'OFFICIAL'
-    }
+    { name:'CPGRAMS',            desc:'File a complaint with any Central Government ministry',          url:'https://cpgrams.gov.in',           col:'#FF6B00', icon:'📝', tag:'GRIEVANCE' },
+    { name:'RTI Online',         desc:'File Right to Information with Central Government — free',       url:'https://rtionline.gov.in',         col:'#ffd700', icon:'📂', tag:'RTI' },
+    { name:'PIB Fact Check',     desc:'Official government unit debunking fake news on govt schemes',   url:'https://factcheck.pib.gov.in',     col:'#22c55e', icon:'✅', tag:'FACT CHECK' },
+    { name:'FactChecker.in',     desc:'Independent data journalism — verifies government statistics',   url:'https://factchecker.in',           col:'#22c55e', icon:'🔬', tag:'FACT CHECK' },
+    { name:'PRS Legislative',    desc:'Non-partisan analysis of Parliament bills and budgets',          url:'https://prsindia.org',             col:'#a855f7', icon:'📊', tag:'RESEARCH' },
+    { name:'The Hindu',          desc:'Established newspaper — Parliament, judiciary, policy coverage', url:'https://thehindu.com/news/national', col:'#00b8e6', icon:'📰', tag:'NEWS' },
+    { name:'Scroll.in',          desc:'Civic, social and rights-based long-form journalism',            url:'https://scroll.in/india',          col:'#00ddb8', icon:'📜', tag:'NEWS' },
+    { name:'MyGov India',        desc:'Participate in government consultations and citizen feedback',   url:'https://mygov.in',                 col:'#22c55e', icon:'🗳️', tag:'CITIZEN' },
+    { name:'PIB India',          desc:'Official government press releases and announcements',            url:'https://pib.gov.in',               col:'#FF6B00', icon:'🏛️', tag:'OFFICIAL' },
   ];
 
-  // ── RENDER ──────────────────────────────────────────────────────
-  function channelCard(ch) {
-    return [
-      '<a href="' + esc(ch.url) + '" target="_blank" rel="noopener" class="ncard">',
-        '<div style="font-size:22px;flex-shrink:0;line-height:1">' + ch.icon + '</div>',
-        '<div style="flex:1;min-width:0">',
-          '<div style="display:flex;align-items:center;gap:6px;margin-bottom:3px;flex-wrap:wrap">',
-            '<span style="font-family:Baloo2,cursive;font-weight:700;font-size:13px;color:#fff">' + esc(ch.name) + '</span>',
-            '<span style="font-size:8px;font-weight:700;letter-spacing:.8px;padding:1px 6px;border-radius:3px;background:' + ch.col + '20;color:' + ch.col + ';border:1px solid ' + ch.col + '40">' + ch.tag + '</span>',
-          '</div>',
-          '<div style="font-size:10.5px;color:var(--mt);line-height:1.5">' + esc(ch.desc) + '</div>',
-        '</div>',
-        '<div style="color:var(--mt);font-size:14px;flex-shrink:0;align-self:center">↗</div>',
-      '</a>'
-    ].join('');
+  function chCard(ch) {
+    return '<a href="' + esc(ch.url) + '" target="_blank" rel="noopener" class="ncard">'
+      + '<div style="font-size:22px;flex-shrink:0;line-height:1">' + ch.icon + '</div>'
+      + '<div style="flex:1;min-width:0">'
+      + '<div style="display:flex;align-items:center;gap:6px;margin-bottom:3px;flex-wrap:wrap">'
+      + '<span style="font-family:Baloo2,cursive;font-weight:700;font-size:13px;color:#fff">' + esc(ch.name) + '</span>'
+      + '<span style="font-size:8px;font-weight:700;letter-spacing:.8px;padding:1px 6px;border-radius:3px;background:' + ch.col + '20;color:' + ch.col + ';border:1px solid ' + ch.col + '40">' + ch.tag + '</span>'
+      + '</div>'
+      + '<div style="font-size:10.5px;color:var(--mt);line-height:1.5">' + esc(ch.desc) + '</div>'
+      + '</div>'
+      + '<div style="color:var(--mt);font-size:14px;flex-shrink:0;align-self:center">↗</div>'
+      + '</a>';
   }
 
-  function portalCard(p) {
-    return [
-      '<a href="' + esc(p.url) + '" target="_blank" rel="noopener" class="ncard" style="border-left:3px solid ' + p.col + '">',
-        '<div style="font-size:22px;flex-shrink:0;line-height:1">' + p.icon + '</div>',
-        '<div style="flex:1;min-width:0">',
-          '<div style="display:flex;align-items:center;gap:6px;margin-bottom:3px;flex-wrap:wrap">',
-            '<span style="font-family:Baloo2,cursive;font-weight:700;font-size:13px;color:#fff">' + esc(p.name) + '</span>',
-            '<span style="font-size:8px;font-weight:700;letter-spacing:.8px;padding:1px 6px;border-radius:3px;background:' + p.col + '20;color:' + p.col + ';border:1px solid ' + p.col + '40">' + p.tag + '</span>',
-          '</div>',
-          '<div style="font-size:10.5px;color:var(--mt);line-height:1.5">' + esc(p.desc) + '</div>',
-        '</div>',
-        '<div style="color:var(--mt);font-size:14px;flex-shrink:0;align-self:center">↗</div>',
-      '</a>'
-    ].join('');
+  function ptCard(p) {
+    return '<a href="' + esc(p.url) + '" target="_blank" rel="noopener" class="ncard" style="border-left:3px solid ' + p.col + '">'
+      + '<div style="font-size:22px;flex-shrink:0;line-height:1">' + p.icon + '</div>'
+      + '<div style="flex:1;min-width:0">'
+      + '<div style="display:flex;align-items:center;gap:6px;margin-bottom:3px;flex-wrap:wrap">'
+      + '<span style="font-family:Baloo2,cursive;font-weight:700;font-size:13px;color:#fff">' + esc(p.name) + '</span>'
+      + '<span style="font-size:8px;font-weight:700;letter-spacing:.8px;padding:1px 6px;border-radius:3px;background:' + p.col + '20;color:' + p.col + ';border:1px solid ' + p.col + '40">' + p.tag + '</span>'
+      + '</div>'
+      + '<div style="font-size:10.5px;color:var(--mt);line-height:1.5">' + esc(p.desc) + '</div>'
+      + '</div>'
+      + '<div style="color:var(--mt);font-size:14px;flex-shrink:0;align-self:center">↗</div>'
+      + '</a>';
   }
 
   var out = [];
 
-  // Notice
-  out.push('<div style="margin:8px 8px 14px;padding:10px 13px;background:#00b8e608;border:1px solid #00b8e620;border-radius:8px;font-size:10.5px;color:#4a8090;line-height:1.6">');
-  out.push('<strong style="color:#00b8e6">Note:</strong> YouTube does not allow live stream embedding on third-party sites. All channels open directly on YouTube for full quality playback. Links go to the live/latest tab of each channel.');
+  // ── Embeddable civic videos (click to play inline) ───────────────
+  out.push('<div class="vsec">');
+  out.push('<div class="vsec-hd">▶ Civic Issue Reports — Watch Inline</div>');
+  for (var i = 0; i < embeds.length; i++) {
+    var v = embeds[i];
+    out.push('<div class="vcard" id="vc-' + v.id + '">');
+    out.push('<div class="vthumb" data-vid="' + esc(v.id) + '">');
+    out.push('<div class="vthumb-inner">');
+    // Use YouTube thumbnail via crossorigin-safe URL
+    out.push('<img src="https://i.ytimg.com/vi/' + v.id + '/hqdefault.jpg" alt="" loading="lazy" crossorigin="anonymous" onerror="this.style.opacity=0"/>');
+    out.push('<div class="vplay-btn">&#9654;</div>');
+    out.push('<div class="vthumb-label">' + esc(v.cat) + ' · ' + esc(v.src) + '</div>');
+    out.push('</div></div>');
+    out.push('<div class="vmeta"><div class="vtitle">' + esc(v.title) + '</div><div class="vsrc">📺 ' + esc(v.src) + '</div></div>');
+    out.push('</div>');
+  }
   out.push('</div>');
 
-  // Government
+  // ── Live govt channels (link only — YouTube blocks live embeds) ──
+  out.push('<div style="margin:0 0 14px;padding:10px 13px;background:#ff174408;border:1px solid #ff174420;border-radius:8px;font-size:10.5px;color:#804040;line-height:1.6">');
+  out.push('<strong style="color:#ff6060">Note:</strong> YouTube blocks live stream embedding on third-party sites. Government TV channels below open on YouTube in a new tab for full quality.');
+  out.push('</div>');
+
   out.push('<div class="vsec">');
   out.push('<div class="vsec-hd"><span style="display:inline-block;width:7px;height:7px;border-radius:50%;background:#ff1744;animation:pu 1.5s infinite;margin-right:6px;vertical-align:middle"></span>Official Government Channels</div>');
-  for (var i = 0; i < govChannels.length; i++) out.push(channelCard(govChannels[i]));
+  for (var j = 0; j < govChannels.length; j++) out.push(chCard(govChannels[j]));
   out.push('</div>');
 
-  // Independent journalism
   out.push('<div class="vsec">');
   out.push('<div class="vsec-hd">📰 Independent &amp; Investigative Journalism</div>');
-  for (var j = 0; j < journoChannels.length; j++) out.push(channelCard(journoChannels[j]));
+  for (var k = 0; k < journoChannels.length; k++) out.push(chCard(journoChannels[k]));
   out.push('</div>');
 
-  // Portals
   out.push('<div class="vsec">');
-  out.push('<div class="vsec-hd">🔗 Civic Portals, RTI &amp; Fact-Check Tools</div>');
-  for (var k = 0; k < portals.length; k++) out.push(portalCard(portals[k]));
+  out.push('<div class="vsec-hd">🔗 Civic Portals, RTI &amp; Fact-Check</div>');
+  for (var l = 0; l < portals.length; l++) out.push(ptCard(portals[l]));
   out.push('</div>');
 
   el.innerHTML = out.join('');
+
+  // Wire up click-to-embed for non-live videos
+  el.querySelectorAll('.vthumb[data-vid]').forEach(function(thumb) {
+    thumb.addEventListener('click', function() {
+      var vid = this.getAttribute('data-vid');
+      var frame = document.createElement('div');
+      frame.className = 'vframe';
+      frame.innerHTML = '<iframe src="https://www.youtube.com/embed/' + vid + '?autoplay=1&rel=0" allowfullscreen allow="autoplay; encrypted-media" loading="lazy"></iframe>';
+      this.parentNode.replaceChild(frame, this);
+    });
+  });
 }
 
 
@@ -1352,7 +1352,14 @@ document.getElementById('rDesc').addEventListener('input', function() {
   document.getElementById('dc').textContent = this.value.length;
 });
 document.getElementById('rMedia').addEventListener('input', function() {
-  document.getElementById('mediaPreview').innerHTML = renderMedia(this.value.trim());
+  var url = this.value.trim();
+  if (!url) { document.getElementById('mediaPreview').innerHTML = ''; return; }
+  var check = contentSafe('', url);
+  if (!check.ok) {
+    document.getElementById('mediaPreview').innerHTML = '<div style="color:#ff1744;font-size:11px;padding:5px 0">' + esc(check.reason) + '</div>';
+    return;
+  }
+  document.getElementById('mediaPreview').innerHTML = renderMedia(url);
 });
 
 document.getElementById('btnSub').addEventListener('click', function() {
@@ -1368,6 +1375,12 @@ document.getElementById('btnSub').addEventListener('click', function() {
   if (!dist) { alert('Please enter your district or city.'); return; }
   if (!title) { alert('Please enter an issue title.'); return; }
   if (!desc || desc.length < 15) { alert('Please add more detail (at least 15 characters).'); return; }
+
+  // Content safety check
+  var titleCheck = contentSafe(title + ' ' + desc, '');
+  if (!titleCheck.ok) { alert('⚠️ ' + titleCheck.reason); return; }
+  var mediaCheck = contentSafe('', media);
+  if (!mediaCheck.ok) { alert('⚠️ ' + mediaCheck.reason); return; }
   var btn = this;
   btn.disabled = true; btn.textContent = '⏳ Registering...';
   var kw = classify(title + ' ' + desc);
@@ -1486,6 +1499,19 @@ document.getElementById('adminPwd').addEventListener('keydown', function(e) {
 document.getElementById('adminCancelBtn').addEventListener('click', function() {
   document.getElementById('adminBar').classList.remove('show');
   document.getElementById('adminPwd').value = '';
+});
+
+document.getElementById('adminClearBtn').addEventListener('click', function() {
+  if (!confirm('Clear ALL locally cached issues? This removes ghost issues from this browser. GitHub Issues remain unchanged.')) return;
+  localStorage.removeItem('bm_v5');
+  localStorage.removeItem('bm_v4');
+  localStorage.removeItem('bm_v3');
+  localStorage.removeItem('bm_seen_v3');
+  localStorage.removeItem('bm_seen_v2');
+  localStorage.removeItem('bm_seen_v1');
+  issues = issues.filter(function(i){ return i.src !== 'citizen'; });
+  updateCounters(); renderIssues(); updateChoropleth(); addIssueMarkers(issues);
+  alert('Cache cleared. Reload the page to refetch from GitHub.');
 });
 
 document.getElementById('adminLockBtn').addEventListener('click', function() {

@@ -798,71 +798,96 @@ function getDistrictCoords(district, state) {
   return null;
 }
 
-// Small deterministic offset so overlapping same-city dots spread slightly
-// Uses issue ID as seed so position stays stable across reloads
-function stableOffset(id, axis) {
-  var s = (id || '') + axis;
-  var h = 5381;
-  for (var i = 0; i < s.length; i++) h = ((h << 5) + h) ^ s.charCodeAt(i);
-  h = h >>> 0;
-  return ((h % 1000) / 1000 - 0.5) * 0.06; // ±0.03° ≈ 3km spread
+// Two independent hash functions for lat/lng — prevents correlated offsets
+function hash32a(s) {
+  var h = 0x811c9dc5;
+  for (var i = 0; i < s.length; i++) h = Math.imul(h ^ s.charCodeAt(i), 0x01000193);
+  return (h >>> 0);
+}
+function hash32b(s) {
+  var h = 0x5bd1e995;
+  for (var i = 0; i < s.length; i++) h = Math.imul(h ^ s.charCodeAt(i), 0x9e3779b9) ^ (h >>> 13);
+  return (h >>> 0);
 }
 
-// Try to extract a known city/district from the issue title or description
-// This helps RSS items that mention a city name get placed correctly
+// Returns a stable value in (-1, 1) for lat or lng independently
+function seedOffset(id, forLat) {
+  var h = forLat ? hash32a(id + 'LAT') : hash32b(id + 'LNG');
+  return (h % 10000) / 10000 - 0.5;  // -0.5 to +0.5
+}
+
+// Clamp inside India bounding box so no dots go into the ocean
+function clampIndia(lat, lng) {
+  return {
+    lat: Math.max(6.5, Math.min(37.5, lat)),
+    lng: Math.max(68.0, Math.min(97.5, lng))
+  };
+}
+
+// State spread radii (°) — bigger states get more spread
+var STATE_SPREAD = {
+  'Rajasthan':3.5,'Madhya Pradesh':3.0,'Maharashtra':2.8,'Uttar Pradesh':2.5,
+  'Jammu & Kashmir':3.5,'Gujarat':2.5,'Karnataka':2.5,'Andhra Pradesh':2.5,
+  'Odisha':2.0,'Chhattisgarh':2.0,'Tamil Nadu':1.8,'West Bengal':1.5,
+  'Bihar':1.5,'Telangana':1.5,'Assam':1.5,'Jharkhand':1.2,
+  'Punjab':1.0,'Haryana':0.8,'Kerala':0.8,'Arunachal Pradesh':2.5,
+  'default':1.2
+};
+
 function extractCityFromText(text) {
   if (!text) return null;
   var lower = text.toLowerCase();
   var cities = Object.keys(DC);
-  // prefer longer matches first to avoid "delhi" matching "new delhi"
   cities.sort(function(a,b){ return b.length - a.length; });
   for (var i = 0; i < cities.length; i++) {
-    if (lower.indexOf(cities[i]) >= 0) return cities[i];
+    // Only match whole words to avoid "india" matching "indiana"-style false hits
+    var idx = lower.indexOf(cities[i]);
+    if (idx < 0) continue;
+    var before = idx > 0 ? lower[idx-1] : ' ';
+    var after  = idx + cities[i].length < lower.length ? lower[idx + cities[i].length] : ' ';
+    if (/[a-z]/.test(before) || /[a-z]/.test(after)) continue; // mid-word, skip
+    return cities[i];
   }
   return null;
 }
 
 function issueCoords(iss) {
-  var id = iss.id || iss.ticket || '';
+  var id = iss.id || iss.ticket || String(iss.ts || '');
 
-  // ── Priority 1: Exact GPS coordinates (citizen reports with GPS) ──
-  if (iss.lat && iss.lng && Math.abs(iss.lat) > 0.1 && Math.abs(iss.lng) > 0.1) {
-    return { lat: +iss.lat, lng: +iss.lng };
+  // 1. Exact GPS from citizen report
+  if (iss.lat && iss.lng && Math.abs(+iss.lat) > 0.5 && Math.abs(+iss.lng) > 0.5) {
+    return clampIndia(+iss.lat, +iss.lng);
   }
 
-  // ── Priority 2: District field filled in (citizen reports) ────────
+  // 2. District centroid (citizen reports with district field)
   if (iss.district && iss.district.length > 1) {
     var dc = getDistrictCoords(iss.district, iss.state);
-    if (dc) return {
-      lat: dc.lat + stableOffset(id, 'lat'),
-      lng: dc.lng + stableOffset(id, 'lng')
-    };
+    if (dc) return clampIndia(
+      dc.lat + seedOffset(id, true)  * 0.05,
+      dc.lng + seedOffset(id, false) * 0.05
+    );
   }
 
-  // ── Priority 3: City name found in TITLE only (RSS items) ──────────
-  // Do NOT include state name — it causes false matches in DC dict
-  // e.g. "India" or "Madhya Pradesh" accidentally matching a district key
+  // 3. City name found in title (RSS news)
   var city = extractCityFromText(iss.title || '');
-  if (city && DC[city]) {
-    return {
-      lat: DC[city].lt + stableOffset(id, 'lat'),
-      lng: DC[city].lg + stableOffset(id, 'lng')
-    };
-  }
+  if (city && DC[city]) return clampIndia(
+    DC[city].lt + seedOffset(id, true)  * 0.04,
+    DC[city].lg + seedOffset(id, false) * 0.04
+  );
 
-  // ── Priority 4: State centroid — spread issues across the state ────
-  // Uses stableOffset so each issue gets a unique but fixed position.
-  // Scale ±0.8° (~88km) so dots visually fill the state rather than
-  // all piling on the capital. Issues with same state fan out across it.
+  // 4. State centroid with spread proportional to state size
   if (iss.state && iss.state !== 'India' && iss.state !== '') {
     var c = SC[iss.state];
-    if (c) return {
-      lat: c.lt + stableOffset(id, 'lat') * 14,   // ±0.84° spread
-      lng: c.lg + stableOffset(id, 'lng') * 14
-    };
+    if (c) {
+      var r = (STATE_SPREAD[iss.state] || STATE_SPREAD['default']);
+      return clampIndia(
+        c.lt + seedOffset(id, true)  * r,
+        c.lg + seedOffset(id, false) * r
+      );
+    }
   }
 
-  // ── Priority 5: No location data — do NOT plot on map ─────────────
+  // 5. No usable location → skip
   return null;
 }
 
@@ -967,135 +992,88 @@ function renderIssues() {
 // Groups issues by rounded lat/lng key, then fans them out in a 
 // small spiral so nearby dots are visible without overlapping.
 
+// ── MAP MARKERS ──────────────────────────────────────────────────
+// Uses issueCoords() which already handles GPS → district → city → state
+// with deterministic spread and India bounding box clamp.
+// markerPool stores real Marker objects so they can be properly removed.
 var markerPool = [];
-
-function spiralOffset(index, total) {
-  if (index === 0) return { dlat: 0, dlng: 0 };
-  // Sunflower / Fermat spiral — evenly spaces any number of dots
-  // radius grows with sqrt(index) so outer rings fill in nicely
-  var angle = index * 2.3999; // ~137.5° golden angle in radians
-  var radius = 0.055 * Math.sqrt(index); // 0.055° ≈ 6 km per step
-  return {
-    dlat: Math.sin(angle) * radius,
-    dlng: Math.cos(angle) * radius * 1.4 // wider lng spread (India is wider than tall)
-  };
-}
+var _lastMarkerCount = -1;
 
 function addIssueMarkers(issList) {
   if (!mapLoaded) return;
-  markerPool.forEach(function(m){ m.remove(); });
+
+  // Only redraw if data actually changed — prevents visual jump on card click
+  if (issList.length === _lastMarkerCount) return;
+  _lastMarkerCount = issList.length;
+
+  // Remove existing markers properly
+  for (var r = 0; r < markerPool.length; r++) markerPool[r].remove();
   markerPool = [];
 
-  // Filter: citizen always shown; RSS only if title mentions a known city
-  var eligible = issList.filter(function(iss) {
-    if (iss.src === 'citizen') return true;
-    var city = extractCityFromText(iss.title || '');
-    return city && DC[city];
-  });
-
-  // ── Group by location name (state + district) ──────────────────
-  // This is the key fix: group by NAME not by coords.
-  // stableOffset makes every coord unique so coord-based grouping
-  // always gives groups of 1 → spiral never fires → all dots stack.
-  var groups = {};
-  for (var i = 0; i < eligible.length; i++) {
-    var iss0 = eligible[i];
-    // Get the BASE coords (centroid only, no per-issue offset)
-    var baseCoords = null;
-    if (iss0.lat && iss0.lng) {
-      baseCoords = { lat: +iss0.lat, lng: +iss0.lng };
-    } else if (iss0.district) {
-      var dc0 = getDistrictCoords(iss0.district, iss0.state);
-      if (dc0) baseCoords = { lat: dc0.lat, lng: dc0.lng };
-    }
-    if (!baseCoords && iss0.src !== 'citizen') {
-      var city0 = extractCityFromText((iss0.title || '') + ' ' + (iss0.state || ''));
-      if (city0 && DC[city0]) baseCoords = { lat: DC[city0].lt, lng: DC[city0].lg };
-    }
-    if (!baseCoords) {
-      var sc0 = SC[iss0.state];
-      if (sc0) baseCoords = { lat: sc0.lt, lng: sc0.lg };
-    }
-    if (!baseCoords) continue;
-
-    // Group key = district name OR state name (same place = same group)
-    var gKey = (iss0.district && iss0.district.length > 1)
-      ? (iss0.state || '') + '|' + iss0.district
-      : (iss0.state || 'India');
-    if (!groups[gKey]) groups[gKey] = { base: baseCoords, items: [] };
-    groups[gKey].items.push(iss0);
-  }
-
-  // ── Render each group with spiral offsets ──────────────────────
   var rendered = 0;
-  var keys = Object.keys(groups);
-  for (var k = 0; k < keys.length; k++) {
-    var grp = groups[keys[k]];
-    var total = grp.items.length;
-    var base = grp.base;
-    for (var m = 0; m < total; m++) {
-      if (rendered >= 300) break;
-      var iss = grp.items[m];
-      var off = spiralOffset(m, total);
-      var lat = base.lat + off.dlat;
-      var lng = base.lng + off.dlng;
+  for (var i = 0; i < issList.length; i++) {
+    if (rendered >= 400) break;
+    var iss = issList[i];
 
-      var isCitizen = iss.src === 'citizen';
-      var isNew = (Date.now() - (iss.ts || 0)) < 300000;
-      var col = CC[iss.cat] || '#aaa';
-      var sz = iss.sev === 'emergency' ? 13 : iss.sev === 'critical' ? 11 : iss.sev === 'high' ? 9 : 7;
+    // issueCoords handles ALL location logic + clamping to India bbox
+    var coords = issueCoords(iss);
+    if (!coords) continue;
 
-      var el = document.createElement('div');
-      el.style.cssText = [
-        'width:' + sz + 'px',
-        'height:' + sz + 'px',
-        'border-radius:50%',
-        'background:' + col,
-        'border:' + (isCitizen ? '2px solid rgba(255,255,255,0.6)' : '1px solid ' + col + '80'),
-        'box-shadow:0 0 ' + (sz + 2) + 'px ' + col + '60',
-        'cursor:pointer',
-        'opacity:' + (isCitizen ? '1' : '0.65'),
-        'transition:transform .15s,opacity .15s',
-        'position:relative'
-      ].join(';');
-      if (isNew && isCitizen) el.className = 'marker-new';
+    var isCitizen = iss.src === 'citizen';
+    var isNew     = (Date.now() - (iss.ts || 0)) < 300000;
+    var col       = CC[iss.cat] || '#aaa';
+    var sz        = iss.sev === 'emergency' ? 13
+                  : iss.sev === 'critical'  ? 11
+                  : iss.sev === 'high'      ? 9 : 7;
 
-      (function(capturedIss, capturedEl, capturedCol) {
-        capturedEl.addEventListener('mouseenter', function() {
-          capturedEl.style.transform = 'scale(1.7)';
-          capturedEl.style.opacity = '1';
-          capturedEl.style.zIndex = '999';
-        });
-        capturedEl.addEventListener('mouseleave', function() {
-          capturedEl.style.transform = 'scale(1)';
-          capturedEl.style.opacity = capturedIss.src === 'citizen' ? '1' : '0.65';
-          capturedEl.style.zIndex = '';
-        });
+    var el = document.createElement('div');
+    el.style.cssText = [
+      'width:'  + sz + 'px',
+      'height:' + sz + 'px',
+      'border-radius:50%',
+      'background:' + col,
+      'border:' + (isCitizen ? '2px solid rgba(255,255,255,0.55)' : '1px solid ' + col + '70'),
+      'box-shadow:0 0 ' + (sz + 3) + 'px ' + col + '55',
+      'cursor:pointer',
+      'opacity:' + (isCitizen ? '1' : '0.6'),
+      'transition:transform .15s,opacity .15s'
+    ].join(';');
+    if (isNew && isCitizen) el.className = 'marker-new';
 
-        var popup = new maplibregl.Popup({ offset: 10, closeButton: false, maxWidth: '240px' })
-          .setHTML(
-            '<div style="font-size:12px">' +
-            '<div style="color:' + capturedCol + ';font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px">' +
-              esc(CL[capturedIss.cat] || capturedIss.cat) + ' &nbsp;·&nbsp; ' + (capturedIss.sev || '').toUpperCase() +
-            '</div>' +
-            '<div style="line-height:1.45;margin-bottom:5px;color:#cde">' + esc((capturedIss.title || '').slice(0, 90)) + '</div>' +
-            '<div style="color:#5a7090;font-size:10px">📍 ' + esc(capturedIss.state + (capturedIss.district ? ', ' + capturedIss.district : '')) + '</div>' +
-            (capturedIss.src === 'citizen'
-              ? '<div style="margin-top:5px;font-size:9px;color:#00ddb8;font-weight:700">🟢 CITIZEN REPORT</div>'
-              : '<div style="margin-top:5px;font-size:9px;color:#4a7090">📰 NEWS FEED</div>') +
-            '</div>'
-          );
+    (function(qi, qel, qcol) {
+      qel.addEventListener('mouseenter', function() {
+        qel.style.transform = 'scale(1.8)';
+        qel.style.opacity   = '1';
+        qel.style.zIndex    = '999';
+      });
+      qel.addEventListener('mouseleave', function() {
+        qel.style.transform = '';
+        qel.style.opacity   = qi.src === 'citizen' ? '1' : '0.6';
+        qel.style.zIndex    = '';
+      });
 
-        new maplibregl.Marker({ element: capturedEl })
-          .setLngLat([lng, lat])
-          .setPopup(popup)
-          .addTo(map);
-      })(iss, el, col);
+      var popup = new maplibregl.Popup({ offset: 10, closeButton: false, maxWidth: '240px' })
+        .setHTML(
+          '<div style="font-size:12px">' +
+          '<div style="color:' + qcol + ';font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px">' +
+            esc(CL[qi.cat] || qi.cat) + ' &nbsp;·&nbsp; ' + (qi.sev || '').toUpperCase() +
+          '</div>' +
+          '<div style="line-height:1.45;margin-bottom:5px;color:#cde">' + esc((qi.title || '').slice(0, 90)) + '</div>' +
+          '<div style="color:#5a7090;font-size:10px">📍 ' + esc(qi.state + (qi.district ? ', ' + qi.district : '')) + '</div>' +
+          (qi.src === 'citizen'
+            ? '<div style="margin-top:5px;font-size:9px;color:#00ddb8;font-weight:700">🟢 CITIZEN REPORT</div>'
+            : '<div style="margin-top:5px;font-size:9px;color:#4a7090">📰 NEWS FEED</div>') +
+          '</div>'
+        );
 
-      markerPool.push({ remove: function(){} });
-      rendered++;
-    }
-    if (rendered >= 300) break;
+      var mk = new maplibregl.Marker({ element: qel })
+        .setLngLat([coords.lng, coords.lat])
+        .setPopup(popup)
+        .addTo(map);
+      markerPool.push(mk);
+    })(iss, el, col);
+
+    rendered++;
   }
 }
 

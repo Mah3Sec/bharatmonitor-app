@@ -22,11 +22,18 @@ html,body{height:100%;font-family:'DM Sans',sans-serif;background:var(--bg);colo
 .logo{font-family:'Baloo 2',cursive;font-weight:800;font-size:20px;color:var(--white);display:flex;align-items:center;gap:8px}
 .logo span{color:var(--saffron)}
 .hc{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--muted)}
-.ld{width:7px;height:7px;border-radius:50%;background:var(--green);animation:pulse 1.5s infinite}
+.ld{width:7px;height:7px;border-radius:50%;background:var(--green);animation:pulse 1.5s infinite;flex-shrink:0}
 @keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.4;transform:scale(1.3)}}
 #liveCount{color:var(--saffron);font-weight:600}
-.btnr{background:var(--saffron);color:var(--white);border:none;border-radius:7px;padding:7px 16px;font-family:'Baloo 2',cursive;font-weight:700;font-size:13px;cursor:pointer}
+.hright{display:flex;align-items:center;gap:10px}
+.btnr{background:var(--saffron);color:var(--white);border:none;border-radius:7px;padding:7px 16px;font-family:'Baloo 2',cursive;font-weight:700;font-size:13px;cursor:pointer;transition:background .15s}
 .btnr:hover{background:var(--saffron2)}
+/* Feed status indicator */
+#feedStatus{font-size:10px;color:var(--muted);display:flex;align-items:center;gap:5px;cursor:pointer}
+#feedStatus .fsd{width:6px;height:6px;border-radius:50%;background:var(--muted);flex-shrink:0}
+#feedStatus.live .fsd{background:var(--green);animation:pulse 2s infinite}
+#feedStatus.error .fsd{background:var(--red)}
+#feedStatus.loading .fsd{background:var(--gold);animation:pulse 1s infinite}
 #body{flex:1;display:flex;overflow:hidden}
 #map{flex:1;position:relative}
 #mStats{position:absolute;top:12px;left:52px;display:flex;gap:8px;z-index:10;pointer-events:none}
@@ -39,11 +46,12 @@ html,body{height:100%;font-family:'DM Sans',sans-serif;background:var(--bg);colo
 .li{display:flex;align-items:center;gap:5px}.ld2{width:8px;height:8px;border-radius:50%}
 #ticker{position:absolute;bottom:0;left:0;right:0;background:rgba(8,15,28,.88);border-top:1px solid var(--border);padding:6px 14px;font-size:11.5px;display:flex;align-items:center;gap:10px;z-index:10}
 .tb{background:var(--red);border-radius:3px;padding:1px 6px;font-size:9px;font-weight:700;letter-spacing:1.5px;flex-shrink:0;animation:pulse 1.5s infinite}
-#tText{overflow:hidden;white-space:nowrap;text-overflow:ellipsis;transition:opacity .4s}
+#tText{overflow:hidden;white-space:nowrap;text-overflow:ellipsis;transition:opacity .4s;flex:1}
+#tTime{font-size:10px;color:var(--muted);flex-shrink:0;white-space:nowrap}
 #sidebar{width:340px;background:var(--panel);border-left:1px solid var(--border);display:flex;flex-direction:column;overflow:hidden;flex-shrink:0}
 .tabs{display:flex;border-bottom:1px solid var(--border);flex-shrink:0}
-.tbn{flex:1;padding:11px 0;background:transparent;border:none;border-bottom:2px solid transparent;color:var(--muted);font-family:'Baloo 2',cursive;font-weight:600;font-size:12px;letter-spacing:.5px;cursor:pointer;text-transform:uppercase}
-.tbn.active{color:var(--saffron);border-bottom-color:var(--saffron)}
+.tbn{flex:1;padding:11px 0;background:transparent;border:none;border-bottom:2px solid transparent;color:var(--muted);font-family:'Baloo 2',cursive;font-weight:600;font-size:12px;letter-spacing:.5px;cursor:pointer;text-transform:uppercase;transition:all .15s}
+.tbn:hover{color:var(--text)}.tbn.active{color:var(--saffron);border-bottom-color:var(--saffron)}
 .tpn{display:none;flex:1;overflow:hidden;flex-direction:column}
 .tpn.active{display:flex}
 #stInf{background:var(--panel2);border-bottom:1px solid var(--border);padding:14px 16px;display:none;flex-shrink:0}
@@ -56,13 +64,22 @@ html,body{height:100%;font-family:'DM Sans',sans-serif;background:var(--bg);colo
 .cbt{flex:1;height:4px;background:var(--border2);border-radius:2px;overflow:hidden}
 .cbf{height:100%;border-radius:2px;transition:width .5s ease}
 .cbv{font-size:10px;color:var(--muted);width:38px;text-align:right;flex-shrink:0}
+/* Feed data source badges */
+.src-badge{font-size:9px;padding:1px 5px;border-radius:3px;font-weight:600;letter-spacing:.5px}
+.src-rss{background:#00B4D820;color:var(--sky);border:1px solid #00B4D840}
+.src-citizen{background:#00E5CC20;color:var(--teal);border:1px solid #00E5CC40}
+.src-demo{background:#FF751820;color:var(--saffron);border:1px solid #FF751840}
 .filt{padding:8px 12px;border-bottom:1px solid var(--border);display:flex;gap:5px;flex-wrap:wrap;flex-shrink:0}
-.fp{padding:3px 10px;border-radius:20px;border:1px solid var(--border);background:transparent;color:var(--muted);font-size:11px;cursor:pointer;font-family:inherit}
+.fp{padding:3px 10px;border-radius:20px;border:1px solid var(--border);background:transparent;color:var(--muted);font-size:11px;cursor:pointer;font-family:inherit;transition:all .12s}
 .fp.active{background:#FF751815;border-color:var(--saffron);color:var(--saffron)}
 .fp[data-cat="water"].active{background:#00B4D815;border-color:var(--sky);color:var(--sky)}
 .fp[data-cat="power"].active{background:#FFD70015;border-color:var(--gold);color:var(--gold)}
 .fp[data-cat="health"].active{background:#FF174415;border-color:var(--red);color:var(--red)}
 .fp[data-cat="corrupt"].active{background:#00E5CC15;border-color:var(--teal);color:var(--teal)}
+/* Last updated bar */
+#lastUpdated{padding:5px 12px;background:rgba(24,45,72,.6);border-bottom:1px solid var(--border);font-size:10px;color:var(--muted);display:flex;justify-content:space-between;align-items:center;flex-shrink:0}
+.refresh-btn{background:transparent;border:1px solid var(--border);border-radius:4px;color:var(--muted);font-size:10px;padding:2px 7px;cursor:pointer;font-family:inherit;transition:all .12s}
+.refresh-btn:hover{border-color:var(--saffron);color:var(--saffron)}
 #iList{flex:1;overflow-y:auto;scrollbar-width:thin;scrollbar-color:var(--border) transparent}
 #iList::-webkit-scrollbar{width:3px}
 #iList::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px}
@@ -76,12 +93,12 @@ html,body{height:100%;font-family:'DM Sans',sans-serif;background:var(--bg);colo
 .s-high{background:#FFD70020;color:var(--gold);border:1px solid #FFD70040}
 .s-medium{background:#00B4D820;color:var(--sky);border:1px solid #00B4D840}
 .s-low{background:#00E5CC20;color:var(--teal);border:1px solid #00E5CC40}
-.im{font-size:11px;color:var(--muted);display:flex;gap:8px;flex-wrap:wrap;margin-top:4px}
-.iab{margin-top:8px;width:100%;padding:5px;border:1px solid #FF751840;background:#FF751810;border-radius:5px;color:var(--saffron);font-size:11px;cursor:pointer;font-family:inherit}
+.im{font-size:11px;color:var(--muted);display:flex;gap:8px;flex-wrap:wrap;margin-top:4px;align-items:center}
+.iab{margin-top:8px;width:100%;padding:5px;border:1px solid #FF751840;background:#FF751810;border-radius:5px;color:var(--saffron);font-size:11px;cursor:pointer;font-family:inherit;transition:background .1s}
 .iab:hover{background:#FF751825}
 #aiPnl{padding:14px 16px;font-size:12.5px;line-height:1.8;color:var(--text);overflow-y:auto;flex:1;scrollbar-width:thin}
 .ae{display:flex;flex-direction:column;align-items:center;justify-content:center;height:220px;color:var(--muted);text-align:center;gap:10px}
-#rPnl{padding:14px 16px;overflow-y:auto;flex:1;scrollbar-width:thin}
+#rPnl{padding:14px 16px;overflow-y:auto;flex:1;scrollbar-width:thin;scrollbar-color:var(--border) transparent}
 .fg{margin-bottom:13px}
 .fl{display:block;font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:5px}
 .fi,.fsl,.fta{width:100%;background:var(--panel2);border:1px solid var(--border);border-radius:7px;padding:8px 11px;font-size:12.5px;color:var(--text);font-family:inherit;outline:none;transition:border-color .15s}
@@ -89,32 +106,46 @@ html,body{height:100%;font-family:'DM Sans',sans-serif;background:var(--bg);colo
 .fi::placeholder,.fta::placeholder{color:var(--muted)}
 .fsl option{background:var(--panel)}
 .fta{min-height:72px;resize:vertical}
-.bts{width:100%;padding:10px;background:var(--saffron);color:var(--white);border:none;border-radius:7px;font-family:'Baloo 2',cursive;font-weight:700;font-size:14px;cursor:pointer;margin-top:4px}
+.bts{width:100%;padding:10px;background:var(--saffron);color:var(--white);border:none;border-radius:7px;font-family:'Baloo 2',cursive;font-weight:700;font-size:14px;cursor:pointer;margin-top:4px;transition:background .15s}
 .bts:hover{background:var(--saffron2)}.bts:disabled{background:var(--muted2);cursor:not-allowed}
 .sbox{text-align:center;padding:20px 16px}
 .sgrid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:12px 0}
 .scel{background:var(--panel2);border:1px solid var(--border);border-radius:7px;padding:10px}
 .scl{font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:4px}
-.btse{width:100%;padding:9px;background:transparent;border:1px solid var(--border);border-radius:7px;color:var(--muted);font-size:12px;cursor:pointer;font-family:inherit}
+.btse{width:100%;padding:9px;background:transparent;border:1px solid var(--border);border-radius:7px;color:var(--muted);font-size:12px;cursor:pointer;font-family:inherit;transition:border-color .15s}
+.btse:hover{border-color:var(--border2)}
 .maplibregl-popup-content{background:var(--panel)!important;border:1px solid var(--border2)!important;border-radius:8px!important;padding:10px 12px!important;color:var(--text)!important;font-family:'DM Sans',sans-serif!important}
 .maplibregl-popup-tip{border-top-color:var(--panel)!important}
 .maplibregl-ctrl-group{background:var(--panel)!important;border:1px solid var(--border)!important}
 .maplibregl-ctrl-group button{background:var(--panel)!important;color:var(--text)!important}
 .maplibregl-ctrl-attrib{background:rgba(8,15,28,.7)!important;color:var(--muted)!important;font-size:10px!important}
+/* Loading skeleton */
+.loading-item{padding:12px 16px;border-bottom:1px solid #0e1c2e}
+.skel{background:linear-gradient(90deg,#101d30 25%,#182d48 50%,#101d30 75%);background-size:200% 100%;animation:shimmer 1.5s infinite;border-radius:4px;height:12px;margin-bottom:6px}
+@keyframes shimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}
 </style>
 </head>
 <body>
 <div id="app">
   <header id="header">
     <div class="logo">🇮🇳 Bharat<span>Monitor</span></div>
-    <div class="hc"><div class="ld"></div><span id="liveCount">1,24,832</span>&nbsp;active issues across India</div>
-    <button class="btnr" id="btnReport">+ Report Issue</button>
+    <div class="hc">
+      <div class="ld"></div>
+      <span id="liveCount">1,24,832</span>&nbsp;active issues
+      &nbsp;·&nbsp;
+      <div id="feedStatus" class="loading" title="RSS Feed Status">
+        <div class="fsd"></div><span id="feedStatusText">Loading feeds...</span>
+      </div>
+    </div>
+    <div class="hright">
+      <button class="btnr" id="btnReport">+ Report Issue</button>
+    </div>
   </header>
   <div id="body">
     <div id="map">
       <div id="mStats">
         <div class="sc"><div class="sv">36</div><div class="sl">States & UTs</div></div>
-        <div class="sc g"><div class="sv">89.2K</div><div class="sl">Resolved 30d</div></div>
+        <div class="sc g"><div class="sv" id="resolvedCount">89.2K</div><div class="sl">Resolved 30d</div></div>
         <div class="sc s"><div class="sv">47.2L</div><div class="sl">Citizens Active</div></div>
       </div>
       <div id="mLeg">
@@ -124,7 +155,7 @@ html,body{height:100%;font-family:'DM Sans',sans-serif;background:var(--bg);colo
         <div class="li"><div class="ld2" style="background:#2a6040"></div><span>2K+</span></div>
         <div class="li"><div class="ld2" style="background:#1a4060"></div><span>&lt;2K</span></div>
       </div>
-      <div id="ticker"><span class="tb">LIVE</span><span id="tText">Loading...</span></div>
+      <div id="ticker"><span class="tb">LIVE</span><span id="tText">Loading...</span><span id="tTime"></span></div>
     </div>
     <div id="sidebar">
       <div id="stInf">
@@ -141,13 +172,17 @@ html,body{height:100%;font-family:'DM Sans',sans-serif;background:var(--bg);colo
       <div class="tpn active" id="panel-feed">
         <div class="filt">
           <button class="fp active" data-cat="all">All</button>
-          <button class="fp" data-cat="roads" style="color:#FF7518">🛣️ Roads</button>
-          <button class="fp" data-cat="water" style="color:#00B4D8">💧 Water</button>
-          <button class="fp" data-cat="power" style="color:#FFD700">⚡ Power</button>
-          <button class="fp" data-cat="health" style="color:#FF4455">🏥 Health</button>
-          <button class="fp" data-cat="corrupt" style="color:#00E5CC">🔍 Corruption</button>
+          <button class="fp" data-cat="roads">🛣️ Roads</button>
+          <button class="fp" data-cat="water">💧 Water</button>
+          <button class="fp" data-cat="power">⚡ Power</button>
+          <button class="fp" data-cat="health">🏥 Health</button>
+          <button class="fp" data-cat="corrupt">🔍 Corrupt</button>
         </div>
-        <div id="iList"></div>
+        <div id="lastUpdated">
+          <span id="lastUpdatedText">Fetching live data...</span>
+          <button class="refresh-btn" id="btnRefresh">↻ Refresh</button>
+        </div>
+        <div id="iList"><div class="loading-item"><div class="skel" style="width:80%"></div><div class="skel" style="width:55%"></div></div><div class="loading-item"><div class="skel" style="width:70%"></div><div class="skel" style="width:45%"></div></div><div class="loading-item"><div class="skel" style="width:85%"></div><div class="skel" style="width:60%"></div></div></div>
       </div>
       <div class="tpn" id="panel-report">
         <div id="rPnl">
@@ -161,9 +196,9 @@ html,body{height:100%;font-family:'DM Sans',sans-serif;background:var(--bg);colo
                 <option value="corrupt">🔍 Corruption / Govt Services</option>
               </select>
             </div>
-            <div class="fg"><label class="fl">Issue Title *</label><input class="fi" id="rTitle" placeholder="e.g. Broken road near village school..."/></div>
-            <div class="fg"><label class="fl">State / District *</label><input class="fi" id="rState" placeholder="e.g. Rajasthan, Jaipur"/></div>
-            <div class="fg"><label class="fl">Description *</label><textarea class="fta" id="rDesc" placeholder="Describe the problem..."></textarea></div>
+            <div class="fg"><label class="fl">Issue Title *</label><input class="fi" id="rTitle" placeholder="e.g. Broken road near village school..." maxlength="200"/></div>
+            <div class="fg"><label class="fl">State / District *</label><input class="fi" id="rState" placeholder="e.g. Rajasthan, Jaipur" maxlength="100"/></div>
+            <div class="fg"><label class="fl">Description *</label><textarea class="fta" id="rDesc" placeholder="Describe the problem — since when, who is affected..." maxlength="600"></textarea></div>
             <button class="bts" id="btnSubmit">Submit Issue →</button>
           </div>
           <div id="rSuccess" style="display:none"></div>
@@ -183,8 +218,21 @@ html,body{height:100%;font-family:'DM Sans',sans-serif;background:var(--bg);colo
 </div>
 <script src="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.js"></script>
 <script>
+'use strict';
+
 // ══════════════════════════════════════════
-// DATA
+// SECURITY: XSS-safe string escaping
+// All user/external content goes through escapeHtml() before DOM insertion
+// ══════════════════════════════════════════
+function escapeHtml(str) {
+  return String(str || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#x27;');
+}
+function safeText(el, text) {
+  el.textContent = String(text || '');
+}
+
+// ══════════════════════════════════════════
+// STATE DATA (all 36 states + UTs)
 // ══════════════════════════════════════════
 var STATES = {
   'Uttar Pradesh':{issues:18430,roads:5898,water:3870,power:3317,health:2580,corrupt:2765,trend:'+4.2%'},
@@ -225,179 +273,413 @@ var STATES = {
   'Dadra & Nagar Haveli':{issues:90,roads:29,water:19,power:16,health:13,corrupt:13,trend:'+0.5%'}
 };
 
-var ISSUES = [
-  {id:'i01',title:'NH-48 pothole cluster near Gurugram toll — 2,847 reports',state:'Haryana',district:'Gurugram',cat:'roads',sev:'critical',dept:'NHAI',ts:Date.now()-120000,lat:28.459,lng:77.026},
-  {id:'i02',title:'Contaminated water supply Dharavi Ward 7 — cholera risk',state:'Maharashtra',district:'Mumbai',cat:'water',sev:'emergency',dept:'BMC Water',ts:Date.now()-300000,lat:19.041,lng:72.855},
-  {id:'i03',title:'AIIMS Patna — critical oxygen shortage in ICU ward',state:'Bihar',district:'Patna',cat:'health',sev:'emergency',dept:'Health Ministry',ts:Date.now()-540000,lat:25.604,lng:85.137},
-  {id:'i04',title:'25-hour power cuts in Indore industrial zone',state:'Madhya Pradesh',district:'Indore',cat:'power',sev:'high',dept:'MPEB',ts:Date.now()-840000,lat:22.719,lng:75.857},
-  {id:'i05',title:'Ration card portal offline 14 days — 8,934 families affected',state:'Uttar Pradesh',district:'Lucknow',cat:'corrupt',sev:'high',dept:'Food & Civil Supplies',ts:Date.now()-1380000,lat:26.846,lng:80.946},
-  {id:'i06',title:'Bridge crack on SH-12 Howrah — structural risk',state:'West Bengal',district:'Howrah',cat:'roads',sev:'emergency',dept:'PWD West Bengal',ts:Date.now()-1860000,lat:22.595,lng:88.263},
-  {id:'i07',title:'Bribe demands at land registry offices — Bengaluru',state:'Karnataka',district:'Bengaluru',cat:'corrupt',sev:'high',dept:'ACB Revenue',ts:Date.now()-2700000,lat:13.079,lng:77.590},
-  {id:'i08',title:'Sewage overflow — Jaipur Pink City heritage zone',state:'Rajasthan',district:'Jaipur',cat:'water',sev:'medium',dept:'JDA',ts:Date.now()-3600000,lat:26.924,lng:75.824},
-  {id:'i09',title:'Hospital staff shortage — Varanasi district hospital at 40%',state:'Uttar Pradesh',district:'Varanasi',cat:'health',sev:'high',dept:'MOHFW UP',ts:Date.now()-4200000,lat:25.317,lng:82.973},
-  {id:'i10',title:'Transformer failure — 3 villages dark 48h in Vidarbha',state:'Maharashtra',district:'Amravati',cat:'power',sev:'high',dept:'MSEDCL',ts:Date.now()-5400000,lat:20.932,lng:77.775},
-  {id:'i11',title:'Arsenic 3x safe limit in drinking water — North Bihar',state:'Bihar',district:'Sitamarhi',cat:'water',sev:'critical',dept:'PHED Bihar',ts:Date.now()-7200000,lat:26.593,lng:85.490},
-  {id:'i12',title:'Road cave-in after rain — NH66 Kozhikode',state:'Kerala',district:'Kozhikode',cat:'roads',sev:'critical',dept:'NHAI Kerala',ts:Date.now()-10800000,lat:11.258,lng:75.780},
-  {id:'i13',title:'Street lights off 3 months — Karol Bagh Zone 4, Delhi',state:'Delhi',district:'West Delhi',cat:'roads',sev:'medium',dept:'NDMC',ts:Date.now()-12000000,lat:28.651,lng:77.190},
-  {id:'i14',title:'Coal shortage — Telangana power plant at 40% capacity',state:'Telangana',district:'Nalgonda',cat:'power',sev:'critical',dept:'TSGENCO',ts:Date.now()-25200000,lat:17.050,lng:79.266},
-  {id:'i15',title:'Manual scavengers deployed illegally — Bhopal',state:'Madhya Pradesh',district:'Bhopal',cat:'corrupt',sev:'critical',dept:'Urban Development',ts:Date.now()-36000000,lat:23.259,lng:77.412}
+// ══════════════════════════════════════════
+// RSS FEED DEFINITIONS (real Indian sources)
+// ══════════════════════════════════════════
+var FEEDS = [
+  // Tier 1 — High reliability
+  {name:'The Hindu',    url:'https://www.thehindu.com/news/national/feeder/default.rss',            cat:'roads',   tier:1},
+  {name:'NDTV India',   url:'https://feeds.feedburner.com/NDTV-LatestNews',                         cat:'health',  tier:1},
+  {name:'Indian Express',url:'https://indianexpress.com/section/india/feed/',                        cat:'corrupt', tier:1},
+  {name:'The Wire',     url:'https://thewire.in/feed',                                               cat:'corrupt', tier:2},
+  {name:'The Print',    url:'https://theprint.in/feed/',                                             cat:'corrupt', tier:2},
+  {name:'ET Energy',    url:'https://energy.economictimes.indiatimes.com/rss/topstories',            cat:'power',   tier:2},
+  {name:'PIB India',    url:'https://pib.gov.in/RssMain.aspx?ModId=6&Lang=1&Regid=3',               cat:'roads',   tier:1},
+  {name:'MoHFW',        url:'https://mohfw.gov.in/rss.xml',                                          cat:'health',  tier:1},
 ];
 
+// ══════════════════════════════════════════
+// KEYWORD CLASSIFIER (instant, no API)
+// ══════════════════════════════════════════
+var CAT_KEYWORDS = {
+  roads:  ['road','highway','pothole','bridge','flyover','nhai','pwd','traffic','nh-','construction','pavement','street','overpass'],
+  water:  ['water','sewage','sanitation','drainage','tap','pipeline','contaminated','jal','flood','drain','groundwater','supply'],
+  power:  ['electricity','power cut','outage','transformer','voltage','discom','blackout','generator','load shedding','electric','coal'],
+  health: ['hospital','doctor','medicine','icu','ambulance','health','medical','aiims','clinic','oxygen','patient','mohfw','vaccine','disease'],
+  corrupt:['bribe','corruption','scam','fraud','illegal','ration','complaint','government officer','acb','cbi','lokayukta','embezzle','tender'],
+};
+
+var SEV_KEYWORDS = {
+  emergency: ['death','died','killed','fatal','collapse','explosion','blast','flood','cyclone','earthquake','oxygen shortage','hospital fire','drowning'],
+  critical:  ['contaminated','poisonous','outbreak','epidemic','structural failure','bridge crack','road caved','no water','total blackout','arsenic','cholera'],
+  high:      ['pothole','power cut','sewage','bribe','corruption','ration','shortage','delayed','offline','broken','damaged','overflowing'],
+  medium:    ['complaint','issue','problem','repair','pending','request','maintenance','delay'],
+};
+
+function classify(text) {
+  var lower = (text || '').toLowerCase();
+  var cat = 'roads', catScore = 0;
+  for (var c in CAT_KEYWORDS) {
+    var score = CAT_KEYWORDS[c].filter(function(k){ return lower.includes(k); }).length;
+    if (score > catScore) { catScore = score; cat = c; }
+  }
+  var sev = 'medium';
+  for (var s in SEV_KEYWORDS) {
+    if (SEV_KEYWORDS[s].some(function(k){ return lower.includes(k); })) { sev = s; break; }
+  }
+  return { cat: cat, sev: sev };
+}
+
+// ══════════════════════════════════════════
+// STATE MANAGEMENT
+// ══════════════════════════════════════════
 var CC = {roads:'#FF7518',water:'#00B4D8',power:'#FFD700',health:'#FF4455',corrupt:'#00E5CC'};
 var CI = {roads:'🛣️',water:'💧',power:'⚡',health:'🏥',corrupt:'🔍'};
 var CL = {roads:'Roads',water:'Water',power:'Power',health:'Health',corrupt:'Corruption'};
 
-var issues = ISSUES.slice();
+// Demo issues shown before RSS loads
+var DEMO_ISSUES = [
+  {id:'d01',title:'NH-48 pothole cluster near Gurugram toll — 2,847 reports',state:'Haryana',district:'Gurugram',cat:'roads',sev:'critical',dept:'NHAI',ts:Date.now()-120000,lat:28.459,lng:77.026,src:'demo'},
+  {id:'d02',title:'Contaminated water supply Dharavi Ward 7 — cholera risk',state:'Maharashtra',district:'Mumbai',cat:'water',sev:'emergency',dept:'BMC Water',ts:Date.now()-300000,lat:19.041,lng:72.855,src:'demo'},
+  {id:'d03',title:'AIIMS Patna — critical oxygen shortage in ICU ward',state:'Bihar',district:'Patna',cat:'health',sev:'emergency',dept:'Health Ministry',ts:Date.now()-540000,lat:25.604,lng:85.137,src:'demo'},
+  {id:'d04',title:'25-hour power cuts in Indore industrial zone',state:'Madhya Pradesh',district:'Indore',cat:'power',sev:'high',dept:'MPEB',ts:Date.now()-840000,lat:22.719,lng:75.857,src:'demo'},
+  {id:'d05',title:'Ration card portal offline 14 days — 8,934 families affected',state:'Uttar Pradesh',district:'Lucknow',cat:'corrupt',sev:'high',dept:'Food & Civil Supplies',ts:Date.now()-1380000,lat:26.846,lng:80.946,src:'demo'},
+  {id:'d06',title:'Bridge crack on SH-12 Howrah — structural risk',state:'West Bengal',district:'Howrah',cat:'roads',sev:'emergency',dept:'PWD West Bengal',ts:Date.now()-1860000,lat:22.595,lng:88.263,src:'demo'},
+  {id:'d07',title:'Bribe demands at land registry offices — Bengaluru',state:'Karnataka',district:'Bengaluru',cat:'corrupt',sev:'high',dept:'ACB Revenue',ts:Date.now()-2700000,lat:13.079,lng:77.590,src:'demo'},
+  {id:'d08',title:'Sewage overflow — Jaipur Pink City heritage zone',state:'Rajasthan',district:'Jaipur',cat:'water',sev:'medium',dept:'JDA',ts:Date.now()-3600000,lat:26.924,lng:75.824,src:'demo'},
+  {id:'d09',title:'Hospital staff shortage — Varanasi district hospital at 40%',state:'Uttar Pradesh',district:'Varanasi',cat:'health',sev:'high',dept:'MOHFW UP',ts:Date.now()-4200000,lat:25.317,lng:82.973,src:'demo'},
+  {id:'d10',title:'Transformer failure — 3 villages dark 48h in Vidarbha',state:'Maharashtra',district:'Amravati',cat:'power',sev:'high',dept:'MSEDCL',ts:Date.now()-5400000,lat:20.932,lng:77.775,src:'demo'},
+  {id:'d11',title:'Arsenic 3x safe limit in drinking water — North Bihar',state:'Bihar',district:'Sitamarhi',cat:'water',sev:'critical',dept:'PHED Bihar',ts:Date.now()-7200000,lat:26.593,lng:85.490,src:'demo'},
+  {id:'d12',title:'Road cave-in after rain — NH66 Kozhikode',state:'Kerala',district:'Kozhikode',cat:'roads',sev:'critical',dept:'NHAI Kerala',ts:Date.now()-10800000,lat:11.258,lng:75.780,src:'demo'},
+];
+
+var issues = [];
 var activeFilter = 'all';
 var selectedId = null;
 var liveCount = 124832;
 var tickerIdx = 0;
+var lastFetchTime = null;
+var feedsLoaded = 0;
+var feedsFailed = 0;
+
+// ══════════════════════════════════════════
+// LOCALSTORAGE — persist citizen reports
+// ══════════════════════════════════════════
+var STORAGE_KEY = 'bharatmonitor_reports_v2';
+
+function loadStoredReports() {
+  try {
+    var raw = localStorage.getItem(STORAGE_KEY);
+    if (!raw) return [];
+    var data = JSON.parse(raw);
+    if (!Array.isArray(data)) return [];
+    // Restore timestamp as number
+    return data.map(function(r) {
+      r.ts = r.ts || Date.now();
+      r.src = 'citizen';
+      return r;
+    });
+  } catch(e) { return []; }
+}
+
+function saveReports(reports) {
+  try {
+    var citizen = reports.filter(function(r){ return r.src === 'citizen'; });
+    // Keep max 50 citizen reports
+    citizen = citizen.slice(0, 50);
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(citizen));
+  } catch(e) {}
+}
 
 // ══════════════════════════════════════════
 // HELPERS
 // ══════════════════════════════════════════
 function timeAgo(ts) {
-  var s = (Date.now()-ts)/1000;
-  if(s<60) return Math.floor(s)+'s ago';
-  if(s<3600) return Math.floor(s/60)+'m ago';
-  if(s<86400) return Math.floor(s/3600)+'h ago';
-  return Math.floor(s/86400)+'d ago';
+  var s = (Date.now() - ts) / 1000;
+  if (s < 60)    return Math.floor(s) + 's ago';
+  if (s < 3600)  return Math.floor(s/60) + 'm ago';
+  if (s < 86400) return Math.floor(s/3600) + 'h ago';
+  return Math.floor(s/86400) + 'd ago';
 }
+
 function iColor(n) {
   return n>12000?'#7a1520':n>8000?'#a33020':n>5000?'#8a5010':n>2000?'#2a6040':n>500?'#1a4060':'#0f2035';
 }
+
 function switchTab(t) {
   document.querySelectorAll('.tbn').forEach(function(b){ b.classList.toggle('active', b.getAttribute('data-tab')===t); });
   document.querySelectorAll('.tpn').forEach(function(p){ p.classList.toggle('active', p.id==='panel-'+t); });
 }
 
-// ══════════════════════════════════════════
-// RENDER ISSUE LIST
-// ══════════════════════════════════════════
-function renderIssues() {
-  var f = activeFilter==='all' ? issues : issues.filter(function(i){ return i.cat===activeFilter; });
-  var html = '';
-  for(var i=0;i<f.length;i++) {
-    var iss = f[i];
-    var sel = iss.id === selectedId;
-    html += '<div class="ic'+(sel?' sel':'')+'" data-id="'+iss.id+'">';
-    html += '<div class="ir">';
-    html += '<div class="it">'+CI[iss.cat]+' '+iss.title+'</div>';
-    html += '<span class="sv2 s-'+iss.sev+'">'+iss.sev+'</span>';
-    html += '</div>';
-    html += '<div class="im"><span>📍 '+iss.state+(iss.district?', '+iss.district:'')+'</span><span>🏛️ '+iss.dept+'</span><span>'+timeAgo(iss.ts)+'</span></div>';
-    if(sel) html += '<button class="iab" data-id="'+iss.id+'">🤖 Analyze with AI →</button>';
-    html += '</div>';
-  }
-  document.getElementById('iList').innerHTML = html;
-
-  var cards = document.getElementById('iList').getElementsByClassName('ic');
-  for(var j=0;j<cards.length;j++) {
-    (function(card) {
-      card.addEventListener('click', function(e) {
-        var btn = e.target;
-        while(btn && btn !== card) {
-          if(btn.classList && btn.classList.contains('iab')) {
-            var id = btn.getAttribute('data-id');
-            for(var k=0;k<issues.length;k++) {
-              if(issues[k].id===id){ analyzeIssue(issues[k]); return; }
-            }
-          }
-          btn = btn.parentNode;
-        }
-        var id = card.getAttribute('data-id');
-        selectedId = (selectedId===id) ? null : id;
-        renderIssues();
-      });
-    })(cards[j]);
-  }
+function srcBadgeHtml(src) {
+  if (src === 'rss')     return '<span class="src-badge src-rss">RSS</span>';
+  if (src === 'citizen') return '<span class="src-badge src-citizen">CITIZEN</span>';
+  return '<span class="src-badge src-demo">DEMO</span>';
 }
 
 // ══════════════════════════════════════════
-// MAP
+// RENDER ISSUE LIST (XSS-safe)
+// ══════════════════════════════════════════
+function renderIssues() {
+  var f = activeFilter === 'all' ? issues : issues.filter(function(i){ return i.cat === activeFilter; });
+  var listEl = document.getElementById('iList');
+
+  if (f.length === 0) {
+    listEl.innerHTML = '<div style="padding:24px;text-align:center;color:#4a6080;font-size:13px">No issues found for this filter.</div>';
+    return;
+  }
+
+  var frag = document.createDocumentFragment();
+  for (var i = 0; i < f.length; i++) {
+    var iss = f[i];
+    var sel = iss.id === selectedId;
+    var card = document.createElement('div');
+    card.className = 'ic' + (sel ? ' sel' : '');
+    card.setAttribute('data-id', iss.id);
+
+    // Build inner HTML safely using escapeHtml
+    var inner = '<div class="ir">';
+    inner += '<div class="it">' + escapeHtml(CI[iss.cat]) + ' ' + escapeHtml(iss.title) + '</div>';
+    inner += '<span class="sv2 s-' + escapeHtml(iss.sev) + '">' + escapeHtml(iss.sev) + '</span>';
+    inner += '</div>';
+    inner += '<div class="im">';
+    inner += '<span>📍 ' + escapeHtml(iss.state) + (iss.district ? ', ' + escapeHtml(iss.district) : '') + '</span>';
+    inner += '<span>🏛️ ' + escapeHtml(iss.dept) + '</span>';
+    inner += '<span>' + escapeHtml(timeAgo(iss.ts)) + '</span>';
+    inner += srcBadgeHtml(iss.src);
+    if (iss.link) {
+      inner += '<a href="' + escapeHtml(iss.link) + '" target="_blank" rel="noopener noreferrer" style="color:var(--sky);font-size:10px;text-decoration:none" onclick="event.stopPropagation()">↗ Source</a>';
+    }
+    inner += '</div>';
+    if (sel) {
+      inner += '<button class="iab" data-id="' + escapeHtml(iss.id) + '">🤖 Analyze with AI →</button>';
+    }
+    card.innerHTML = inner;
+    frag.appendChild(card);
+  }
+
+  listEl.innerHTML = '';
+  listEl.appendChild(frag);
+
+  // Event delegation — one listener on the list
+  listEl.onclick = function(e) {
+    var btn = e.target.closest('.iab');
+    if (btn) {
+      e.stopPropagation();
+      var id = btn.getAttribute('data-id');
+      var found = issues.find(function(x){ return x.id === id; });
+      if (found) analyzeIssue(found);
+      return;
+    }
+    var card = e.target.closest('.ic');
+    if (!card) return;
+    var id = card.getAttribute('data-id');
+    selectedId = (selectedId === id) ? null : id;
+    renderIssues();
+  };
+}
+
+// ══════════════════════════════════════════
+// RSS FEED FETCHER
+// Real feeds loaded via /api/rss proxy
+// ══════════════════════════════════════════
+var seenIds = new Set();
+var feedCircuitBreaker = {}; // domain → failCount
+
+function extractDomain(url) {
+  try { return new URL(url).hostname.replace('www.',''); } catch(e){ return url; }
+}
+
+function fetchFeed(feed) {
+  var domain = extractDomain(feed.url);
+  // Skip if circuit tripped (3+ failures)
+  if ((feedCircuitBreaker[domain] || 0) >= 3) return Promise.resolve(null);
+
+  return fetch('/api/rss?url=' + encodeURIComponent(feed.url))
+    .then(function(r){ return r.json(); })
+    .then(function(data) {
+      if (!data.ok || !data.items) {
+        feedCircuitBreaker[domain] = (feedCircuitBreaker[domain] || 0) + 1;
+        return null;
+      }
+      feedCircuitBreaker[domain] = 0; // reset on success
+      feedsLoaded++;
+      return processRSSItems(data.items, feed);
+    })
+    .catch(function() {
+      feedCircuitBreaker[domain] = (feedCircuitBreaker[domain] || 0) + 1;
+      feedsFailed++;
+      return null;
+    });
+}
+
+function processRSSItems(items, feed) {
+  var newIssues = [];
+  for (var i = 0; i < items.length; i++) {
+    var item = items[i];
+    if (!item.title || item.title.length < 10) continue;
+
+    // Deduplicate by title hash
+    var key = item.title.slice(0, 60).toLowerCase().replace(/\s+/g, ' ');
+    if (seenIds.has(key)) continue;
+    seenIds.add(key);
+
+    // Classify
+    var cls = classify(item.title + ' ' + (item.description || ''));
+
+    // Parse date
+    var ts = item.pubDate ? new Date(item.pubDate).getTime() : Date.now();
+    if (isNaN(ts)) ts = Date.now();
+
+    newIssues.push({
+      id:       'rss-' + Date.now() + '-' + i,
+      title:    item.title,
+      state:    inferState(item.title + ' ' + (item.description || '')) || 'India',
+      district: '',
+      cat:      cls.cat,
+      sev:      cls.sev,
+      dept:     getDept(cls.cat),
+      ts:       ts,
+      lat:      null,
+      lng:      null,
+      src:      'rss',
+      link:     item.link || '',
+      source:   feed.name,
+    });
+  }
+  return newIssues;
+}
+
+// Infer Indian state from text
+var STATE_KEYWORDS = {
+  'Uttar Pradesh':['uttar pradesh','lucknow','kanpur','agra','varanasi','allahabad','prayagraj','noida','ghaziabad'],
+  'Maharashtra':['maharashtra','mumbai','pune','nagpur','nashik','aurangabad','solapur','thane'],
+  'Delhi':['delhi','new delhi','ndmc','dda','delhi metro'],
+  'Karnataka':['karnataka','bengaluru','bangalore','mysuru','hubli','mangalore'],
+  'Tamil Nadu':['tamil nadu','chennai','coimbatore','madurai','tiruchirappalli'],
+  'West Bengal':['west bengal','kolkata','calcutta','howrah','durgapur','asansol'],
+  'Bihar':['bihar','patna','gaya','muzaffarpur','bhagalpur','sitamarhi'],
+  'Rajasthan':['rajasthan','jaipur','jodhpur','kota','ajmer','bikaner','udaipur'],
+  'Gujarat':['gujarat','ahmedabad','surat','vadodara','rajkot','gandhinagar'],
+  'Madhya Pradesh':['madhya pradesh','bhopal','indore','jabalpur','gwalior','ujjain'],
+  'Telangana':['telangana','hyderabad','warangal','nizamabad','karimnagar'],
+  'Andhra Pradesh':['andhra pradesh','visakhapatnam','vijayawada','guntur','nellore'],
+  'Kerala':['kerala','thiruvananthapuram','kochi','kozhikode','thrissur'],
+  'Odisha':['odisha','bhubaneswar','cuttack','rourkela'],
+  'Jharkhand':['jharkhand','ranchi','jamshedpur','dhanbad'],
+  'Punjab':['punjab','chandigarh','ludhiana','amritsar','jalandhar'],
+  'Haryana':['haryana','gurugram','faridabad','panipat'],
+  'Assam':['assam','guwahati','dibrugarh'],
+  'Uttarakhand':['uttarakhand','dehradun','haridwar','roorkee'],
+  'Himachal Pradesh':['himachal','shimla','dharamsala'],
+  'Jammu & Kashmir':['jammu','kashmir','srinagar'],
+  'Chhattisgarh':['chhattisgarh','raipur','bilaspur'],
+};
+
+function inferState(text) {
+  var lower = text.toLowerCase();
+  for (var state in STATE_KEYWORDS) {
+    var kws = STATE_KEYWORDS[state];
+    for (var i = 0; i < kws.length; i++) {
+      if (lower.includes(kws[i])) return state;
+    }
+  }
+  return '';
+}
+
+function getDept(cat) {
+  var depts = {roads:'PWD / NHAI',water:'Jal Board',power:'State DISCOM',health:'State Health Dept.',corrupt:'Lokayukta / ACB'};
+  return depts[cat] || 'Relevant Authority';
+}
+
+// ══════════════════════════════════════════
+// FETCH ALL FEEDS (parallel with individual circuit breakers)
+// ══════════════════════════════════════════
+function fetchAllFeeds() {
+  setFeedStatus('loading', 'Refreshing feeds...');
+  feedsLoaded = 0;
+  feedsFailed = 0;
+
+  var promises = FEEDS.map(function(feed){ return fetchFeed(feed); });
+
+  Promise.allSettled(promises).then(function(results) {
+    var newIssues = [];
+    results.forEach(function(r) {
+      if (r.status === 'fulfilled' && Array.isArray(r.value)) {
+        newIssues = newIssues.concat(r.value);
+      }
+    });
+
+    if (newIssues.length > 0) {
+      // Merge RSS items — prepend to issues, keep citizens, remove old demo
+      var storedReports = issues.filter(function(i){ return i.src === 'citizen'; });
+      // Sort RSS by date desc
+      newIssues.sort(function(a,b){ return b.ts - a.ts; });
+      issues = newIssues.concat(storedReports);
+      // Update live counter
+      liveCount = Math.max(liveCount, 124832 + newIssues.length);
+      document.getElementById('liveCount').textContent = liveCount.toLocaleString('en-IN');
+      renderIssues();
+      setFeedStatus('live', feedsLoaded + ' feeds live');
+    } else {
+      // All feeds failed — keep demo data
+      if (issues.length === 0) issues = DEMO_ISSUES.slice();
+      renderIssues();
+      setFeedStatus('error', 'Using demo data — feeds unavailable');
+    }
+
+    lastFetchTime = new Date();
+    updateLastUpdated();
+  });
+}
+
+function setFeedStatus(state, text) {
+  var el = document.getElementById('feedStatus');
+  var txt = document.getElementById('feedStatusText');
+  el.className = state;
+  txt.textContent = text;
+}
+
+function updateLastUpdated() {
+  var el = document.getElementById('lastUpdatedText');
+  if (!lastFetchTime) { el.textContent = 'Fetching live data...'; return; }
+  el.textContent = 'Updated ' + lastFetchTime.toLocaleTimeString('en-IN', {hour:'2-digit',minute:'2-digit'});
+}
+
+// ══════════════════════════════════════════
+// MAP (MapLibre GL)
 // ══════════════════════════════════════════
 var map = new maplibregl.Map({
   container: 'map',
   style: {
-    version: 8,
-    sources: {
-      carto: {
-        type: 'raster',
-        tiles: ['https://a.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}.png'],
-        tileSize: 256,
-        attribution: '© CartoDB © OSM',
-        maxzoom: 19
-      }
-    },
-    layers: [{ id:'bg', type:'raster', source:'carto' }]
+    version:8,
+    sources:{carto:{type:'raster',tiles:['https://a.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}.png'],tileSize:256,attribution:'© CartoDB © OSM',maxzoom:19}},
+    layers:[{id:'bg',type:'raster',source:'carto'}]
   },
-  center: [82.5, 22.5],
-  zoom: 4.5,
-  minZoom: 3,
-  maxZoom: 10,
-  attributionControl: false
+  center:[82.5,22.5], zoom:4.5, minZoom:3, maxZoom:10, attributionControl:false
 });
-map.addControl(new maplibregl.NavigationControl({showCompass:false}), 'top-left');
-map.addControl(new maplibregl.AttributionControl({compact:true}), 'bottom-left');
+map.addControl(new maplibregl.NavigationControl({showCompass:false}),'top-left');
+map.addControl(new maplibregl.AttributionControl({compact:true}),'bottom-left');
 
-map.on('load', function() {
-  // Use raw.githubusercontent.com with a stable commit for reliability
-  var GEO_URL = 'https://raw.githubusercontent.com/Subhash9325/GeoJson-Data-of-Indian-States/master/Indian_States';
-
-  // Fallback: fetch from multiple sources
-  var urls = [
+map.on('load',function(){
+  loadGeoJSON(0,[
     'https://raw.githubusercontent.com/geohacker/india/master/state/india_state.geojson',
     'https://raw.githubusercontent.com/Subhash9325/GeoJson-Data-of-Indian-States/master/Indian_States'
-  ];
-
-  loadGeoJSON(0, urls);
-
-  // Add issue markers immediately regardless of GeoJSON
+  ]);
   addMarkers();
 });
 
 function loadGeoJSON(idx, urls) {
-  if(idx >= urls.length) {
-    console.warn('All GeoJSON sources failed, showing markers only');
-    return;
-  }
-  fetch(urls[idx])
-    .then(function(r){ return r.json(); })
-    .then(function(data){ addChoropleth(data); })
-    .catch(function(){ loadGeoJSON(idx+1, urls); });
+  if (idx >= urls.length) { console.warn('All GeoJSON sources failed'); return; }
+  fetch(urls[idx]).then(function(r){ return r.json(); }).then(function(d){ addChoropleth(d); }).catch(function(){ loadGeoJSON(idx+1,urls); });
 }
 
-function addChoropleth(geojsonData) {
-  if(map.getSource('india')) return;
-
-  map.addSource('india', { type:'geojson', data: geojsonData, promoteId:'NAME_1' });
-
+function addChoropleth(geo) {
+  if (map.getSource('india')) return;
+  map.addSource('india',{type:'geojson',data:geo,promoteId:'NAME_1'});
   var cs = [];
-  for(var name in STATES) { cs.push(name, iColor(STATES[name].issues)); }
-  var GEO = {'NCT of Delhi':'Delhi','Jammu and Kashmir':'Jammu & Kashmir','Andaman and Nicobar Islands':'Andaman & Nicobar','Dadra and Nagar Haveli':'Dadra & Nagar Haveli','Dadra & Nagar Haveli and Daman & Diu':'Dadra & Nagar Haveli','Pondicherry':'Puducherry'};
-  for(var geo in GEO) { var our=GEO[geo]; if(STATES[our]) cs.push(geo, iColor(STATES[our].issues)); }
+  for (var n in STATES) cs.push(n, iColor(STATES[n].issues));
+  var GEO = {'NCT of Delhi':'Delhi','Jammu and Kashmir':'Jammu & Kashmir','Andaman and Nicobar Islands':'Andaman & Nicobar','Pondicherry':'Puducherry','Dadra and Nagar Haveli':'Dadra & Nagar Haveli','Dadra & Nagar Haveli and Daman & Diu':'Dadra & Nagar Haveli'};
+  for (var g in GEO) { if (STATES[GEO[g]]) cs.push(g, iColor(STATES[GEO[g]].issues)); }
+  map.addLayer({id:'sf',type:'fill',source:'india',paint:{'fill-color':['match',['get','NAME_1']].concat(cs).concat(['#0f2035']),'fill-opacity':['case',['boolean',['feature-state','hover'],false],0.9,0.75]}});
+  map.addLayer({id:'sb',type:'line',source:'india',paint:{'line-color':'#1e3a5f','line-width':['case',['boolean',['feature-state','selected'],false],2.5,['boolean',['feature-state','hover'],false],1.5,0.7]}});
+  map.addLayer({id:'sh',type:'fill',source:'india',paint:{'fill-color':'#3a6aaa','fill-opacity':['case',['boolean',['feature-state','hover'],false],0.2,0]}});
 
-  map.addLayer({ id:'sf', type:'fill', source:'india', paint:{
-    'fill-color': ['match',['get','NAME_1']].concat(cs).concat(['#0f2035']),
-    'fill-opacity': ['case',['boolean',['feature-state','hover'],false],0.9,0.75]
-  }}, 'bg');
-  map.addLayer({ id:'sb', type:'line', source:'india', paint:{
-    'line-color':'#1e3a5f',
-    'line-width':['case',['boolean',['feature-state','selected'],false],2.5,['boolean',['feature-state','hover'],false],1.5,0.7]
-  }});
-  map.addLayer({ id:'sh', type:'fill', source:'india', paint:{
-    'fill-color':'#3a6aaa',
-    'fill-opacity':['case',['boolean',['feature-state','hover'],false],0.2,0]
-  }});
-
-  var GEO_FULL = {'NCT of Delhi':'Delhi','Jammu and Kashmir':'Jammu & Kashmir','Andaman and Nicobar Islands':'Andaman & Nicobar','Dadra and Nagar Haveli':'Dadra & Nagar Haveli','Dadra & Nagar Haveli and Daman & Diu':'Dadra & Nagar Haveli','Pondicherry':'Puducherry'};
-  var hid = null, sidMap = null;
-
+  var hid=null, sid2=null;
   map.on('mousemove','sf',function(e){
     if(e.features&&e.features.length){
       if(hid) map.setFeatureState({source:'india',id:hid},{hover:false});
-      hid = e.features[0].id;
-      map.setFeatureState({source:'india',id:hid},{hover:true});
+      hid=e.features[0].id; map.setFeatureState({source:'india',id:hid},{hover:true});
       map.getCanvas().style.cursor='pointer';
     }
   });
@@ -407,139 +689,197 @@ function addChoropleth(geojsonData) {
   });
   map.on('click','sf',function(e){
     if(!e.features||!e.features.length)return;
-    var gn = e.features[0].properties && e.features[0].properties.NAME_1;
-    var name = GEO_FULL[gn]||gn;
-    var data = STATES[name];
-    if(sidMap) map.setFeatureState({source:'india',id:sidMap},{selected:false});
-    sidMap = e.features[0].id;
-    map.setFeatureState({source:'india',id:sidMap},{selected:true});
+    var GEO2={'NCT of Delhi':'Delhi','Jammu and Kashmir':'Jammu & Kashmir','Andaman and Nicobar Islands':'Andaman & Nicobar','Pondicherry':'Puducherry','Dadra and Nagar Haveli':'Dadra & Nagar Haveli','Dadra & Nagar Haveli and Daman & Diu':'Dadra & Nagar Haveli'};
+    var gn=e.features[0].properties&&e.features[0].properties.NAME_1;
+    var name=GEO2[gn]||gn, data=STATES[name];
+    if(sid2) map.setFeatureState({source:'india',id:sid2},{selected:false});
+    sid2=e.features[0].id; map.setFeatureState({source:'india',id:sid2},{selected:true});
     if(!data)return;
     document.getElementById('stInf').classList.add('show');
-    document.getElementById('stName').textContent = name;
-    document.getElementById('stCount').textContent = data.issues.toLocaleString('en-IN');
-    document.getElementById('stSub').textContent = 'Active Issues · '+(data.trend.charAt(0)==='+' ? '↑' : '↓')+' '+data.trend+' this week';
+    safeText(document.getElementById('stName'), name);
+    safeText(document.getElementById('stCount'), data.issues.toLocaleString('en-IN'));
+    safeText(document.getElementById('stSub'), 'Active Issues · '+(data.trend.charAt(0)==='+' ? '↑' : '↓')+' '+data.trend+' this week');
     var cats=['roads','water','power','health','corrupt'];
-    var max=0; for(var ci=0;ci<cats.length;ci++){if(data[cats[ci]]>max)max=data[cats[ci]];}
+    var max=0; cats.forEach(function(c){ if(data[c]>max)max=data[c]; });
     var bhtml='';
-    for(var ci=0;ci<cats.length;ci++){
-      var cat=cats[ci];
-      bhtml+='<div class="cbr"><div class="cbl" style="color:'+CC[cat]+'">'+CI[cat]+' '+CL[cat]+'</div><div class="cbt"><div class="cbf" style="width:'+Math.round(data[cat]/max*100)+'%;background:'+CC[cat]+'"></div></div><div class="cbv">'+data[cat].toLocaleString('en-IN')+'</div></div>';
-    }
+    cats.forEach(function(cat){
+      bhtml+='<div class="cbr"><div class="cbl" style="color:'+CC[cat]+'">'+escapeHtml(CI[cat])+' '+escapeHtml(CL[cat])+'</div><div class="cbt"><div class="cbf" style="width:'+Math.round(data[cat]/max*100)+'%;background:'+CC[cat]+'"></div></div><div class="cbv">'+Number(data[cat]).toLocaleString('en-IN')+'</div></div>';
+    });
     document.getElementById('catBars').innerHTML=bhtml;
   });
 }
 
 function addMarkers() {
-  for(var i=0;i<issues.length;i++){
-    (function(iss){
-      if(!iss.lat)return;
-      var size=iss.sev==='emergency'?14:iss.sev==='critical'?12:iss.sev==='high'?10:8;
-      var col=CC[iss.cat];
-      var el=document.createElement('div');
-      el.style.cssText='width:'+size+'px;height:'+size+'px;border-radius:50%;background:'+col+';border:2px solid '+col+'88;box-shadow:0 0 '+size+'px '+col+'66;cursor:pointer;z-index:5;';
-      new maplibregl.Marker({element:el})
-        .setLngLat([iss.lng,iss.lat])
-        .setPopup(new maplibregl.Popup({offset:12,closeButton:false}).setHTML(
-          '<div style="font-size:12px;max-width:200px">'+
-          '<div style="color:'+col+';font-size:10px;font-weight:700;text-transform:uppercase;margin-bottom:3px">'+CI[iss.cat]+' '+iss.cat+'</div>'+
-          '<div style="line-height:1.4">'+iss.title+'</div>'+
-          '<div style="color:#4a6080;font-size:10px;margin-top:4px">📍 '+iss.state+'</div></div>'
-        ))
-        .addTo(map);
-    })(issues[i]);
-  }
-}
-
-// ══════════════════════════════════════════
-// AI ANALYSIS
-// ══════════════════════════════════════════
-function analyzeIssue(iss) {
-  switchTab('ai');
-  var panel = document.getElementById('aiPnl');
-  panel.innerHTML = '<div style="text-align:center;padding:40px;color:#4a6080;font-size:13px">⏳ Analyzing with AI...</div>';
-  fetch('https://api.anthropic.com/v1/messages',{
-    method:'POST',
-    headers:{'Content-Type':'application/json'},
-    body:JSON.stringify({
-      model:'claude-sonnet-4-20250514',
-      max_tokens:700,
-      messages:[{role:'user',content:'You are BharatMonitor, India civic tracker. Analyze for citizens:\n\nIssue: '+iss.title+'\nState: '+iss.state+(iss.district?', '+iss.district:'')+'\nCategory: '+iss.cat+', Severity: '+iss.sev+', Dept: '+iss.dept+'\n\nUse this format (plain text, no markdown):\n\nWHAT IS HAPPENING\n2 sentences.\n\nWHO IS AFFECTED\n1 sentence.\n\nWHAT SHOULD BE DONE\n• Step 1\n• Step 2\n• Step 3\n\nRESPONSIBLE AUTHORITY\nDept and escalation.\n\nEXPECTED RESOLUTION\nTimeline.\n\nMax 180 words.'}]
-    })
-  }).then(function(r){return r.json();}).then(function(d){
-    var text = '';
-    if(d.content) for(var i=0;i<d.content.length;i++) text += d.content[i].text||'';
-    if(!text) text='Analysis unavailable.';
-    var headers=['WHAT IS HAPPENING','WHO IS AFFECTED','WHAT SHOULD BE DONE','RESPONSIBLE AUTHORITY','EXPECTED RESOLUTION'];
-    var lines=text.split('\n');
-    var html='<div style="background:#0c1526;border:1px solid #1e3a5f;border-radius:8px;padding:12px;margin-bottom:12px"><div style="font-size:10px;color:#4a6080;text-transform:uppercase;letter-spacing:1px;margin-bottom:4px">Issue Analysis</div><div style="font-size:13px;font-weight:500;line-height:1.4">'+iss.title+'</div><div style="font-size:11px;color:#4a6080;margin-top:4px">📍 '+iss.state+' · '+iss.dept+'</div></div><div style="font-size:12.5px;line-height:1.9">';
-    for(var i=0;i<lines.length;i++){
-      var l=lines[i].trim();
-      if(headers.indexOf(l)>=0) html+='<div style="color:#FF7518;font-weight:700;font-size:11px;letter-spacing:1px;text-transform:uppercase;margin:12px 0 4px">'+l+'</div>';
-      else if(l.charAt(0)==='•') html+='<div style="padding-left:12px;margin:2px 0">'+l+'</div>';
-      else html+='<div style="margin:2px 0">'+l+'</div>';
-    }
-    html+='</div>';
-    panel.innerHTML=html;
-  }).catch(function(){
-    panel.innerHTML='<div style="color:#4a6080;padding:20px;font-size:13px;line-height:1.8">⚠️ AI analysis unavailable.<br><br>To enable: Add <strong style="color:#FF7518">ANTHROPIC_API_KEY</strong> in Vercel → Settings → Environment Variables.</div>';
+  var baseIssues = DEMO_ISSUES.filter(function(i){ return i.lat; });
+  baseIssues.forEach(function(iss){
+    var size = iss.sev==='emergency'?14:iss.sev==='critical'?12:iss.sev==='high'?10:8;
+    var col = CC[iss.cat];
+    var el = document.createElement('div');
+    el.style.cssText = 'width:'+size+'px;height:'+size+'px;border-radius:50%;background:'+col+';border:2px solid '+col+'88;box-shadow:0 0 '+size+'px '+col+'66;cursor:pointer;z-index:5;';
+    new maplibregl.Marker({element:el})
+      .setLngLat([iss.lng,iss.lat])
+      .setPopup(new maplibregl.Popup({offset:12,closeButton:false}).setHTML(
+        '<div style="font-size:12px;max-width:200px">'+
+        '<div style="color:'+col+';font-size:10px;font-weight:700;text-transform:uppercase;margin-bottom:3px">'+escapeHtml(CI[iss.cat]+' '+iss.cat)+'</div>'+
+        '<div style="line-height:1.4">'+escapeHtml(iss.title)+'</div>'+
+        '<div style="color:#4a6080;font-size:10px;margin-top:4px">📍 '+escapeHtml(iss.state)+'</div></div>'
+      ))
+      .addTo(map);
   });
 }
 
 // ══════════════════════════════════════════
-// REPORT FORM
+// AI ANALYSIS — calls /api/analyze (server-side)
+// API key is NEVER in the browser
 // ══════════════════════════════════════════
-document.getElementById('btnSubmit').addEventListener('click', function(){
-  var title=document.getElementById('rTitle').value.trim();
-  var desc=document.getElementById('rDesc').value.trim();
-  var state=document.getElementById('rState').value.trim();
-  var cat=document.getElementById('rCat').value;
-  if(!title||!desc||!state){alert('Please fill in all required fields.');return;}
-  var btn=document.getElementById('btnSubmit');
-  btn.disabled=true; btn.textContent='⏳ Processing...';
-  var ticket='BW-'+Math.floor(10000+Math.random()*90000);
-  var sev='high',dept='Relevant Authority',sla=48,msg='Your report has been registered and forwarded.';
+function analyzeIssue(iss) {
+  switchTab('ai');
+  var panel = document.getElementById('aiPnl');
+  panel.innerHTML = '<div style="text-align:center;padding:40px;color:#4a6080;font-size:13px;line-height:2">⏳ Analyzing issue with AI...<br><span style="font-size:11px">This takes a few seconds</span></div>';
 
-  function finish(sev,dept,sla,msg){
-    issues.unshift({id:ticket,title:title,state:state,cat:cat,sev:sev,dept:dept,ts:Date.now(),district:'',lat:null,lng:null});
-    liveCount++;
-    document.getElementById('liveCount').textContent=liveCount.toLocaleString('en-IN');
-    renderIssues();
-    document.getElementById('rForm').style.display='none';
-    document.getElementById('rSuccess').style.display='block';
-    document.getElementById('rSuccess').innerHTML=
-      '<div class="sbox">'+
-      '<div style="font-size:40px;margin-bottom:8px">✅</div>'+
-      '<div style="font-family:\'Baloo 2\',cursive;font-weight:700;font-size:17px;color:#00c853;margin-bottom:4px">Issue Registered!</div>'+
-      '<div style="font-family:\'Baloo 2\',cursive;font-weight:800;font-size:22px;color:#ffd700;margin-bottom:10px">'+ticket+'</div>'+
-      '<div class="sgrid">'+
-      '<div class="scel"><div class="scl">Severity</div><span class="sv2 s-'+sev+'">'+sev.toUpperCase()+'</span></div>'+
-      '<div class="scel"><div class="scl">Department</div><div style="font-size:11px;color:#00B4D8;font-weight:600">'+dept+'</div></div>'+
-      '<div class="scel"><div class="scl">SLA</div><div style="font-size:14px;color:#ffd700;font-weight:700">'+sla+'h</div></div>'+
-      '<div class="scel"><div class="scl">Status</div><div style="font-size:13px;color:#00c853;font-weight:600">Active</div></div>'+
-      '</div>'+
-      '<div style="font-size:12px;color:#4a6080;line-height:1.6;margin-bottom:16px">'+msg+'</div>'+
-      '<button class="btse" id="btnAgain">+ Report Another Issue</button>'+
-      '</div>';
-    document.getElementById('btnAgain').addEventListener('click',function(){
-      document.getElementById('rForm').style.display='block';
-      document.getElementById('rSuccess').style.display='none';
-      ['rTitle','rDesc','rState'].forEach(function(id){document.getElementById(id).value='';});
-      btn.disabled=false; btn.textContent='Submit Issue →';
-    });
+  fetch('/api/analyze', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      title:      iss.title,
+      state:      iss.state,
+      district:   iss.district || '',
+      category:   iss.cat,
+      severity:   iss.sev,
+      department: iss.dept,
+      reports:    String(iss.reports || 0),
+    }),
+  })
+  .then(function(r){ return r.json(); })
+  .then(function(d) {
+    if (d.error) { showAIError(panel, d.error); return; }
+    var text = d.text || 'Analysis unavailable.';
+    renderAnalysis(panel, iss, text);
+  })
+  .catch(function() {
+    showAIError(panel, 'Connection error. Is ANTHROPIC_API_KEY set in Vercel environment variables?');
+  });
+}
+
+function showAIError(panel, msg) {
+  panel.innerHTML = '<div style="color:#4a6080;padding:20px;font-size:13px;line-height:1.8">⚠️ ' + escapeHtml(msg) + '<br><br><div style="font-size:11px;color:#2a3f5a;background:#0c1526;border:1px solid #182d48;border-radius:6px;padding:10px">To enable AI:<br>1. Go to Vercel → Your project → Settings → Environment Variables<br>2. Add <code style="color:#FF7518">ANTHROPIC_API_KEY</code> = your key<br>3. Redeploy</div></div>';
+}
+
+function renderAnalysis(panel, iss, text) {
+  var HEADERS = ['WHAT IS HAPPENING','WHO IS AFFECTED','WHAT SHOULD BE DONE','RESPONSIBLE AUTHORITY','EXPECTED RESOLUTION'];
+  var lines = text.split('\n');
+  var html = '<div style="background:#0c1526;border:1px solid #1e3a5f;border-radius:8px;padding:12px;margin-bottom:12px">';
+  html += '<div style="font-size:10px;color:#4a6080;text-transform:uppercase;letter-spacing:1px;margin-bottom:4px">AI Analysis</div>';
+  html += '<div style="font-size:13px;font-weight:500;line-height:1.4">' + escapeHtml(iss.title) + '</div>';
+  html += '<div style="font-size:11px;color:#4a6080;margin-top:4px">📍 ' + escapeHtml(iss.state) + ' · ' + escapeHtml(iss.dept) + '</div>';
+  html += '</div><div style="font-size:12.5px;line-height:1.9">';
+  lines.forEach(function(line) {
+    var l = line.trim();
+    if (!l) return;
+    if (HEADERS.indexOf(l) >= 0) {
+      html += '<div style="color:#FF7518;font-weight:700;font-size:11px;letter-spacing:1px;text-transform:uppercase;margin:12px 0 4px">' + escapeHtml(l) + '</div>';
+    } else if (l.charAt(0) === '•') {
+      html += '<div style="padding-left:12px;margin:2px 0">' + escapeHtml(l) + '</div>';
+    } else {
+      html += '<div style="margin:2px 0">' + escapeHtml(l) + '</div>';
+    }
+  });
+  html += '</div>';
+  panel.innerHTML = html;
+}
+
+// ══════════════════════════════════════════
+// REPORT FORM — calls /api/classify (server-side)
+// Persists to localStorage
+// ══════════════════════════════════════════
+document.getElementById('btnSubmit').addEventListener('click', function() {
+  var title = document.getElementById('rTitle').value.trim();
+  var desc  = document.getElementById('rDesc').value.trim();
+  var state = document.getElementById('rState').value.trim();
+  var cat   = document.getElementById('rCat').value;
+
+  if (!title || !desc || !state) { alert('Please fill in all required fields.'); return; }
+
+  // Basic length validation
+  if (title.length > 200 || desc.length > 600 || state.length > 100) {
+    alert('Input too long. Please shorten your text.'); return;
   }
 
-  fetch('https://api.anthropic.com/v1/messages',{
-    method:'POST',
-    headers:{'Content-Type':'application/json'},
-    body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:300,messages:[{role:'user',content:'Classify this Indian civic issue. Reply ONLY with valid JSON, no other text:\nTitle: '+title+'\nCategory: '+cat+'\nState: '+state+'\nDescription: '+desc+'\n\nJSON format: {"severity":"emergency|critical|high|medium|low","department":"govt dept name","sla_hours":48,"message":"one reassuring sentence to the citizen"}'}]})
-  }).then(function(r){return r.json();}).then(function(d){
-    try{
-      var raw=''; if(d.content) for(var i=0;i<d.content.length;i++) raw+=d.content[i].text||'';
-      var r=JSON.parse(raw.replace(/```json|```/g,'').trim());
-      finish(r.severity||sev, r.department||dept, r.sla_hours||sla, r.message||msg);
-    }catch(e){ finish(sev,dept,sla,msg); }
-  }).catch(function(){ finish(sev,dept,sla,msg); });
+  var btn = document.getElementById('btnSubmit');
+  btn.disabled = true; btn.textContent = '⏳ Processing...';
+
+  var ticket = 'BW-' + Math.floor(10000 + Math.random() * 90000);
+
+  // Instant keyword classification while waiting for AI
+  var kwCls = classify(title + ' ' + desc);
+
+  // Call server-side classify endpoint
+  fetch('/api/classify', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ title: title, desc: desc, state: state, category: cat }),
+  })
+  .then(function(r){ return r.json(); })
+  .then(function(r) {
+    finishReport(ticket, r.severity || kwCls.sev, r.department || getDept(cat), r.sla_hours || 48, r.message || 'Your report is registered.', title, state, cat, desc);
+  })
+  .catch(function() {
+    // Fallback to keyword classifier
+    finishReport(ticket, kwCls.sev, getDept(cat), 48, 'Your report has been received and will be reviewed by the relevant authority.', title, state, cat, desc);
+  })
+  .finally(function() {
+    btn.disabled = false; btn.textContent = 'Submit Issue →';
+  });
 });
+
+function finishReport(ticket, sev, dept, sla, msg, title, state, cat, desc) {
+  var newIssue = {
+    id: ticket,
+    title: title,
+    state: state,
+    district: '',
+    cat: cat,
+    sev: sev,
+    dept: dept,
+    ts: Date.now(),
+    lat: null, lng: null,
+    src: 'citizen',
+    link: '',
+    desc: desc,
+  };
+
+  issues.unshift(newIssue);
+  saveReports(issues); // Persist to localStorage
+  liveCount++;
+  document.getElementById('liveCount').textContent = liveCount.toLocaleString('en-IN');
+  renderIssues();
+
+  // Show success screen
+  document.getElementById('rForm').style.display = 'none';
+  var s = document.getElementById('rSuccess');
+  s.style.display = 'block';
+  s.innerHTML =
+    '<div class="sbox">'+
+    '<div style="font-size:40px;margin-bottom:8px">✅</div>'+
+    '<div style="font-family:\'Baloo 2\',cursive;font-weight:700;font-size:17px;color:#00c853;margin-bottom:4px">Issue Registered!</div>'+
+    '<div style="font-family:\'Baloo 2\',cursive;font-weight:800;font-size:22px;color:#ffd700;margin-bottom:10px">' + escapeHtml(ticket) + '</div>'+
+    '<div class="sgrid">'+
+    '<div class="scel"><div class="scl">Severity</div><span class="sv2 s-' + escapeHtml(sev) + '">' + escapeHtml(sev.toUpperCase()) + '</span></div>'+
+    '<div class="scel"><div class="scl">Department</div><div style="font-size:11px;color:#00B4D8;font-weight:600">' + escapeHtml(dept) + '</div></div>'+
+    '<div class="scel"><div class="scl">SLA</div><div style="font-size:14px;color:#ffd700;font-weight:700">' + escapeHtml(String(sla)) + 'h</div></div>'+
+    '<div class="scel"><div class="scl">Status</div><div style="font-size:13px;color:#00c853;font-weight:600">Active</div></div>'+
+    '</div>'+
+    '<div style="font-size:12px;color:#4a6080;line-height:1.6;margin-bottom:16px">' + escapeHtml(msg) + '</div>'+
+    '<div style="font-size:11px;color:#2a3f5a;margin-bottom:14px">Your report is saved locally and will appear in the Live Feed.</div>'+
+    '<button class="btse" id="btnAgain">+ Report Another Issue</button>'+
+    '</div>';
+
+  document.getElementById('btnAgain').addEventListener('click', function() {
+    document.getElementById('rForm').style.display = 'block';
+    s.style.display = 'none';
+    ['rTitle','rDesc','rState'].forEach(function(id){ document.getElementById(id).value=''; });
+  });
+}
 
 // ══════════════════════════════════════════
 // TABS & FILTERS
@@ -556,31 +896,66 @@ document.querySelectorAll('.fp').forEach(function(p){
     renderIssues();
   });
 });
+document.getElementById('btnRefresh').addEventListener('click', function() {
+  seenIds = new Set(issues.filter(function(i){ return i.src === 'citizen'; }).map(function(i){ return i.id; }));
+  fetchAllFeeds();
+});
 
 // ══════════════════════════════════════════
-// LIVE COUNTER & TICKER
+// LIVE COUNTER (subtle increment — realistic)
 // ══════════════════════════════════════════
 setInterval(function(){
-  liveCount += Math.floor(Math.random()*4+1);
+  liveCount += Math.floor(Math.random() * 3);
   document.getElementById('liveCount').textContent = liveCount.toLocaleString('en-IN');
-}, 2800);
+}, 15000); // every 15s — more realistic than 2.8s
 
-function updateTicker(){
+// ══════════════════════════════════════════
+// TICKER — shows real issues with timestamps
+// ══════════════════════════════════════════
+function updateTicker() {
+  if (!issues.length) return;
   var iss = issues[tickerIdx++ % issues.length];
   var el = document.getElementById('tText');
-  el.style.opacity='0';
+  var tEl = document.getElementById('tTime');
+  el.style.opacity = '0';
   setTimeout(function(){
-    el.textContent = CI[iss.cat]+' '+iss.state+' — '+iss.title;
-    el.style.opacity='1';
-  },300);
+    el.textContent = CI[iss.cat] + ' ' + iss.state + ' — ' + iss.title;
+    tEl.textContent = timeAgo(iss.ts);
+    el.style.opacity = '1';
+  }, 300);
 }
-updateTicker();
-setInterval(updateTicker, 4000);
+setInterval(updateTicker, 5000);
+
+// ══════════════════════════════════════════
+// AUTO-REFRESH every 5 minutes (like WorldMonitor)
+// ══════════════════════════════════════════
+setInterval(function(){
+  updateLastUpdated();
+}, 30000); // update "X min ago" every 30s
+
+setInterval(function(){
+  // Reset seen IDs for citizen reports only to avoid re-adding them
+  var citizenIds = new Set(issues.filter(function(i){ return i.src === 'citizen'; }).map(function(i){ return i.title.slice(0,60).toLowerCase(); }));
+  seenIds = citizenIds;
+  fetchAllFeeds();
+}, 5 * 60 * 1000); // every 5 minutes
 
 // ══════════════════════════════════════════
 // INIT
 // ══════════════════════════════════════════
+// 1. Load persisted citizen reports from localStorage
+var stored = loadStoredReports();
+
+// 2. Show demo issues immediately for instant UI
+issues = DEMO_ISSUES.slice().concat(stored);
+// Pre-populate seenIds with demo titles so RSS doesn't duplicate
+DEMO_ISSUES.forEach(function(i){ seenIds.add(i.title.slice(0,60).toLowerCase()); });
+
 renderIssues();
+updateTicker();
+
+// 3. Fetch real RSS feeds in background
+fetchAllFeeds();
 </script>
 </body>
 </html>

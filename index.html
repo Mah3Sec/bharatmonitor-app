@@ -217,8 +217,88 @@ html,body{height:100%;font-family:-apple-system, BlinkMacSystemFont, system-ui, 
 .delBtn:hover{background:#ff174425}
 .spamBtn{padding:3px 8px;background:#ffd70015;border:1px solid #ffd70040;border-radius:4px;color:#ffd700;font-size:10px;cursor:pointer;font-family:inherit;font-weight:700;flex-shrink:0}
 .spamBtn:hover{background:#ffd70025}
+/* ── LIVE TV FLOATING PANEL ── */
+#tvPanel{
+  position:absolute;top:0;right:0;bottom:0;
+  width:clamp(260px,30vw,380px);
+  background:rgba(8,12,22,0.96);
+  border-left:1px solid var(--b1);
+  display:flex;flex-direction:column;
+  z-index:20;
+  transition:transform .25s ease;
+}
+#tvPanel.hidden{transform:translateX(100%)}
+#tvToggle{
+  position:absolute;top:50%;left:-28px;transform:translateY(-50%);
+  background:rgba(8,12,22,0.96);border:1px solid var(--b1);
+  border-right:none;border-radius:6px 0 0 6px;
+  width:28px;height:52px;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  font-size:13px;color:var(--mt);z-index:21;
+  transition:color .15s;
+}
+#tvToggle:hover{color:var(--saf)}
+#tvHeader{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:7px 10px;background:var(--p2);
+  border-bottom:1px solid var(--b1);flex-shrink:0;
+}
+#tvChTabs{
+  display:flex;overflow-x:auto;gap:2px;
+  padding:5px 8px;border-bottom:1px solid var(--b1);
+  flex-shrink:0;scrollbar-width:none;
+}
+#tvChTabs::-webkit-scrollbar{display:none}
+.tvTab{
+  padding:3px 9px;border-radius:12px;border:1px solid var(--b1);
+  background:transparent;color:var(--mt);font-size:9.5px;
+  cursor:pointer;white-space:nowrap;flex-shrink:0;font-family:inherit;
+  transition:all .12s;
+}
+.tvTab:hover{border-color:var(--b2);color:var(--tx)}
+.tvTab.active{background:#FF6B0018;border-color:var(--saf);color:var(--saf)}
+#tvVideo{flex:1;position:relative;background:#000;min-height:0;overflow:hidden}
+#tvVideo video{width:100%;height:100%;object-fit:contain;display:block}
+#tvOverlay{
+  position:absolute;inset:0;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;gap:10px;
+  background:#040810;cursor:pointer;
+}
+#tvSpinner{
+  position:absolute;inset:0;display:none;
+  align-items:center;justify-content:center;background:#040810;
+}
+#tvErr{
+  position:absolute;inset:0;display:none;
+  flex-direction:column;align-items:center;justify-content:center;
+  gap:8px;background:#040810;padding:16px;text-align:center;
+}
+#tvInfo{
+  padding:7px 10px;font-size:10px;color:var(--mt);
+  background:var(--p2);border-top:1px solid var(--b1);
+  flex-shrink:0;display:flex;align-items:center;gap:6px;
+}
+/* Mobile: TV panel becomes bottom sheet */
+@media (max-width:768px){
+  #tvPanel{
+    position:fixed;bottom:0;left:0;right:0;top:auto;
+    width:100%;height:56vw;max-height:280px;
+    border-left:none;border-top:1px solid var(--b1);
+    transform:translateY(0);z-index:500;
+  }
+  #tvPanel.hidden{transform:translateY(100%)}
+  #tvToggle{
+    top:auto;bottom:100%;left:50%;transform:translateX(-50%);
+    border-radius:8px 8px 0 0;border-bottom:none;border-right:1px solid var(--b1);
+    width:60px;height:22px;
+  }
+  #tvChTabs{gap:3px;padding:4px 8px}
+  #tvInfo{font-size:9px;padding:5px 8px}
+  /* push sidebar above tv panel on mobile */
+  #sb{padding-bottom:0}
+}
 /* ── RESPONSIVE / MOBILE ── */
-@media (max-width: 768px) {
+@media (max-width:768px){
   html,body{overflow:auto}
   #app{height:auto;min-height:100vh;overflow:auto}
   #hdr{height:auto;padding:8px 10px;flex-wrap:wrap;gap:6px}
@@ -229,7 +309,7 @@ html,body{height:100%;font-family:-apple-system, BlinkMacSystemFont, system-ui, 
   #map{height:45vh;min-height:260px;flex:none;width:100%}
   #mst{top:8px;left:8px;gap:5px}
   .sc{padding:4px 8px}.sv{font-size:12px}.sl{font-size:8px}
-  #mlg{bottom:28px;padding:5px 8px;font-size:9px;gap:6px}
+  #mlg{bottom:32px;padding:5px 8px;font-size:9px;gap:6px}
   #ticker{font-size:10px;padding:4px 10px}
   #sb{width:100%;border-left:none;border-top:1px solid var(--b1);height:auto;min-height:60vh;flex-shrink:0}
   .tabs{overflow-x:auto;-webkit-overflow-scrolling:touch}
@@ -245,6 +325,8 @@ html,body{height:100%;font-family:-apple-system, BlinkMacSystemFont, system-ui, 
   .bts{font-size:15px;padding:12px}
   #adminBar .adminBox{width:92vw;padding:18px}
   #footer{flex-direction:column;gap:6px;text-align:center;padding:8px}
+  /* TV panel hidden by default on mobile — user taps toggle to show */
+  #tvPanel{transform:translateY(100%)}
 }
 @media (max-width: 480px) {
   #map{height:40vh;min-height:220px}
@@ -290,6 +372,55 @@ html,body{height:100%;font-family:-apple-system, BlinkMacSystemFont, system-ui, 
         <div class="li"><div class="ld2" style="background:#1a4060"></div><span>Low</span></div>
       </div>
       <div id="ticker"><span class="tb">LIVE</span><span id="tt">Fetching real-time civic data...</span><span id="tsrc"></span></div>
+
+      <!-- ── LIVE TV PANEL (fills blank map space) ── -->
+      <div id="tvPanel">
+        <button id="tvToggle" onclick="tvToggle()" title="Toggle Live TV">📺</button>
+
+        <!-- Header -->
+        <div id="tvHeader">
+          <div style="display:flex;align-items:center;gap:6px">
+            <span style="background:#ff1744;border-radius:3px;padding:2px 6px;font-size:8px;font-weight:700;letter-spacing:1px;color:#fff;animation:pu 1.5s infinite">● LIVE</span>
+            <span style="font-size:11px;font-weight:700;color:var(--tx)" id="tvChName">Select Channel</span>
+          </div>
+          <div style="display:flex;gap:5px;align-items:center">
+            <span style="font-size:8px;color:var(--mt)">HLS</span>
+            <a id="tvExtLink" href="#" target="_blank" rel="noopener" style="font-size:10px;color:var(--mt);text-decoration:none" title="Open in browser">↗</a>
+          </div>
+        </div>
+
+        <!-- Channel tabs -->
+        <div id="tvChTabs"></div>
+
+        <!-- Video area -->
+        <div id="tvVideo">
+          <video id="tvVid" playsinline muted controls style="width:100%;height:100%;object-fit:contain;display:none"></video>
+
+          <!-- Play overlay -->
+          <div id="tvOverlay">
+            <div style="width:52px;height:52px;border-radius:50%;background:var(--saf);display:flex;align-items:center;justify-content:center;font-size:22px;box-shadow:0 0 24px rgba(255,107,0,.5)">▶</div>
+            <div style="font-size:11px;color:var(--mt)">Select a channel above</div>
+          </div>
+
+          <!-- Spinner -->
+          <div id="tvSpinner">
+            <div style="width:32px;height:32px;border:2.5px solid #FF6B0044;border-top-color:var(--saf);border-radius:50%;animation:spin 0.8s linear infinite"></div>
+          </div>
+
+          <!-- Error -->
+          <div id="tvErr">
+            <div style="font-size:11px;color:#ff4444">Stream unavailable</div>
+            <a id="tvErrLink" href="#" target="_blank" style="font-size:10px;color:#4a9fd4;text-decoration:none">▶ Open in browser ↗</a>
+            <button onclick="tvRetry()" style="margin-top:4px;padding:4px 12px;background:var(--saf);color:#fff;border:none;border-radius:5px;font-size:10px;cursor:pointer">Retry</button>
+          </div>
+        </div>
+
+        <!-- Channel info bar -->
+        <div id="tvInfo">
+          <span style="width:6px;height:6px;border-radius:50%;background:var(--saf);animation:pu 1.5s infinite;flex-shrink:0"></span>
+          <span id="tvInfoTxt">India Live News — HLS Direct Streams</span>
+        </div>
+      </div>
     </div>
 
     <!-- SIDEBAR -->
@@ -1314,30 +1445,30 @@ function renderVideos() {
   // These are the same URLs used by worldmonitor.app — publicly accessible, no auth needed.
   // Uses hls.js for Chrome/Firefox, native HLS for Safari.
   var CHANNELS = [
-    { id:'bloomberg',   name:'Bloomberg',         color:'#F57F17',
-      hls:'https://www.bloomberg.com/media-manifest/streams/eu.m3u8',
-      ytFb:'https://www.bloomberg.com/live' },
-    { id:'skynews',     name:'Sky News',          color:'#0277BD',
-      hls:'https://linear227.sky.com/skynews/hls/primary/index.m3u8',
-      ytFb:'https://news.sky.com/watch-sky-news-live' },
-    { id:'aljazeera',   name:'Al Jazeera',        color:'#00838F',
-      hls:'https://live-hls-web-aje.getaj.net/AJE/index.m3u8',
-      ytFb:'https://www.aljazeera.com/live' },
-    { id:'france24',    name:'France 24',         color:'#1565C0',
-      hls:'https://static.france24.com/live/F24_EN_HI_HLS/live_tv.m3u8',
-      ytFb:'https://www.france24.com/en/live-news' },
-    { id:'dw',          name:'DW News',           color:'#E53935',
-      hls:'https://dwamdstream102.akamaized.net/hls/live/2015525/dwstream102/index.m3u8',
-      ytFb:'https://www.dw.com/en/live-tv' },
-    { id:'euronews',    name:'Euronews',          color:'#7B1FA2',
-      hls:'https://euronews-euronews-1-gb.samsung.wurl.tv/manifest/playlist.m3u8',
-      ytFb:'https://www.euronews.com/live' },
-    { id:'trtworld',    name:'TRT World',         color:'#BF360C',
-      hls:'https://tv-trtworld.live.trt.com.tr/master.m3u8',
-      ytFb:'https://www.trtworld.com/watch' },
-    { id:'nhkworld',    name:'NHK World',         color:'#2E7D32',
-      hls:'https://nhkworld.webcdn.stream.ne.jp/www11/nhkworld-tv/global/263941/live_wa_s.m3u8',
-      ytFb:'https://www3.nhk.or.jp/nhkworld/en/live' },
+    { id:'aajtakhd',    name:'Aaj Tak HD',     lang:'HI', color:'#e53935',
+      hls:'https://aajtakhdlive-amd.akamaized.net/hls/live/2014415/aajtakhd/aajtakhdlive/live_720p/chunks.m3u8',
+      ytFb:'https://www.aajtak.in/livetv' },
+    { id:'indiatoday',  name:'India Today',    lang:'EN', color:'#1565c0',
+      hls:'https://feeds.intoday.in/hltapps/api/master.m3u8',
+      ytFb:'https://www.indiatoday.in/livetv' },
+    { id:'ndtv24x7',    name:'NDTV 24x7',      lang:'EN', color:'#0288d1',
+      hls:'https://ndtv24x7elemarchana.akamaized.net/hls/live/2003678/ndtv24x7/ndtv24x7master.m3u8',
+      ytFb:'https://www.ndtv.com/live-tv' },
+    { id:'abpnews',     name:'ABP News',        lang:'HI', color:'#f57c00',
+      hls:'https://abplivetv.akamaized.net/hls/live/2043010/hindi/master.m3u8',
+      ytFb:'https://www.abplive.com/live-tv' },
+    { id:'ddnews',      name:'DD News',         lang:'EN', color:'#2e7d32',
+      hls:'https://nicls1-lh.akamaihd.net/i/ddnews_1@409133/master.m3u8',
+      ytFb:'https://ddnews.gov.in/live' },
+    { id:'ndtvindia',   name:'NDTV India',      lang:'HI', color:'#00838f',
+      hls:'https://ndtvindiaelemarchana.akamaized.net/hls/live/2003679/ndtvindia/ndtvindiamaster.m3u8',
+      ytFb:'https://khabar.ndtv.com/videos/live/channel/ndtvindia' },
+    { id:'republic',    name:'Republic Bharat', lang:'HI', color:'#7b1fa2',
+      hls:'https://republic.pc.cdn.bitgravity.com/live/bharat_hls/master.m3u8',
+      ytFb:'https://bharat.republicworld.com/livetv' },
+    { id:'news18india', name:'News18 India',    lang:'HI', color:'#c62828',
+      hls:'https://news18india-lh.akamaihd.net/i/news18india_1@174951/index_4_av-b.m3u8',
+      ytFb:'https://hindi.news18.com/livetv' },
   ];
 
   // Map of hls.js instances keyed by channel id
@@ -1359,7 +1490,7 @@ function renderVideos() {
     html += '<div style="display:flex;align-items:center;justify-content:space-between;padding:8px 12px;background:var(--p2);border-bottom:1px solid var(--b1);flex-shrink:0">';
     html += '<div style="display:flex;align-items:center;gap:6px">';
     html += '<span style="background:#ff1744;border-radius:3px;padding:2px 7px;font-size:9px;font-weight:700;letter-spacing:1px;color:#fff;animation:pu 1.5s infinite">● LIVE</span>';
-    html += '<span style="font-size:12px;font-weight:700;color:var(--tx)">Live News — HLS</span>';
+    html += '<span style="font-size:12px;font-weight:700;color:var(--tx)">India Live News — HLS</span>';
     html += '<span style="font-size:10px;color:var(--mt)">— Click to play</span>';
     html += '</div>';
     html += '<button id="playAllBtn" onclick="playAll()" style="font-size:10px;padding:4px 10px;background:var(--saf);color:#fff;border:none;border-radius:5px;cursor:pointer;font-weight:700">▶ Play All</button>';
@@ -1376,7 +1507,7 @@ function renderVideos() {
       html += '<div style="display:flex;align-items:center;gap:5px;padding:4px 8px;background:' + ch.color + '18;border-bottom:1px solid ' + ch.color + '25;flex-shrink:0">';
       html += '<span style="width:6px;height:6px;border-radius:50%;background:' + ch.color + ';animation:pu 1.5s infinite;flex-shrink:0"></span>';
       html += '<span style="font-size:9px;font-weight:700;color:' + ch.color + ';flex:1">' + esc(ch.name) + '</span>';
-      html += '<span style="font-size:7px;color:#3a5060;font-weight:600">HLS</span>';
+      html += '<span style="font-size:7px;color:#3a5060;font-weight:700;background:' + ch.color + '22;border-radius:3px;padding:1px 4px">' + ch.lang + '</span>';
       html += '<a href="' + ch.ytFb + '" target="_blank" rel="noopener" style="font-size:8px;color:var(--mt);text-decoration:none;opacity:.6" onclick="event.stopPropagation()">↗</a>';
       html += '</div>';
 
@@ -1411,7 +1542,7 @@ function renderVideos() {
 
     // Footer notice
     html += '<div style="padding:5px 12px;font-size:9.5px;color:#3a5060;background:var(--p2);border-top:1px solid var(--b1);flex-shrink:0">';
-    html += '📡 Direct HLS streams — no YouTube. Click ↗ to open in browser if stream fails.';
+    html += '📡 Indian news HLS streams — Aaj Tak, NDTV, ABP & more. Click ↗ to open in browser if stream fails.';
     html += '</div>';
 
     el.innerHTML = html;
@@ -1490,7 +1621,130 @@ function renderVideos() {
   };
 
   buildUI();
+  initMapTvPanel();
 }
+
+// ════════════════════════════════════════════════════════
+//  FLOATING MAP TV PANEL  (fills blank map space)
+// ════════════════════════════════════════════════════════
+var _tvHls      = null;   // active hls.js instance
+var _tvCurId    = null;   // currently selected channel id
+
+function initMapTvPanel() {
+  var tabs = document.getElementById('tvChTabs');
+  if (!tabs) return;
+
+  // Build channel tabs
+  var html = '';
+  for (var i = 0; i < CHANNELS.length; i++) {
+    var ch = CHANNELS[i];
+    html += '<button class="tvTab" data-chid="' + ch.id + '" '
+          + 'style="border-color:' + ch.color + '55;color:' + ch.color + '" '
+          + 'onclick="tvSelectChannel(\'' + ch.id + '\')">'
+          + ch.name
+          + '</button>';
+  }
+  tabs.innerHTML = html;
+
+  // Add spin keyframe if missing
+  if (!document.getElementById('hlsSpinStyle')) {
+    var st = document.createElement('style');
+    st.id = 'hlsSpinStyle';
+    st.textContent = '@keyframes spin{to{transform:rotate(360deg)}}';
+    document.head.appendChild(st);
+  }
+
+  // Auto-load first channel
+  setTimeout(function(){ tvSelectChannel(CHANNELS[0].id); }, 400);
+}
+
+window.tvSelectChannel = function(id) {
+  var ch = null;
+  for (var i = 0; i < CHANNELS.length; i++) { if (CHANNELS[i].id === id) { ch = CHANNELS[i]; break; } }
+  if (!ch) return;
+  _tvCurId = id;
+
+  // Update tab highlights
+  document.querySelectorAll('.tvTab').forEach(function(b) {
+    var active = b.getAttribute('data-chid') === id;
+    b.classList.toggle('active', active);
+    if (active) b.style.background = ch.color + '22';
+    else b.style.background = '';
+  });
+
+  // Update header
+  var nameEl = document.getElementById('tvChName');
+  if (nameEl) nameEl.textContent = ch.name + ' (' + ch.lang + ')';
+
+  var extLink = document.getElementById('tvExtLink');
+  if (extLink) extLink.href = ch.ytFb;
+
+  var errLink = document.getElementById('tvErrLink');
+  if (errLink) errLink.href = ch.ytFb;
+
+  var infoTxt = document.getElementById('tvInfoTxt');
+  if (infoTxt) infoTxt.textContent = ch.name + ' · Live HLS Stream · ' + ch.lang;
+
+  // Show spinner, hide others
+  var vid     = document.getElementById('tvVid');
+  var overlay = document.getElementById('tvOverlay');
+  var spinner = document.getElementById('tvSpinner');
+  var errEl   = document.getElementById('tvErr');
+  if (!vid || !overlay || !spinner || !errEl) return;
+
+  overlay.style.display = 'none';
+  errEl.style.display   = 'none';
+  vid.style.display     = 'none';
+  spinner.style.display = 'flex';
+
+  // Destroy old hls instance
+  if (_tvHls) { try { _tvHls.destroy(); } catch(e){} _tvHls = null; }
+  vid.src = '';
+
+  ensureHlsJs(function() {
+    function onStreamReady() {
+      spinner.style.display = 'none';
+      vid.style.display     = 'block';
+      vid.muted = false;
+      vid.play().catch(function(){ vid.muted = true; vid.play().catch(function(){}); });
+    }
+    function onStreamError() {
+      spinner.style.display = 'none';
+      vid.style.display     = 'none';
+      errEl.style.display   = 'flex';
+    }
+
+    if (window.Hls && Hls.isSupported()) {
+      var hls = new Hls({ lowLatencyMode:true, maxBufferLength:12 });
+      _tvHls = hls;
+      hls.loadSource(ch.hls);
+      hls.attachMedia(vid);
+      hls.on(Hls.Events.MANIFEST_PARSED, onStreamReady);
+      hls.on(Hls.Events.ERROR, function(e, d) {
+        if (d.fatal) onStreamError();
+      });
+    } else if (vid.canPlayType('application/vnd.apple.mpegurl')) {
+      // Native HLS — Safari / iOS
+      vid.src = ch.hls;
+      vid.addEventListener('loadedmetadata', onStreamReady, { once:true });
+      vid.addEventListener('error', onStreamError, { once:true });
+    } else {
+      onStreamError();
+    }
+  });
+};
+
+window.tvRetry = function() {
+  if (_tvCurId) tvSelectChannel(_tvCurId);
+};
+
+window.tvToggle = function() {
+  var panel = document.getElementById('tvPanel');
+  if (!panel) return;
+  var hidden = panel.classList.toggle('hidden');
+  var btn = document.getElementById('tvToggle');
+  if (btn) btn.textContent = hidden ? '📺' : '✕';
+};
 
 // ── TABS ──────────────────────────────────────────────────────────
 function switchTab(t) {

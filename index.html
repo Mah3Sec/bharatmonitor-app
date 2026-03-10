@@ -1150,76 +1150,169 @@ var videosLoaded = false;
 function renderVideos() {
   if (videosLoaded) return;
   videosLoaded = true;
+
   var el = document.getElementById('vContent');
 
-  var govChannels = [
-    { name:'Lok Sabha TV',   desc:'Live Parliament sessions, Question Hour, budget debates, committee proceedings', url:'https://www.youtube.com/@loksabhatv/streams',   tag:'LIVE', col:'#ff1744', icon:'🏛️' },
-    { name:'Rajya Sabha TV', desc:'Upper house live sessions, private member bills, zero hour discussions',         url:'https://www.youtube.com/@rajyasabhatv/streams', tag:'LIVE', col:'#ff1744', icon:'🏛️' },
-    { name:'DD News',        desc:'Doordarshan national broadcaster — 24x7 live news, rural and state coverage',   url:'https://www.youtube.com/@DDNewsHindi/live',     tag:'LIVE', col:'#ff1744', icon:'📺' },
-    { name:'DD India',       desc:'Doordarshan international — English news, government announcements',            url:'https://www.youtube.com/@ddindia/live',          tag:'LIVE', col:'#ff1744', icon:'📺' },
-    { name:'PIB India',      desc:'Press Information Bureau — official government press briefings and releases',   url:'https://www.youtube.com/@PIBIndia',             tag:'OFFICIAL', col:'#FF6B00', icon:'📢' },
+  // ── CHANNELS ─────────────────────────────────────────────────────
+  // Magic: youtube.com/embed/live_stream?channel=ID always plays
+  // the channel's CURRENT live stream. No video ID needed.
+  var CHANNELS = [
+    { id:'aajtak',     name:'Aaj Tak',      lang:'HI', chId:'UCt4t-jeY85JegMlZ-E5UWuQ', color:'#FF6B00', icon:'🔴' },
+    { id:'ndtv',       name:'NDTV India',   lang:'HI', chId:'UCZFMm1mMw0F81Z37aaEzTUA', color:'#e53935', icon:'🔴' },
+    { id:'abp',        name:'ABP News',     lang:'HI', chId:'UCIvaYmXn9-MK1SbCLUHWBGQ', color:'#1565C0', icon:'🔴' },
+    { id:'zee',        name:'Zee News',     lang:'HI', chId:'UCpgDp9Ym-kLfzqMa0TLHBNw', color:'#6A1B9A', icon:'🔴' },
+    { id:'indiatoday', name:'India Today',  lang:'EN', chId:'UCYPvAwZP8pZhSMW8qs7cVCw', color:'#00838F', icon:'🔴' },
+    { id:'republic',   name:'Republic TV',  lang:'EN', chId:'UCKRQRWtHHGllhO2HvSR9WNw', color:'#BF360C', icon:'🔴' },
+    { id:'indiatv',    name:'India TV',     lang:'HI', chId:'UCRWFSbif-RCIfAHWW7ot8Lg', color:'#2E7D32', icon:'🔴' },
+    { id:'news18',     name:'News18',       lang:'HI', chId:'UC9CYT9gSNbGgMeVL7gqSNsA', color:'#0277BD', icon:'🔴' },
+    { id:'timesnow',   name:'Times Now',    lang:'EN', chId:'UCK9LgPtk8EvWCJWHC0CzVKA', color:'#F57F17', icon:'🔴' },
+    { id:'loksabha',   name:'Lok Sabha TV', lang:'PA', chId:'UCnxnS3sS8OEYu1oLQ-VhTkQ', color:'#1A237E', icon:'🏛️' },
+    { id:'ddnews',     name:'DD News',      lang:'EN', chId:'UCt6M35OdgDlNtBiKHMiMvOg', color:'#004D40', icon:'📺' },
   ];
 
-  var journoChannels = [
-    { name:'The Wire',    desc:'Donor-funded independent journalism — corruption, rights, policy failures',         url:'https://www.youtube.com/@TheWireNews',   tag:'INDEPENDENT', col:'#a855f7', icon:'🔎' },
-    { name:'Newslaundry', desc:'Subscription-funded, no ads, no corporate owners — media watchdog + ground reporting', url:'https://www.youtube.com/@newslaundry', tag:'INDEPENDENT', col:'#a855f7', icon:'🔬' },
-    { name:'The Print',   desc:'Parliament, judiciary and policy reporting — founded by senior journalists',        url:'https://www.youtube.com/@ThePrintIndia', tag:'JOURNALISM', col:'#00b8e6', icon:'🗞️' },
-    { name:'The Quint',   desc:'Ground reporting, civic issues, RTI guides, fact-checks',                          url:'https://www.youtube.com/@TheQuint',      tag:'JOURNALISM', col:'#00b8e6', icon:'🗞️' },
-    { name:'NDTV',        desc:'National broadcaster — Parliament, Supreme Court, state government failures',       url:'https://www.youtube.com/@ndtv',          tag:'MAINSTREAM', col:'#22c55e', icon:'📡' },
-    { name:'India Today', desc:'National daily — investigative series, sting operations, accountability',          url:'https://www.youtube.com/@IndiaToday',    tag:'MAINSTREAM', col:'#22c55e', icon:'📡' },
-    { name:'Scroll.in',   desc:'Long-form civic and rights-based journalism',                                      url:'https://www.youtube.com/@ScrollinIndia', tag:'JOURNALISM', col:'#00ddb8', icon:'📜' },
-  ];
+  var activeIdx = 0;
+  var ytPlayer = null;
+  var ytReady = false;
 
-  var portals = [
-    { name:'CPGRAMS',          desc:'File a complaint with any Central Government ministry — free, official',       url:'https://cpgrams.gov.in',            col:'#FF6B00', icon:'📝', tag:'GRIEVANCE' },
-    { name:'RTI Online',       desc:'File Right to Information with Central Government — free, online',             url:'https://rtionline.gov.in',          col:'#ffd700', icon:'📂', tag:'RTI' },
-    { name:'PIB Fact Check',   desc:'Official government unit debunking fake news on government schemes',           url:'https://factcheck.pib.gov.in',      col:'#22c55e', icon:'✅', tag:'FACT CHECK' },
-    { name:'FactChecker.in',   desc:'Independent data journalism — verifies government statistics and claims',      url:'https://factchecker.in',            col:'#22c55e', icon:'🔬', tag:'FACT CHECK' },
-    { name:'PRS Legislative',  desc:'Non-partisan analysis of Parliament bills, budgets, committee reports',        url:'https://prsindia.org',              col:'#a855f7', icon:'📊', tag:'RESEARCH' },
-    { name:'The Hindu',        desc:'Established newspaper — Parliament, judiciary and policy coverage',            url:'https://thehindu.com/news/national', col:'#00b8e6', icon:'📰', tag:'NEWS' },
-    { name:'Scroll.in',        desc:'Civic, social and rights-based long-form journalism',                          url:'https://scroll.in/india',           col:'#00ddb8', icon:'📜', tag:'NEWS' },
-    { name:'MyGov India',      desc:'Participate in government consultations and citizen feedback initiatives',     url:'https://mygov.in',                  col:'#22c55e', icon:'🗳️', tag:'CITIZEN' },
-    { name:'PIB India',        desc:'Official government press releases and ministry announcements',                url:'https://pib.gov.in',                col:'#FF6B00', icon:'🏛️', tag:'OFFICIAL' },
-  ];
+  function buildUI() {
+    var html = '';
 
-  function card(ch, leftBorder) {
-    var style = leftBorder ? 'border-left:3px solid ' + ch.col + ';' : '';
-    return '<a href="' + esc(ch.url) + '" target="_blank" rel="noopener" class="ncard" style="' + style + '">'
-      + '<div style="font-size:22px;flex-shrink:0;line-height:1">' + ch.icon + '</div>'
-      + '<div style="flex:1;min-width:0">'
-      + '<div style="display:flex;align-items:center;gap:6px;margin-bottom:3px;flex-wrap:wrap">'
-      + '<span style="font-family:Baloo2,cursive;font-weight:700;font-size:13px;color:#fff">' + esc(ch.name) + '</span>'
-      + '<span style="font-size:8px;font-weight:700;letter-spacing:.8px;padding:1px 6px;border-radius:3px;background:' + ch.col + '20;color:' + ch.col + ';border:1px solid ' + ch.col + '40">' + ch.tag + '</span>'
-      + '</div>'
-      + '<div style="font-size:10.5px;color:var(--mt);line-height:1.5">' + esc(ch.desc) + '</div>'
-      + '</div>'
-      + '<div style="color:var(--mt);font-size:14px;flex-shrink:0;align-self:center">↗</div>'
-      + '</a>';
+    // ── Tab bar ───────────────────────────────────────────────────
+    html += '<div id="liveTabs" style="display:flex;gap:4px;flex-wrap:wrap;padding:8px 8px 0;background:var(--p2);border-bottom:1px solid var(--b1)">';
+    for (var i = 0; i < CHANNELS.length; i++) {
+      var ch = CHANNELS[i];
+      html += '<button class="ltab" data-idx="' + i + '" style="'
+        + 'font-size:10px;padding:4px 9px;border-radius:4px 4px 0 0;border:1px solid var(--b1);'
+        + 'border-bottom:none;cursor:pointer;white-space:nowrap;font-family:Baloo2,cursive;font-weight:700;'
+        + 'background:var(--panel);color:var(--mt);transition:all .15s'
+        + '" data-color="' + ch.color + '">'
+        + '<span style="color:' + ch.color + ';font-size:8px;vertical-align:middle;margin-right:3px">●</span>'
+        + esc(ch.name)
+        + '<span style="margin-left:4px;font-size:8px;opacity:.6">' + ch.lang + '</span>'
+        + '</button>';
+    }
+    html += '</div>';
+
+    // ── Player area ───────────────────────────────────────────────
+    html += '<div style="position:relative;width:100%;padding-top:56.25%;background:#000">';
+    html += '<div id="ytPlayerWrap" style="position:absolute;top:0;left:0;width:100%;height:100%">';
+    // Click-to-play placeholder shown before YT API loads
+    html += '<div id="ytPlaceholder" style="width:100%;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;cursor:pointer;background:#080f1c" data-idx="0">';
+    html += '<div style="width:60px;height:60px;border-radius:50%;background:#FF6B00;display:flex;align-items:center;justify-content:center;font-size:24px">▶</div>';
+    html += '<div style="color:#c8d8e8;font-size:13px" id="ytPlaceholderLabel">' + esc(CHANNELS[0].name) + ' — Click to watch live</div>';
+    html += '<div style="color:#506070;font-size:10px">Powered by YouTube IFrame API</div>';
+    html += '</div>';
+    html += '<div id="yt-player" style="width:100%;height:100%;display:none"></div>';
+    html += '</div>';
+
+    // LIVE badge
+    html += '<div id="ytLiveBadge" style="display:none;position:absolute;top:10px;left:10px;z-index:10;background:#ff1744;border-radius:3px;padding:2px 8px;font-size:9px;font-weight:700;letter-spacing:1px;color:#fff">● LIVE</div>';
+    html += '</div>';
+
+    // ── Channel info strip ────────────────────────────────────────
+    html += '<div id="ytChannelInfo" style="padding:8px 12px;background:var(--p2);border-bottom:1px solid var(--b1);display:flex;align-items:center;gap:8px">';
+    html += '<div id="ytChDot" style="width:8px;height:8px;border-radius:50%;background:' + CHANNELS[0].color + ';animation:pu 1.5s infinite;flex-shrink:0"></div>';
+    html += '<div id="ytChName" style="font-family:Baloo2,cursive;font-weight:700;font-size:13px;color:var(--tx)">' + esc(CHANNELS[0].name) + '</div>';
+    html += '<div style="color:var(--mt);font-size:10px">24/7 Live Stream &mdash; via YouTube</div>';
+    html += '<a id="ytChLink" href="https://youtube.com/channel/' + CHANNELS[0].chId + '/live" target="_blank" rel="noopener" style="margin-left:auto;font-size:10px;color:var(--saf);text-decoration:none">Open on YouTube ↗</a>';
+    html += '</div>';
+
+    // ── Info notice ───────────────────────────────────────────────
+    html += '<div style="padding:6px 12px;font-size:10px;color:#506070;background:var(--p2);line-height:1.5">';
+    html += '💡 If a channel shows "Sign in to confirm" — open it on YouTube directly using the link above. YouTube occasionally bot-checks embedded streams.';
+    html += '</div>';
+
+    el.innerHTML = html;
+
+    // Wire tabs
+    el.querySelectorAll('.ltab').forEach(function(btn) {
+      btn.addEventListener('click', function() {
+        switchChannel(parseInt(this.getAttribute('data-idx')));
+      });
+    });
+
+    // Wire placeholder click
+    document.getElementById('ytPlaceholder').addEventListener('click', function() {
+      loadYTApi(parseInt(this.getAttribute('data-idx')));
+    });
+
+    setActiveTab(0);
   }
 
-  var out = [];
+  function setActiveTab(idx) {
+    document.querySelectorAll('.ltab').forEach(function(btn, i) {
+      var col = btn.getAttribute('data-color');
+      if (i === idx) {
+        btn.style.background = col;
+        btn.style.color = '#fff';
+        btn.style.borderColor = col;
+      } else {
+        btn.style.background = 'var(--panel)';
+        btn.style.color = 'var(--mt)';
+        btn.style.borderColor = 'var(--b1)';
+      }
+    });
+    var ch = CHANNELS[idx];
+    var dot = document.getElementById('ytChDot');
+    var nm  = document.getElementById('ytChName');
+    var lk  = document.getElementById('ytChLink');
+    if (dot) dot.style.background = ch.color;
+    if (nm)  nm.textContent = ch.name;
+    if (lk)  { lk.href = 'https://youtube.com/channel/' + ch.chId + '/live'; }
+  }
 
-  // Notice
-  out.push('<div style="margin:8px 8px 14px;padding:10px 13px;background:#ff174408;border:1px solid #ff174420;border-radius:8px;font-size:10.5px;color:#804040;line-height:1.6">');
-  out.push('<strong style="color:#ff7060">Note:</strong> YouTube blocks live stream embedding on all third-party sites. Click any channel below — it opens on YouTube directly for full quality live playback.');
-  out.push('</div>');
+  function switchChannel(idx) {
+    activeIdx = idx;
+    setActiveTab(idx);
+    var ch = CHANNELS[idx];
 
-  out.push('<div class="vsec">');
-  out.push('<div class="vsec-hd"><span style="display:inline-block;width:7px;height:7px;border-radius:50%;background:#ff1744;animation:pu 1.5s infinite;margin-right:6px;vertical-align:middle"></span>Live Government TV</div>');
-  for (var i = 0; i < govChannels.length; i++) out.push(card(govChannels[i], false));
-  out.push('</div>');
+    if (ytReady && ytPlayer) {
+      // Load new channel live stream
+      var url = 'https://www.youtube.com/embed/live_stream?channel=' + ch.chId
+        + '&autoplay=1&rel=0&modestbranding=1&enablejsapi=1';
+      ytPlayer.loadVideoByUrl({ mediaContentUrl: url });
+      showPlayer();
+    } else if (document.getElementById('yt-player').style.display !== 'none') {
+      // Reload iframe directly
+      loadPlayerIframe(idx);
+    } else {
+      // Update placeholder
+      var ph = document.getElementById('ytPlaceholder');
+      var lb = document.getElementById('ytPlaceholderLabel');
+      if (ph) ph.setAttribute('data-idx', idx);
+      if (lb) lb.textContent = ch.name + ' \u2014 Click to watch live';
+    }
+  }
 
-  out.push('<div class="vsec">');
-  out.push('<div class="vsec-hd">📰 Independent & Investigative Journalism</div>');
-  for (var j = 0; j < journoChannels.length; j++) out.push(card(journoChannels[j], false));
-  out.push('</div>');
+  function showPlayer() {
+    var ph = document.getElementById('ytPlaceholder');
+    var yt = document.getElementById('yt-player');
+    var badge = document.getElementById('ytLiveBadge');
+    if (ph) ph.style.display = 'none';
+    if (yt) yt.style.display = 'block';
+    if (badge) badge.style.display = 'block';
+  }
 
-  out.push('<div class="vsec">');
-  out.push('<div class="vsec-hd">🔗 Civic Portals, RTI & Fact-Check</div>');
-  for (var k = 0; k < portals.length; k++) out.push(card(portals[k], true));
-  out.push('</div>');
+  function loadPlayerIframe(idx) {
+    var ch = CHANNELS[idx];
+    var wrap = document.getElementById('ytPlayerWrap');
+    if (!wrap) return;
+    var src = 'https://www.youtube.com/embed/live_stream?channel=' + ch.chId
+      + '&autoplay=1&rel=0&modestbranding=1';
+    wrap.innerHTML = '<iframe src="' + src + '" style="width:100%;height:100%;border:none;position:absolute;top:0;left:0"'
+      + ' allow="autoplay;fullscreen;encrypted-media" allowfullscreen></iframe>';
+    var badge = document.getElementById('ytLiveBadge');
+    if (badge) badge.style.display = 'block';
+  }
 
-  el.innerHTML = out.join('');
+  function loadYTApi(idx) {
+    activeIdx = idx;
+    // Try direct iframe first — simpler & works in most cases
+    loadPlayerIframe(idx);
+    showPlayer();
+  }
+
+  buildUI();
 }
 
 

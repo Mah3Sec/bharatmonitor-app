@@ -13,7 +13,7 @@
   --saf:#FF6B00;--saf2:#cc5200;--grn:#00c853;--sky:#00b8e6;--gld:#ffd700;
   --red:#ff1744;--tel:#00ddb8;--pur:#a855f7;--tx:#c8d8e8;--mt:#4a6080;--mt2:#2a3f5a;--w:#fff;
 }
-html,body{height:100%;font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--tx);overflow:hidden}
+html,body{height:100%;font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--tx);overflow:hidden}@media(max-width:768px){html,body{overflow:auto;height:auto}}
 #app{display:flex;flex-direction:column;height:100vh}
 /* HEADER */
 #hdr{height:52px;background:var(--panel);border-bottom:1px solid var(--b1);display:flex;align-items:center;justify-content:space-between;padding:0 14px;flex-shrink:0;z-index:200;gap:10px}
@@ -28,7 +28,7 @@ html,body{height:100%;font-family:'DM Sans',sans-serif;background:var(--bg);colo
 #fs.live .fsd{background:var(--grn);animation:pu 2s infinite}
 #fs.error .fsd{background:var(--red)}
 #fs.loading .fsd{background:var(--gld);animation:pu 1s infinite}
-.btnr{background:var(--saf);color:var(--w);border:none;border-radius:7px;padding:7px 14px;font-family:'Baloo 2',cursive;font-weight:700;font-size:13px;cursor:pointer;white-space:nowrap}
+.btnr{background:var(--saf);color:var(--w);border:none;border-radius:7px;padding:7px 14px;-webkit-tap-highlight-color:transparent;font-family:'Baloo 2',cursive;font-weight:700;font-size:13px;cursor:pointer;white-space:nowrap}
 .btnr:hover{background:var(--saf2)}
 /* BODY */
 #body{flex:1;display:flex;overflow:hidden;min-height:0}
@@ -177,6 +177,63 @@ html,body{height:100%;font-family:'DM Sans',sans-serif;background:var(--bg);colo
 .maplibregl-ctrl-group{background:var(--panel)!important;border:1px solid var(--b1)!important}
 .maplibregl-ctrl-group button{background:var(--panel)!important;color:var(--tx)!important}
 .maplibregl-ctrl-attrib{background:rgba(8,15,28,.7)!important;color:var(--mt)!important;font-size:10px!important}
+
+/* ADMIN PANEL */
+#adminBar{display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(4,8,16,.92);z-index:9999;align-items:center;justify-content:center}
+#adminBar.show{display:flex}
+.adminBox{background:var(--panel);border:1px solid #FF6B0060;border-radius:12px;padding:24px;width:340px;max-width:95vw}
+.adminTitle{font-family:'Baloo 2',cursive;font-weight:800;font-size:18px;color:var(--saf);margin-bottom:4px}
+.adminSub{font-size:11px;color:var(--mt);margin-bottom:16px}
+.adminInput{width:100%;background:var(--p2);border:1px solid var(--b1);border-radius:7px;padding:8px 12px;color:var(--tx);font-family:inherit;font-size:13px;outline:none;margin-bottom:10px}
+.adminInput:focus{border-color:var(--saf)}
+.adminBtn{width:100%;padding:9px;background:var(--saf);color:#fff;border:none;border-radius:7px;font-family:'Baloo 2',cursive;font-weight:700;font-size:14px;cursor:pointer;margin-bottom:8px}
+.adminBtn:hover{background:var(--saf2)}
+.adminClose{width:100%;padding:7px;background:transparent;border:1px solid var(--b1);border-radius:7px;color:var(--mt);font-family:inherit;font-size:12px;cursor:pointer}
+.adminClose:hover{border-color:var(--b2);color:var(--tx)}
+.delBtn{padding:3px 8px;background:#ff174415;border:1px solid #ff174440;border-radius:4px;color:#ff1744;font-size:10px;cursor:pointer;font-family:inherit;font-weight:700;flex-shrink:0}
+.delBtn:hover{background:#ff174425}
+.spamBtn{padding:3px 8px;background:#ffd70015;border:1px solid #ffd70040;border-radius:4px;color:#ffd700;font-size:10px;cursor:pointer;font-family:inherit;font-weight:700;flex-shrink:0}
+.spamBtn:hover{background:#ffd70025}
+/* ── RESPONSIVE / MOBILE ── */
+@media (max-width: 768px) {
+  html,body{overflow:auto}
+  #app{height:auto;min-height:100vh;overflow:auto}
+  #hdr{height:auto;padding:8px 10px;flex-wrap:wrap;gap:6px}
+  .logo{font-size:16px}
+  .hc{font-size:10px;justify-content:flex-start;width:100%}
+  .btnr{padding:6px 10px;font-size:12px}
+  #body{flex-direction:column;overflow:visible;height:auto}
+  #map{height:45vh;min-height:260px;flex:none;width:100%}
+  #mst{top:8px;left:8px;gap:5px}
+  .sc{padding:4px 8px}.sv{font-size:12px}.sl{font-size:8px}
+  #mlg{bottom:28px;padding:5px 8px;font-size:9px;gap:6px}
+  #ticker{font-size:10px;padding:4px 10px}
+  #sb{width:100%;border-left:none;border-top:1px solid var(--b1);height:auto;min-height:60vh;flex-shrink:0}
+  .tabs{overflow-x:auto;-webkit-overflow-scrolling:touch}
+  .tbn{min-width:70px;font-size:9px;padding:9px 6px}
+  .tpn.active{display:flex;min-height:55vh}
+  #il,#rp,#myp,#vp,#aip{overflow-y:auto;-webkit-overflow-scrolling:touch}
+  .ic{padding:9px 12px}
+  .it{font-size:11px}
+  #sti{padding:10px 12px}
+  .stc{font-size:18px}
+  .sgrid{grid-template-columns:1fr 1fr}
+  .fi,.fsl,.fta{font-size:14px;padding:9px 12px}
+  .bts{font-size:15px;padding:12px}
+  #adminBar .adminBox{width:92vw;padding:18px}
+  #footer{flex-direction:column;gap:6px;text-align:center;padding:8px}
+}
+@media (max-width: 480px) {
+  #map{height:40vh;min-height:220px}
+  #mst .sc:last-child{display:none}
+  .tbn{min-width:58px;font-size:8.5px;padding:8px 3px}
+  #sb{min-height:58vh}
+  .tpn.active{min-height:52vh}
+}
+@media (min-width: 769px) and (max-width:1024px) {
+  #sb{width:300px}
+  .tbn{font-size:9.5px;padding:9px 3px}
+}
 /* FOOTER */
 #footer{flex-shrink:0;background:var(--panel);border-top:1px solid var(--b1);padding:5px 16px;display:flex;align-items:center;justify-content:space-between;font-size:10px;color:var(--mt);z-index:100}
 #footer a{color:var(--mt);text-decoration:none}
@@ -324,6 +381,22 @@ html,body{height:100%;font-family:'DM Sans',sans-serif;background:var(--bg);colo
     </div>
   </div>
 
+  <!-- ADMIN PANEL -->
+  <div id="adminBar">
+    <div class="adminBox">
+      <div class="adminTitle">🔐 Admin Panel</div>
+      <div class="adminSub">BharatMonitor — Issue Moderation</div>
+      <div id="adminLogin">
+        <input class="adminInput" type="password" id="adminPwd" placeholder="Enter admin password"/>
+        <button class="adminBtn" id="adminLoginBtn">Unlock Admin Mode</button>
+        <button class="adminClose" id="adminCancelBtn">Cancel</button>
+      </div>
+      <div id="adminUnlocked" style="display:none">
+        <div style="background:#00c85320;border:1px solid #00c85340;border-radius:7px;padding:8px 12px;font-size:12px;color:#00c853;margin-bottom:12px">✅ Admin mode active — delete buttons visible on all issues</div>
+        <button class="adminClose" id="adminLockBtn">🔒 Lock Admin</button>
+      </div>
+    </div>
+  </div>
   <!-- FOOTER -->
   <footer id="footer">
     <div>&#127988;&#8205;&#9729;&#65039; <strong style="color:var(--tx)">BharatMonitor</strong> &mdash; India Civic Intelligence</div>
@@ -585,10 +658,27 @@ function renderIssues() {
     html += '</div>';
     if (iss.imageUrl) html += renderMedia(iss.imageUrl);
     if (sel) html += '<button class="iab" data-id="' + esc(iss.id) + '">📋 Analyse Issue →</button>';
+    if (adminUnlocked && iss.src === 'citizen' && iss.ghNumber) {
+      html += '<div style="display:flex;gap:6px;margin-top:6px">';
+      html += '<button class="spamBtn" data-gh="' + iss.ghNumber + '" data-iid="' + esc(iss.id) + '" data-spam="1">🚫 Spam</button>';
+      html += '<button class="delBtn" data-gh="' + iss.ghNumber + '" data-iid="' + esc(iss.id) + '" data-spam="0">🗑️ Remove</button>';
+      html += '</div>';
+    }
     html += '</div>';
   }
   el.innerHTML = html;
   el.onclick = function(e) {
+    // Admin delete/spam buttons
+    var adminBtn = e.target.closest ? e.target.closest('.delBtn, .spamBtn') : null;
+    if (adminBtn) {
+      e.stopPropagation();
+      var ghNum = parseInt(adminBtn.getAttribute('data-gh'));
+      var issId = adminBtn.getAttribute('data-iid');
+      var isSpam = adminBtn.getAttribute('data-spam') === '1';
+      closeIssue(ghNum, issId, isSpam);
+      return;
+    }
+    // Analyse button
     var btn = e.target.closest ? e.target.closest('.iab') : null;
     if (btn) {
       e.stopPropagation();
@@ -725,14 +815,38 @@ function fetchAllFeeds() {
   });
 
   // Then merge GitHub citizen reports non-blocking
+  // Also REMOVE issues that were closed/deleted on GitHub
   ghPromise.then(function(ghItems) {
-    if (!ghItems.length) return;
+    var openIds = {};
+    ghItems.forEach(function(i){ openIds[i.id] = true; });
     var changed = false;
+    // Add new ones
     ghItems.forEach(function(i) {
       var exists = false;
       for (var j = 0; j < issues.length; j++) { if (issues[j].id === i.id) { exists = true; break; } }
       if (!exists) { issues.unshift(i); changed = true; }
     });
+    // Remove citizen issues that are no longer open on GitHub
+    var before = issues.length;
+    issues = issues.filter(function(i) {
+      // Keep RSS items always
+      if (i.src !== 'citizen') return true;
+      // Keep local-only reports (no ghUrl = not yet on GitHub)
+      if (!i.ghUrl && !i.link) return true;
+      // If it was on GitHub, only keep if still open
+      if (i.id && i.id.indexOf('gh-') === 0) return openIds[i.id] === true;
+      return true;
+    });
+    if (issues.length !== before) {
+      changed = true;
+      // Also clean localStorage - remove closed issues
+      var storedReps = loadRep().filter(function(r) {
+        if (!r.ghUrl && !r.link) return true;
+        if (r.id && r.id.indexOf('gh-') === 0) return openIds[r.id] === true;
+        return true;
+      });
+      saveRep(storedReps);
+    }
     if (changed) { updateCounters(); renderIssues(); updateChoropleth(); addIssueMarkers(issues); }
   });
 }
@@ -1029,8 +1143,8 @@ function finishSubmit(r, cat, state, dist, title, desc, media, kw) {
     + '<div class="scel"><div class="scl">Status</div><div style="font-size:12px;color:#00c853;font-weight:600">Active</div></div>'
     + '</div>'
     + ghSection
-    + '<a href="https://chat.whatsapp.com/BvuaVkb3ZY1KuSr7V8wi74" target="_blank" rel="noopener" style="display:flex;align-items:center;justify-content:center;gap:6px;padding:9px;background:#25D36615;border:1px solid #25D36640;border-radius:7px;color:#25D366;font-size:12px;font-weight:600;text-decoration:none;margin-bottom:6px">💬 Join BharatMonitor WhatsApp Community</a>'
-    + '<button class="bts" style="background:#25D366;margin-bottom:8px" onclick="window.open(\'https://wa.me/?text=' + wm + '\',\'_blank\')">📲 Escalate on WhatsApp →</button>'
+    
+    + '<a href="https://chat.whatsapp.com/BvuaVkb3ZY1KuSr7V8wi74" target="_blank" rel="noopener" style="display:flex;align-items:center;justify-content:center;gap:8px;padding:10px;background:#25D366;border-radius:7px;color:#fff;font-family:Baloo 2,cursive;font-weight:700;font-size:14px;text-decoration:none;margin-bottom:8px">📲 Share in WhatsApp Community →</a>'
     + '<button class="bse" id="btnVR">📋 View My Reports</button>'
     + '<button class="bse" id="btnAg" style="margin-top:6px">+ Report Another Issue</button>'
     + '</div>';
@@ -1047,6 +1161,96 @@ function finishSubmit(r, cat, state, dist, title, desc, media, kw) {
     document.getElementById('mediaPreview').innerHTML = '';
   };
 }
+
+
+// ── ADMIN PANEL ──────────────────────────────────────────────────
+var adminUnlocked = false;
+var adminPwdHash = '';
+
+// Secret trigger: click footer "Built by" text 5 times fast
+var footerClicks = 0, footerTimer = null;
+document.getElementById('footer').addEventListener('click', function(e) {
+  if (e.target.tagName === 'A') return;
+  footerClicks++;
+  if (footerTimer) clearTimeout(footerTimer);
+  footerTimer = setTimeout(function(){ footerClicks = 0; }, 2000);
+  if (footerClicks >= 5) {
+    footerClicks = 0;
+    document.getElementById('adminBar').classList.add('show');
+    document.getElementById('adminPwd').focus();
+  }
+});
+
+document.getElementById('adminLoginBtn').addEventListener('click', function() {
+  var pwd = document.getElementById('adminPwd').value;
+  if (!pwd) return;
+  // Verify against server
+  fetch('/api/admin', {
+    method: 'POST',
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify({password: pwd, action: 'verify', issueNumber: 0})
+  })
+  .then(function(r){ return r.json(); })
+  .then(function(d) {
+    if (d.error === 'Missing issueNumber' || d.ok) {
+      // Password accepted
+      adminUnlocked = true;
+      adminPwdHash = pwd;
+      document.getElementById('adminLogin').style.display = 'none';
+      document.getElementById('adminUnlocked').style.display = 'block';
+      renderIssues(); // re-render with delete buttons
+    } else {
+      document.getElementById('adminPwd').style.borderColor = '#ff1744';
+      document.getElementById('adminPwd').value = '';
+      document.getElementById('adminPwd').placeholder = 'Wrong password — try again';
+    }
+  })
+  .catch(function() {
+    // If endpoint doesn't exist yet, just unlock locally for testing
+    alert('Admin API not responding. Check ADMIN_PASSWORD env var in Vercel.');
+  });
+});
+
+document.getElementById('adminPwd').addEventListener('keydown', function(e) {
+  if (e.key === 'Enter') document.getElementById('adminLoginBtn').click();
+});
+
+document.getElementById('adminCancelBtn').addEventListener('click', function() {
+  document.getElementById('adminBar').classList.remove('show');
+  document.getElementById('adminPwd').value = '';
+});
+
+document.getElementById('adminLockBtn').addEventListener('click', function() {
+  adminUnlocked = false; adminPwdHash = '';
+  document.getElementById('adminLogin').style.display = 'block';
+  document.getElementById('adminUnlocked').style.display = 'none';
+  document.getElementById('adminBar').classList.remove('show');
+  renderIssues();
+});
+
+window.closeIssue = function(ghNumber, issueId, spam) {
+  if (!confirm((spam ? 'Mark as spam and close' : 'Close') + ' issue #' + ghNumber + '?')) return;
+  fetch('/api/admin', {
+    method: 'POST',
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify({password: adminPwdHash, action: spam ? 'label_spam' : 'close', issueNumber: String(ghNumber)})
+  })
+  .then(function(r){ return r.json(); })
+  .then(function(d) {
+    if (d.ok) {
+      // Remove from local issues array immediately
+      issues = issues.filter(function(i){ return i.id !== issueId; });
+      // Remove from localStorage
+      var stored = loadRep().filter(function(r){ return r.id !== issueId; });
+      saveRep(stored);
+      updateCounters(); renderIssues(); updateChoropleth(); addIssueMarkers(issues);
+      alert('Issue closed' + (spam ? ' and marked as spam' : '') + ' successfully.');
+    } else {
+      alert('Error: ' + (d.error || 'Unknown error'));
+    }
+  })
+  .catch(function(){ alert('Could not connect to admin API.'); });
+};
 
 // ── EVENT BINDINGS ────────────────────────────────────────────────
 document.querySelectorAll('.tbn').forEach(function(b) {
@@ -1074,13 +1278,32 @@ setInterval(function() {
     .then(function(r){ return r.json(); })
     .then(function(d) {
       var ghItems = d.issues || [];
-      if (!ghItems.length) return;
+      var openIds = {};
+      ghItems.forEach(function(i){ openIds[i.id] = true; });
       var changed = false;
+      // Add new open issues
       ghItems.forEach(function(i) {
         var exists = false;
         for (var j = 0; j < issues.length; j++) { if (issues[j].id === i.id) { exists = true; break; } }
         if (!exists) { issues.unshift(i); changed = true; }
       });
+      // Remove issues closed on GitHub
+      var before = issues.length;
+      issues = issues.filter(function(i) {
+        if (i.src !== 'citizen') return true;
+        if (!i.ghUrl && !i.link) return true;
+        if (i.id && i.id.indexOf('gh-') === 0) return openIds[i.id] === true;
+        return true;
+      });
+      if (issues.length !== before) {
+        changed = true;
+        var storedReps = loadRep().filter(function(r) {
+          if (!r.ghUrl && !r.link) return true;
+          if (r.id && r.id.indexOf('gh-') === 0) return openIds[r.id] === true;
+          return true;
+        });
+        saveRep(storedReps);
+      }
       if (changed) { updateCounters(); renderIssues(); updateChoropleth(); addIssueMarkers(issues); }
     })
     .catch(function(){});

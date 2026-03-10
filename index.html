@@ -6,12 +6,17 @@
 <title>BharatMonitor — India Civic Intelligence</title>
 <link rel="icon" type="image/x-icon" href="/favicon.ico"/>
 <link rel="icon" type="image/svg+xml" href="/logo.svg"/>
-<link rel="apple-touch-icon" href="/logo-192.png"/>
+<link rel="icon" type="image/png" sizes="192x192" href="/logo-192.png"/>
+<link rel="icon" type="image/png" sizes="512x512" href="/logo-512.png"/>
+<link rel="apple-touch-icon" sizes="192x192" href="/logo-192.png"/>
 <meta name="theme-color" content="#080f1c"/>
 <meta name="description" content="Real-time India civic issue tracker — report roads, water, power, corruption and more across all 36 states and UTs."/>
 <meta property="og:title" content="BharatMonitor — India Civic Intelligence"/>
 <meta property="og:description" content="Real-time civic issue tracker for India. Report and track public service failures across all 36 states."/>
 <meta property="og:image" content="/logo-512.png"/>
+<meta property="og:type" content="website"/>
+<meta name="twitter:card" content="summary"/>
+<meta name="twitter:image" content="/logo-512.png"/>
 <link rel="stylesheet" href="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.css"/>
 <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700;800&family=DM+Sans:wght@400;500&display=swap" rel="stylesheet"/>
 <style>
@@ -262,7 +267,7 @@ html,body{height:100%;font-family:'DM Sans',sans-serif;background:var(--bg);colo
 <div id="app">
   <!-- HEADER -->
   <header id="hdr">
-    <div class="logo">&#127988;&#8205;&#9729;&#65039; Bharat<span>Monitor</span></div>
+    <div class="logo"><img src="/logo.svg" alt="BharatMonitor" style="width:28px;height:28px;border-radius:50%;flex-shrink:0"/> Bharat<span>Monitor</span></div>
     <div class="hc">
       <div class="ld"></div>&nbsp;<span id="lc">0</span>&nbsp;civic issues&nbsp;&middot;&nbsp;
       <div id="fs" class="loading"><div class="fsd"></div><span id="fst">Loading...</span></div>

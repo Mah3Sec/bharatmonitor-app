@@ -1310,111 +1310,181 @@ function renderVideos() {
   videosLoaded = true;
   var el = document.getElementById('vContent');
 
-  // ── Channel list — 8 international channels with permanent live stream video IDs ──
-  // Using direct video IDs (not channel IDs) — these are permanent 24/7 live streams
-  // that allow embedding. Indian channels block iframe embedding by policy.
+  // ── HLS Native Streams (no YouTube embeds — direct .m3u8 from channel CDNs) ──
+  // These are the same URLs used by worldmonitor.app — publicly accessible, no auth needed.
+  // Uses hls.js for Chrome/Firefox, native HLS for Safari.
   var CHANNELS = [
-    { id:'aljazeeraen', name:'Al Jazeera English', lang:'EN', vidId:'nSOn_g4EMAU', color:'#00838F' },
-    { id:'dwnews',      name:'DW News',            lang:'EN', vidId:'vfqk2MXVMVE', color:'#E53935' },
-    { id:'france24',    name:'France 24 English',  lang:'EN', vidId:'h3MuIUNCCLI', color:'#1565C0' },
-    { id:'skynews',     name:'Sky News',            lang:'EN', vidId:'9Auq9mYxFEE', color:'#0277BD' },
-    { id:'bloomberg',   name:'Bloomberg TV',        lang:'EN', vidId:'dp8PhLsUcFE', color:'#F57F17' },
-    { id:'euronews',    name:'Euronews',            lang:'EN', vidId:'DWDUn5q3iPs', color:'#7B1FA2' },
-    { id:'trtworld',    name:'TRT World',           lang:'EN', vidId:'n0frSbFcNmk', color:'#BF360C' },
-    { id:'nhkworld',    name:'NHK World Japan',     lang:'EN', vidId:'8i0UXNC7y7o', color:'#2E7D32' },
+    { id:'bloomberg',   name:'Bloomberg',         color:'#F57F17',
+      hls:'https://www.bloomberg.com/media-manifest/streams/eu.m3u8',
+      ytFb:'https://www.bloomberg.com/live' },
+    { id:'skynews',     name:'Sky News',          color:'#0277BD',
+      hls:'https://linear227.sky.com/skynews/hls/primary/index.m3u8',
+      ytFb:'https://news.sky.com/watch-sky-news-live' },
+    { id:'aljazeera',   name:'Al Jazeera',        color:'#00838F',
+      hls:'https://live-hls-web-aje.getaj.net/AJE/index.m3u8',
+      ytFb:'https://www.aljazeera.com/live' },
+    { id:'france24',    name:'France 24',         color:'#1565C0',
+      hls:'https://static.france24.com/live/F24_EN_HI_HLS/live_tv.m3u8',
+      ytFb:'https://www.france24.com/en/live-news' },
+    { id:'dw',          name:'DW News',           color:'#E53935',
+      hls:'https://dwamdstream102.akamaized.net/hls/live/2015525/dwstream102/index.m3u8',
+      ytFb:'https://www.dw.com/en/live-tv' },
+    { id:'euronews',    name:'Euronews',          color:'#7B1FA2',
+      hls:'https://euronews-euronews-1-gb.samsung.wurl.tv/manifest/playlist.m3u8',
+      ytFb:'https://www.euronews.com/live' },
+    { id:'trtworld',    name:'TRT World',         color:'#BF360C',
+      hls:'https://tv-trtworld.live.trt.com.tr/master.m3u8',
+      ytFb:'https://www.trtworld.com/watch' },
+    { id:'nhkworld',    name:'NHK World',         color:'#2E7D32',
+      hls:'https://nhkworld.webcdn.stream.ne.jp/www11/nhkworld-tv/global/263941/live_wa_s.m3u8',
+      ytFb:'https://www3.nhk.or.jp/nhkworld/en/live' },
   ];
 
-  // Track which windows are currently playing
-  var playing = {};
+  // Map of hls.js instances keyed by channel id
+  var hlsInstances = {};
+
+  // Load hls.js from CDN if not already present
+  function ensureHlsJs(cb) {
+    if (window.Hls) { cb(); return; }
+    var s = document.createElement('script');
+    s.src = 'https://cdn.jsdelivr.net/npm/hls.js@latest/dist/hls.min.js';
+    s.onload = cb;
+    document.head.appendChild(s);
+  }
 
   function buildUI() {
     var html = '';
 
-    // ── Header bar ────────────────────────────────────────────────
+    // Header
     html += '<div style="display:flex;align-items:center;justify-content:space-between;padding:8px 12px;background:var(--p2);border-bottom:1px solid var(--b1);flex-shrink:0">';
     html += '<div style="display:flex;align-items:center;gap:6px">';
     html += '<span style="background:#ff1744;border-radius:3px;padding:2px 7px;font-size:9px;font-weight:700;letter-spacing:1px;color:#fff;animation:pu 1.5s infinite">● LIVE</span>';
-    html += '<span style="font-size:12px;font-weight:700;color:var(--tx)">' + CHANNELS.length + ' News Channels</span>';
-    html += '<span style="font-size:10px;color:var(--mt)">— Click any window to play</span>';
+    html += '<span style="font-size:12px;font-weight:700;color:var(--tx)">Live News — HLS</span>';
+    html += '<span style="font-size:10px;color:var(--mt)">— Click to play</span>';
     html += '</div>';
     html += '<button id="playAllBtn" onclick="playAll()" style="font-size:10px;padding:4px 10px;background:var(--saf);color:#fff;border:none;border-radius:5px;cursor:pointer;font-weight:700">▶ Play All</button>';
     html += '</div>';
 
-    // ── Grid of channel windows ───────────────────────────────────
-    html += '<div id="newsGrid" style="display:grid;grid-template-columns:1fr 1fr;gap:6px;padding:8px;overflow-y:auto;flex:1;min-height:0">';
+    // Grid
+    html += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;padding:8px;overflow-y:auto;flex:1;min-height:0">';
 
     for (var i = 0; i < CHANNELS.length; i++) {
       var ch = CHANNELS[i];
-      html += '<div class="newsWin" id="win-' + ch.id + '" style="'
-        + 'background:#050d1a;border:1px solid ' + ch.color + '55;border-radius:8px;'
-        + 'overflow:hidden;position:relative;display:flex;flex-direction:column'
-        + '">';
+      html += '<div style="background:#050d1a;border:1px solid ' + ch.color + '44;border-radius:8px;overflow:hidden;display:flex;flex-direction:column">';
 
-      // Channel header strip
-      html += '<div style="display:flex;align-items:center;gap:5px;padding:4px 7px;background:' + ch.color + '18;border-bottom:1px solid ' + ch.color + '30;flex-shrink:0">';
-      html += '<span style="width:6px;height:6px;border-radius:50%;background:' + ch.color + ';flex-shrink:0;animation:pu 1.5s infinite"></span>';
-      html += '<span style="font-size:9px;font-weight:700;color:' + ch.color + ';flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">' + esc(ch.name) + '</span>';
-      html += '<span style="font-size:7px;color:#3a5060;font-weight:600">' + ch.lang + '</span>';
-      html += '<a href="https://youtube.com/watch?v=' + ch.vidId + '" target="_blank" rel="noopener" '
-        + 'style="font-size:8px;color:var(--mt);text-decoration:none;opacity:.6;flex-shrink:0" '
-        + 'onclick="event.stopPropagation()">↗</a>';
+      // Channel header
+      html += '<div style="display:flex;align-items:center;gap:5px;padding:4px 8px;background:' + ch.color + '18;border-bottom:1px solid ' + ch.color + '25;flex-shrink:0">';
+      html += '<span style="width:6px;height:6px;border-radius:50%;background:' + ch.color + ';animation:pu 1.5s infinite;flex-shrink:0"></span>';
+      html += '<span style="font-size:9px;font-weight:700;color:' + ch.color + ';flex:1">' + esc(ch.name) + '</span>';
+      html += '<span style="font-size:7px;color:#3a5060;font-weight:600">HLS</span>';
+      html += '<a href="' + ch.ytFb + '" target="_blank" rel="noopener" style="font-size:8px;color:var(--mt);text-decoration:none;opacity:.6" onclick="event.stopPropagation()">↗</a>';
       html += '</div>';
 
-      // Video area — 16:9
+      // 16:9 video container
       html += '<div style="position:relative;padding-top:56.25%;background:#000;flex-shrink:0">';
 
-      // Placeholder (shown before click)
-      html += '<div id="ph-' + ch.id + '" class="winPh" data-id="' + ch.id + '" data-vid="' + ch.vidId + '" '
+      // Placeholder
+      html += '<div id="ph-' + ch.id + '" data-id="' + ch.id + '" '
         + 'style="position:absolute;top:0;left:0;width:100%;height:100%;display:flex;flex-direction:column;'
-        + 'align-items:center;justify-content:center;gap:6px;cursor:pointer;background:#040b16">';
-      html += '<div style="width:34px;height:34px;border-radius:50%;background:' + ch.color + ';display:flex;align-items:center;justify-content:center;font-size:14px">▶</div>';
-      html += '<div style="font-size:9px;color:#4a6080;text-align:center;line-height:1.4">Click to watch live</div>';
+        + 'align-items:center;justify-content:center;gap:6px;cursor:pointer;background:#040b16" '
+        + 'onclick="loadHlsChannel(\'' + ch.id + '\')">';
+      html += '<div style="width:36px;height:36px;border-radius:50%;background:' + ch.color + ';display:flex;align-items:center;justify-content:center;font-size:15px">▶</div>';
+      html += '<div style="font-size:9px;color:#4a6080">Click to watch</div>';
       html += '</div>';
 
-      // iFrame slot (empty until clicked)
-      html += '<div id="fr-' + ch.id + '" style="position:absolute;top:0;left:0;width:100%;height:100%;display:none"></div>';
-      html += '</div>'; // end video area
+      // Video element (hidden until loaded)
+      html += '<video id="vid-' + ch.id + '" '
+        + 'style="position:absolute;top:0;left:0;width:100%;height:100%;display:none;background:#000" '
+        + 'playsinline muted controls></video>';
 
-      html += '</div>'; // end newsWin
+      // Loading spinner overlay
+      html += '<div id="spin-' + ch.id + '" style="display:none;position:absolute;top:0;left:0;width:100%;height:100%;'
+        + 'align-items:center;justify-content:center;background:#04080f">'
+        + '<div style="width:24px;height:24px;border:2px solid ' + ch.color + '44;border-top-color:' + ch.color + ';border-radius:50%;animation:spin 0.8s linear infinite"></div>'
+        + '</div>';
+
+      html += '</div>'; // end 16:9
+      html += '</div>'; // end card
     }
 
     html += '</div>'; // end grid
 
-    // ── Notice ────────────────────────────────────────────────────
-    html += '<div style="padding:5px 12px;font-size:9.5px;color:#3a5060;background:var(--p2);border-top:1px solid var(--b1);flex-shrink:0;line-height:1.5">';
-    html += '💡 International public broadcasters — these allow embedding. Click ↗ to open on YouTube if a window doesn\'t load.';
+    // Footer notice
+    html += '<div style="padding:5px 12px;font-size:9.5px;color:#3a5060;background:var(--p2);border-top:1px solid var(--b1);flex-shrink:0">';
+    html += '📡 Direct HLS streams — no YouTube. Click ↗ to open in browser if stream fails.';
     html += '</div>';
 
     el.innerHTML = html;
 
-    // Wire placeholder clicks
-    el.querySelectorAll('.winPh').forEach(function(ph) {
-      ph.addEventListener('click', function() {
-        loadWindow(this.getAttribute('data-id'), this.getAttribute('data-vid'));
-      });
-    });
-  }
-
-  // Load iframe into a window
-  function loadWindow(id, vidId) {
-    if (playing[id]) return;
-    playing[id] = true;
-    var ph = document.getElementById('ph-' + id);
-    var fr = document.getElementById('fr-' + id);
-    if (!ph || !fr) return;
-    ph.style.display = 'none';
-    fr.style.display = 'block';
-    var src = 'https://www.youtube.com/embed/' + vidId
-      + '?autoplay=1&rel=0&modestbranding=1';
-    fr.innerHTML = '<iframe src="' + src + '" style="width:100%;height:100%;border:none"'
-      + ' allow="autoplay;encrypted-media;fullscreen" allowfullscreen></iframe>';
-  }
-
-  // Expose playAll globally
-  window.playAll = function() {
-    for (var i = 0; i < CHANNELS.length; i++) {
-      loadWindow(CHANNELS[i].id, CHANNELS[i].vidId);
+    // Add spin keyframe if not present
+    if (!document.getElementById('hlsSpinStyle')) {
+      var st = document.createElement('style');
+      st.id = 'hlsSpinStyle';
+      st.textContent = '@keyframes spin{to{transform:rotate(360deg)}}';
+      document.head.appendChild(st);
     }
+  }
+
+  // Load a single HLS channel
+  window.loadHlsChannel = function(id) {
+    var ch = null;
+    for (var i = 0; i < CHANNELS.length; i++) { if (CHANNELS[i].id === id) { ch = CHANNELS[i]; break; } }
+    if (!ch) return;
+
+    var ph   = document.getElementById('ph-' + id);
+    var vid  = document.getElementById('vid-' + id);
+    var spin = document.getElementById('spin-' + id);
+    if (!ph || !vid) return;
+
+    ph.style.display   = 'none';
+    spin.style.display = 'flex';
+    vid.style.display  = 'none';
+
+    ensureHlsJs(function() {
+      // Destroy existing hls instance if any
+      if (hlsInstances[id]) { hlsInstances[id].destroy(); delete hlsInstances[id]; }
+
+      function onReady() {
+        spin.style.display = 'none';
+        vid.style.display  = 'block';
+        vid.muted = false;
+        vid.play().catch(function(){ vid.muted = true; vid.play(); });
+      }
+
+      if (Hls.isSupported()) {
+        var hls = new Hls({ lowLatencyMode: true, maxBufferLength: 10 });
+        hlsInstances[id] = hls;
+        hls.loadSource(ch.hls);
+        hls.attachMedia(vid);
+        hls.on(Hls.Events.MANIFEST_PARSED, onReady);
+        hls.on(Hls.Events.ERROR, function(evt, data) {
+          if (data.fatal) {
+            spin.style.display = 'none';
+            ph.innerHTML = '<div style="padding:12px;text-align:center">'
+              + '<div style="font-size:9px;color:#ff4444;margin-bottom:6px">Stream unavailable</div>'
+              + '<a href="' + ch.ytFb + '" target="_blank" style="font-size:9px;color:#4a9fd4;text-decoration:none">▶ Open in browser ↗</a>'
+              + '</div>';
+            ph.style.display = 'flex';
+            ph.style.cursor  = 'default';
+          }
+        });
+      } else if (vid.canPlayType('application/vnd.apple.mpegurl')) {
+        // Native HLS (Safari / iOS)
+        vid.src = ch.hls;
+        vid.addEventListener('loadedmetadata', onReady, { once: true });
+      } else {
+        // Fallback
+        spin.style.display = 'none';
+        ph.innerHTML = '<div style="padding:12px;text-align:center">'
+          + '<a href="' + ch.ytFb + '" target="_blank" style="font-size:9px;color:#4a9fd4;text-decoration:none">▶ Open in browser ↗</a></div>';
+        ph.style.display = 'flex';
+      }
+    });
+  };
+
+  // Play all at once
+  window.playAll = function() {
+    for (var i = 0; i < CHANNELS.length; i++) { loadHlsChannel(CHANNELS[i].id); }
     var btn = document.getElementById('playAllBtn');
     if (btn) { btn.textContent = '⏸ All Playing'; btn.style.background = '#2a5040'; }
   };

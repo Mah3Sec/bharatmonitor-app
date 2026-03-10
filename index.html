@@ -798,38 +798,69 @@ function getDistrictCoords(district, state) {
   return null;
 }
 
-// Deterministic hash → reproducible small offset per issue
-// (so dots don't jump every reload, but nearby issues still separate)
-function hashOffset(str, scale) {
-  var h = 0;
-  for (var i = 0; i < str.length; i++) h = (Math.imul(31, h) + str.charCodeAt(i)) | 0;
-  // produces value in (-scale, +scale)
-  return ((h & 0xFFFF) / 0xFFFF - 0.5) * 2 * scale;
+// Small deterministic offset so overlapping same-city dots spread slightly
+// Uses issue ID as seed so position stays stable across reloads
+function stableOffset(id, axis) {
+  var s = (id || '') + axis;
+  var h = 5381;
+  for (var i = 0; i < s.length; i++) h = ((h << 5) + h) ^ s.charCodeAt(i);
+  h = h >>> 0;
+  return ((h % 1000) / 1000 - 0.5) * 0.06; // ±0.03° ≈ 3km spread
+}
+
+// Try to extract a known city/district from the issue title or description
+// This helps RSS items that mention a city name get placed correctly
+function extractCityFromText(text) {
+  if (!text) return null;
+  var lower = text.toLowerCase();
+  var cities = Object.keys(DC);
+  // prefer longer matches first to avoid "delhi" matching "new delhi"
+  cities.sort(function(a,b){ return b.length - a.length; });
+  for (var i = 0; i < cities.length; i++) {
+    if (lower.indexOf(cities[i]) >= 0) return cities[i];
+  }
+  return null;
 }
 
 function issueCoords(iss) {
-  var seed = iss.id || iss.ticket || (iss.title || '').slice(0, 12);
+  var id = iss.id || iss.ticket || '';
 
-  // 1. Exact GPS — most precise, use as-is
-  if (iss.lat && iss.lng) return { lat: iss.lat, lng: iss.lng };
+  // ── Priority 1: Exact GPS coordinates (citizen reports with GPS) ──
+  if (iss.lat && iss.lng && Math.abs(iss.lat) > 0.1 && Math.abs(iss.lng) > 0.1) {
+    return { lat: +iss.lat, lng: +iss.lng };
+  }
 
-  // 2. Known district/city — pin to centroid + tiny jitter (±0.04° ≈ 4km)
-  //    so stacked same-city dots fan out slightly instead of overlapping
-  if (iss.district) {
+  // ── Priority 2: District field filled in (citizen reports) ────────
+  if (iss.district && iss.district.length > 1) {
     var dc = getDistrictCoords(iss.district, iss.state);
     if (dc) return {
-      lat: dc.lat + hashOffset(seed + 'lat', 0.04),
-      lng: dc.lng + hashOffset(seed + 'lng', 0.04)
+      lat: dc.lat + stableOffset(id, 'lat'),
+      lng: dc.lng + stableOffset(id, 'lng')
     };
   }
 
-  // 3. State centroid — tighter scatter (±0.6° ≈ 65km, stays inside state)
-  var c = SC[iss.state];
-  if (!c) return null;
-  return {
-    lat: c.lt + hashOffset(seed + 'lat', 0.6),
-    lng: c.lg + hashOffset(seed + 'lng', 0.6)
-  };
+  // ── Priority 3: City name found in title/description (RSS items) ──
+  var city = extractCityFromText((iss.title || '') + ' ' + (iss.state || ''));
+  if (city && DC[city]) {
+    return {
+      lat: DC[city].lt + stableOffset(id, 'lat'),
+      lng: DC[city].lg + stableOffset(id, 'lng')
+    };
+  }
+
+  // ── Priority 4: State capital ONLY if issue has explicit state ─────
+  // Do NOT scatter randomly — place at state capital precisely
+  // (with tiny offset so multiple state-level items stack neatly)
+  if (iss.state && iss.state !== 'India' && iss.state !== '') {
+    var c = SC[iss.state];
+    if (c) return {
+      lat: c.lt + stableOffset(id, 'lat') * 0.5,
+      lng: c.lg + stableOffset(id, 'lng') * 0.5
+    };
+  }
+
+  // ── Priority 5: No location data — do NOT plot on map ─────────────
+  return null;
 }
 
 function iColor(n) {
@@ -931,7 +962,14 @@ function addIssueMarkers(issList) {
   if (!mapLoaded) return;
   markerPool.forEach(function(m){ m.remove(); });
   markerPool = [];
-  var shown = issList.slice(0, 200);
+  // For map: always show citizen reports, only show RSS if they have a real city
+  var shown = issList.filter(function(iss) {
+    if (iss.src === 'citizen') return true; // always show citizen
+    // RSS: only show if title mentions a known city
+    var city = extractCityFromText((iss.title || '') + ' ' + (iss.state || ''));
+    return city && DC[city];
+  }).slice(0, 300);
+
   for (var i = 0; i < shown.length; i++) {
     var iss = shown[i];
     var coords = issueCoords(iss);

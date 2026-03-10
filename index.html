@@ -1,150 +1,145 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>BharatMonitor — India Civic Intelligence</title>
-  <meta name="description" content="Real-time civic issue intelligence dashboard for India." />
-  <link rel="stylesheet" href="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.css" />
-  <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700;800&family=DM+Sans:wght@400;500&display=swap" rel="stylesheet" />
-  <style>
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-    :root {
-      --bg:#080f1c; --panel:#0c1526; --panel2:#101d30;
-      --border:#182d48; --border2:#1e3a5f;
-      --saffron:#FF7518; --saffron2:#cc5a0e;
-      --green:#00c853; --sky:#00b4d8; --gold:#ffd700;
-      --red:#ff1744; --teal:#00e5cc;
-      --text:#c8d8e8; --muted:#4a6080; --muted2:#2a3f5a; --white:#ffffff;
-    }
-    html,body{height:100%;font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);overflow:hidden;}
-    #app{display:flex;flex-direction:column;height:100vh;}
-    #header{height:52px;background:var(--panel);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:0 18px;flex-shrink:0;z-index:200;}
-    .logo{font-family:'Baloo 2',cursive;font-weight:800;font-size:20px;color:var(--white);display:flex;align-items:center;gap:8px;}
-    .logo span{color:var(--saffron);}
-    .header-center{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--muted);}
-    .live-dot{width:7px;height:7px;border-radius:50%;background:var(--green);animation:pulse 1.5s infinite;}
-    @keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:0.4;transform:scale(1.3)}}
-    #liveCount{color:var(--saffron);font-weight:600;}
-    .btn-report{background:var(--saffron);color:var(--white);border:none;border-radius:7px;padding:7px 16px;font-family:'Baloo 2',cursive;font-weight:700;font-size:13px;cursor:pointer;}
-    .btn-report:hover{background:var(--saffron2);}
-    #body{flex:1;display:flex;overflow:hidden;}
-    #map{flex:1;position:relative;}
-    #mapStats{position:absolute;top:12px;left:52px;display:flex;gap:8px;z-index:10;pointer-events:none;}
-    .stat-chip{background:rgba(12,21,38,0.92);border:1px solid var(--border);border-radius:7px;padding:6px 12px;border-left:2px solid var(--saffron);}
-    .stat-chip.g{border-left-color:var(--green);}.stat-chip.s{border-left-color:var(--sky);}
-    .stat-val{font-family:'Baloo 2',cursive;font-weight:700;font-size:15px;color:var(--saffron);line-height:1;}
-    .stat-chip.g .stat-val{color:var(--green);}.stat-chip.s .stat-val{color:var(--sky);}
-    .stat-lbl{font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;}
-    #mapLegend{position:absolute;bottom:28px;left:12px;background:var(--panel);border:1px solid var(--border);border-radius:8px;padding:8px 12px;font-size:10px;display:flex;gap:10px;z-index:10;pointer-events:none;}
-    .li{display:flex;align-items:center;gap:5px;}.ld{width:8px;height:8px;border-radius:50%;}
-    #ticker{position:absolute;bottom:0;left:0;right:0;background:rgba(8,15,28,0.88);border-top:1px solid var(--border);padding:6px 14px;font-size:11.5px;display:flex;align-items:center;gap:10px;z-index:10;}
-    .tb{background:var(--red);border-radius:3px;padding:1px 6px;font-size:9px;font-weight:700;letter-spacing:1.5px;flex-shrink:0;animation:pulse 1.5s infinite;}
-    #tickerText{overflow:hidden;white-space:nowrap;text-overflow:ellipsis;color:var(--text);transition:opacity 0.4s;}
-    #sidebar{width:340px;background:var(--panel);border-left:1px solid var(--border);display:flex;flex-direction:column;overflow:hidden;flex-shrink:0;}
-    .tabs{display:flex;border-bottom:1px solid var(--border);flex-shrink:0;}
-    .tab-btn{flex:1;padding:11px 0;background:transparent;border:none;border-bottom:2px solid transparent;color:var(--muted);font-family:'Baloo 2',cursive;font-weight:600;font-size:12px;letter-spacing:0.5px;cursor:pointer;text-transform:uppercase;}
-    .tab-btn.active{color:var(--saffron);border-bottom-color:var(--saffron);}
-    .tab-panel{display:none;flex:1;overflow:hidden;flex-direction:column;}
-    .tab-panel.active{display:flex;}
-    #stateInfo{background:var(--panel2);border-bottom:1px solid var(--border);padding:14px 16px;display:none;flex-shrink:0;}
-    #stateInfo.show{display:block;}
-    .sn{font-family:'Baloo 2',cursive;font-weight:700;font-size:17px;color:var(--white);margin-bottom:2px;}
-    .sc{font-family:'Baloo 2',cursive;font-weight:800;font-size:26px;color:var(--saffron);line-height:1;}
-    .ss{font-size:11px;color:var(--muted);margin-bottom:10px;}
-    .cbr{display:flex;align-items:center;gap:7px;margin-bottom:6px;}
-    .cbl{font-size:11px;width:62px;flex-shrink:0;}
-    .cbt{flex:1;height:4px;background:var(--border2);border-radius:2px;overflow:hidden;}
-    .cbf{height:100%;border-radius:2px;transition:width 0.5s ease;}
-    .cbv{font-size:10px;color:var(--muted);width:38px;text-align:right;flex-shrink:0;}
-    .filters{padding:8px 12px;border-bottom:1px solid var(--border);display:flex;gap:5px;flex-wrap:wrap;flex-shrink:0;}
-    .fp{padding:3px 10px;border-radius:20px;border:1px solid var(--border);background:transparent;color:var(--muted);font-size:11px;cursor:pointer;font-family:inherit;}
-    .fp.active{background:#FF751815;border-color:var(--saffron);color:var(--saffron);}
-    .fp[data-cat="water"].active{background:#00B4D815;border-color:var(--sky);color:var(--sky);}
-    .fp[data-cat="power"].active{background:#FFD70015;border-color:var(--gold);color:var(--gold);}
-    .fp[data-cat="health"].active{background:#FF174415;border-color:var(--red);color:var(--red);}
-    .fp[data-cat="corrupt"].active{background:#00E5CC15;border-color:var(--teal);color:var(--teal);}
-    #issueList{flex:1;overflow-y:auto;scrollbar-width:thin;scrollbar-color:var(--border) transparent;}
-    #issueList::-webkit-scrollbar{width:3px;}
-    #issueList::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px;}
-    .ic{padding:12px 16px;border-bottom:1px solid #0e1c2e;cursor:pointer;transition:background 0.1s;border-left:3px solid transparent;}
-    .ic:hover{background:#0e1c2e;}.ic.active{background:#0f1e34;border-left-color:var(--saffron);}
-    .ir{display:flex;justify-content:space-between;align-items:flex-start;gap:8px;margin-bottom:5px;}
-    .it{font-size:12.5px;font-weight:500;color:var(--text);line-height:1.4;flex:1;}
-    .sb{font-size:9px;font-weight:700;letter-spacing:1px;padding:2px 6px;border-radius:3px;text-transform:uppercase;white-space:nowrap;flex-shrink:0;}
-    .sev-emergency{background:#FF174420;color:var(--red);border:1px solid #FF174440;}
-    .sev-critical{background:#FF751820;color:var(--saffron);border:1px solid #FF751840;}
-    .sev-high{background:#FFD70020;color:var(--gold);border:1px solid #FFD70040;}
-    .sev-medium{background:#00B4D820;color:var(--sky);border:1px solid #00B4D840;}
-    .sev-low{background:#00E5CC20;color:var(--teal);border:1px solid #00E5CC40;}
-    .im{font-size:11px;color:var(--muted);display:flex;gap:8px;flex-wrap:wrap;}
-    .iab{margin-top:8px;width:100%;padding:5px;border:1px solid #FF751840;background:#FF751810;border-radius:5px;color:var(--saffron);font-size:11px;cursor:pointer;font-family:inherit;}
-    #aiPanel{padding:14px 16px;font-size:12.5px;line-height:1.8;color:var(--text);overflow-y:auto;flex:1;scrollbar-width:thin;}
-    #aiPanel::-webkit-scrollbar{width:3px;}
-    .ae{display:flex;flex-direction:column;align-items:center;justify-content:center;height:200px;color:var(--muted);text-align:center;gap:10px;font-size:13px;}
-    #reportPanel{padding:14px 16px;overflow-y:auto;flex:1;scrollbar-width:thin;}
-    #reportPanel::-webkit-scrollbar{width:3px;}
-    .fg{margin-bottom:13px;}
-    .fl{display:block;font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:5px;}
-    .fi,.fsl,.fta{width:100%;background:var(--panel2);border:1px solid var(--border);border-radius:7px;padding:8px 11px;font-size:12.5px;color:var(--text);font-family:inherit;outline:none;transition:border-color 0.15s;}
-    .fi:focus,.fsl:focus,.fta:focus{border-color:var(--saffron);}
-    .fi::placeholder,.fta::placeholder{color:var(--muted);}
-    .fsl option{background:var(--panel);}
-    .fta{min-height:72px;resize:vertical;}
-    .bts{width:100%;padding:10px;background:var(--saffron);color:var(--white);border:none;border-radius:7px;font-family:'Baloo 2',cursive;font-weight:700;font-size:14px;cursor:pointer;margin-top:4px;}
-    .bts:hover{background:var(--saffron2);}.bts:disabled{background:var(--muted2);cursor:not-allowed;}
-    .sbox{text-align:center;padding:20px 16px;animation:fu 0.3s ease;}
-    @keyframes fu{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
-    .sg{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:12px 0;}
-    .scel{background:var(--panel2);border:1px solid var(--border);border-radius:7px;padding:10px;}
-    .scl{font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:4px;}
-    .btsec{width:100%;padding:9px;background:transparent;border:1px solid var(--border);border-radius:7px;color:var(--muted);font-size:12px;cursor:pointer;font-family:inherit;}
-    .maplibregl-popup-content{background:var(--panel)!important;border:1px solid var(--border2)!important;border-radius:8px!important;box-shadow:0 4px 20px #00000080!important;padding:10px 12px!important;color:var(--text)!important;font-family:'DM Sans',sans-serif!important;}
-    .maplibregl-popup-tip{border-top-color:var(--panel)!important;}
-    .maplibregl-ctrl-group{background:var(--panel)!important;border:1px solid var(--border)!important;}
-    .maplibregl-ctrl-group button{background:var(--panel)!important;color:var(--text)!important;}
-    .maplibregl-ctrl-group button:hover{background:var(--panel2)!important;}
-    .maplibregl-ctrl-group button+button{border-top:1px solid var(--border)!important;}
-    .maplibregl-ctrl-attrib{background:rgba(8,15,28,0.7)!important;color:var(--muted)!important;font-size:10px!important;}
-  </style>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>BharatMonitor — India Civic Intelligence</title>
+<link rel="stylesheet" href="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.css"/>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700;800&family=DM+Sans:wght@400;500&display=swap" rel="stylesheet"/>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#080f1c;--panel:#0c1526;--panel2:#101d30;
+  --border:#182d48;--border2:#1e3a5f;
+  --saffron:#FF7518;--saffron2:#cc5a0e;
+  --green:#00c853;--sky:#00b4d8;--gold:#ffd700;
+  --red:#ff1744;--teal:#00e5cc;
+  --text:#c8d8e8;--muted:#4a6080;--muted2:#2a3f5a;--white:#fff;
+}
+html,body{height:100%;font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);overflow:hidden}
+#app{display:flex;flex-direction:column;height:100vh}
+#header{height:52px;background:var(--panel);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:0 18px;flex-shrink:0;z-index:200}
+.logo{font-family:'Baloo 2',cursive;font-weight:800;font-size:20px;color:var(--white);display:flex;align-items:center;gap:8px}
+.logo span{color:var(--saffron)}
+.hc{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--muted)}
+.ld{width:7px;height:7px;border-radius:50%;background:var(--green);animation:pulse 1.5s infinite}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.4;transform:scale(1.3)}}
+#liveCount{color:var(--saffron);font-weight:600}
+.btnr{background:var(--saffron);color:var(--white);border:none;border-radius:7px;padding:7px 16px;font-family:'Baloo 2',cursive;font-weight:700;font-size:13px;cursor:pointer}
+.btnr:hover{background:var(--saffron2)}
+#body{flex:1;display:flex;overflow:hidden}
+#map{flex:1;position:relative}
+#mStats{position:absolute;top:12px;left:52px;display:flex;gap:8px;z-index:10;pointer-events:none}
+.sc{background:rgba(12,21,38,.92);border:1px solid var(--border);border-radius:7px;padding:6px 12px;border-left:2px solid var(--saffron)}
+.sc.g{border-left-color:var(--green)}.sc.s{border-left-color:var(--sky)}
+.sv{font-family:'Baloo 2',cursive;font-weight:700;font-size:15px;color:var(--saffron);line-height:1}
+.sc.g .sv{color:var(--green)}.sc.s .sv{color:var(--sky)}
+.sl{font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:1px}
+#mLeg{position:absolute;bottom:28px;left:12px;background:var(--panel);border:1px solid var(--border);border-radius:8px;padding:8px 12px;font-size:10px;display:flex;gap:10px;z-index:10;pointer-events:none}
+.li{display:flex;align-items:center;gap:5px}.ld2{width:8px;height:8px;border-radius:50%}
+#ticker{position:absolute;bottom:0;left:0;right:0;background:rgba(8,15,28,.88);border-top:1px solid var(--border);padding:6px 14px;font-size:11.5px;display:flex;align-items:center;gap:10px;z-index:10}
+.tb{background:var(--red);border-radius:3px;padding:1px 6px;font-size:9px;font-weight:700;letter-spacing:1.5px;flex-shrink:0;animation:pulse 1.5s infinite}
+#tText{overflow:hidden;white-space:nowrap;text-overflow:ellipsis;transition:opacity .4s}
+#sidebar{width:340px;background:var(--panel);border-left:1px solid var(--border);display:flex;flex-direction:column;overflow:hidden;flex-shrink:0}
+.tabs{display:flex;border-bottom:1px solid var(--border);flex-shrink:0}
+.tbn{flex:1;padding:11px 0;background:transparent;border:none;border-bottom:2px solid transparent;color:var(--muted);font-family:'Baloo 2',cursive;font-weight:600;font-size:12px;letter-spacing:.5px;cursor:pointer;text-transform:uppercase}
+.tbn.active{color:var(--saffron);border-bottom-color:var(--saffron)}
+.tpn{display:none;flex:1;overflow:hidden;flex-direction:column}
+.tpn.active{display:flex}
+#stInf{background:var(--panel2);border-bottom:1px solid var(--border);padding:14px 16px;display:none;flex-shrink:0}
+#stInf.show{display:block}
+.stn{font-family:'Baloo 2',cursive;font-weight:700;font-size:17px;color:var(--white);margin-bottom:2px}
+.stc{font-family:'Baloo 2',cursive;font-weight:800;font-size:26px;color:var(--saffron);line-height:1}
+.sts{font-size:11px;color:var(--muted);margin-bottom:10px}
+.cbr{display:flex;align-items:center;gap:7px;margin-bottom:6px}
+.cbl{font-size:11px;width:62px;flex-shrink:0}
+.cbt{flex:1;height:4px;background:var(--border2);border-radius:2px;overflow:hidden}
+.cbf{height:100%;border-radius:2px;transition:width .5s ease}
+.cbv{font-size:10px;color:var(--muted);width:38px;text-align:right;flex-shrink:0}
+.filt{padding:8px 12px;border-bottom:1px solid var(--border);display:flex;gap:5px;flex-wrap:wrap;flex-shrink:0}
+.fp{padding:3px 10px;border-radius:20px;border:1px solid var(--border);background:transparent;color:var(--muted);font-size:11px;cursor:pointer;font-family:inherit}
+.fp.active{background:#FF751815;border-color:var(--saffron);color:var(--saffron)}
+.fp[data-cat="water"].active{background:#00B4D815;border-color:var(--sky);color:var(--sky)}
+.fp[data-cat="power"].active{background:#FFD70015;border-color:var(--gold);color:var(--gold)}
+.fp[data-cat="health"].active{background:#FF174415;border-color:var(--red);color:var(--red)}
+.fp[data-cat="corrupt"].active{background:#00E5CC15;border-color:var(--teal);color:var(--teal)}
+#iList{flex:1;overflow-y:auto;scrollbar-width:thin;scrollbar-color:var(--border) transparent}
+#iList::-webkit-scrollbar{width:3px}
+#iList::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px}
+.ic{padding:12px 16px;border-bottom:1px solid #0e1c2e;cursor:pointer;transition:background .1s;border-left:3px solid transparent}
+.ic:hover{background:#0e1c2e}.ic.sel{background:#0f1e34;border-left-color:var(--saffron)}
+.ir{display:flex;justify-content:space-between;align-items:flex-start;gap:8px;margin-bottom:5px}
+.it{font-size:12.5px;font-weight:500;color:var(--text);line-height:1.4;flex:1}
+.sv2{font-size:9px;font-weight:700;letter-spacing:1px;padding:2px 6px;border-radius:3px;text-transform:uppercase;white-space:nowrap;flex-shrink:0}
+.s-emergency{background:#FF174420;color:var(--red);border:1px solid #FF174440}
+.s-critical{background:#FF751820;color:var(--saffron);border:1px solid #FF751840}
+.s-high{background:#FFD70020;color:var(--gold);border:1px solid #FFD70040}
+.s-medium{background:#00B4D820;color:var(--sky);border:1px solid #00B4D840}
+.s-low{background:#00E5CC20;color:var(--teal);border:1px solid #00E5CC40}
+.im{font-size:11px;color:var(--muted);display:flex;gap:8px;flex-wrap:wrap;margin-top:4px}
+.iab{margin-top:8px;width:100%;padding:5px;border:1px solid #FF751840;background:#FF751810;border-radius:5px;color:var(--saffron);font-size:11px;cursor:pointer;font-family:inherit}
+.iab:hover{background:#FF751825}
+#aiPnl{padding:14px 16px;font-size:12.5px;line-height:1.8;color:var(--text);overflow-y:auto;flex:1;scrollbar-width:thin}
+.ae{display:flex;flex-direction:column;align-items:center;justify-content:center;height:220px;color:var(--muted);text-align:center;gap:10px}
+#rPnl{padding:14px 16px;overflow-y:auto;flex:1;scrollbar-width:thin}
+.fg{margin-bottom:13px}
+.fl{display:block;font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:5px}
+.fi,.fsl,.fta{width:100%;background:var(--panel2);border:1px solid var(--border);border-radius:7px;padding:8px 11px;font-size:12.5px;color:var(--text);font-family:inherit;outline:none;transition:border-color .15s}
+.fi:focus,.fsl:focus,.fta:focus{border-color:var(--saffron)}
+.fi::placeholder,.fta::placeholder{color:var(--muted)}
+.fsl option{background:var(--panel)}
+.fta{min-height:72px;resize:vertical}
+.bts{width:100%;padding:10px;background:var(--saffron);color:var(--white);border:none;border-radius:7px;font-family:'Baloo 2',cursive;font-weight:700;font-size:14px;cursor:pointer;margin-top:4px}
+.bts:hover{background:var(--saffron2)}.bts:disabled{background:var(--muted2);cursor:not-allowed}
+.sbox{text-align:center;padding:20px 16px}
+.sgrid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:12px 0}
+.scel{background:var(--panel2);border:1px solid var(--border);border-radius:7px;padding:10px}
+.scl{font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:4px}
+.btse{width:100%;padding:9px;background:transparent;border:1px solid var(--border);border-radius:7px;color:var(--muted);font-size:12px;cursor:pointer;font-family:inherit}
+.maplibregl-popup-content{background:var(--panel)!important;border:1px solid var(--border2)!important;border-radius:8px!important;padding:10px 12px!important;color:var(--text)!important;font-family:'DM Sans',sans-serif!important}
+.maplibregl-popup-tip{border-top-color:var(--panel)!important}
+.maplibregl-ctrl-group{background:var(--panel)!important;border:1px solid var(--border)!important}
+.maplibregl-ctrl-group button{background:var(--panel)!important;color:var(--text)!important}
+.maplibregl-ctrl-attrib{background:rgba(8,15,28,.7)!important;color:var(--muted)!important;font-size:10px!important}
+</style>
 </head>
 <body>
 <div id="app">
   <header id="header">
     <div class="logo">🇮🇳 Bharat<span>Monitor</span></div>
-    <div class="header-center"><div class="live-dot"></div><span id="liveCount">1,24,832</span> active issues across India</div>
-    <button class="btn-report" id="btnReport">+ Report Issue</button>
+    <div class="hc"><div class="ld"></div><span id="liveCount">1,24,832</span>&nbsp;active issues across India</div>
+    <button class="btnr" id="btnReport">+ Report Issue</button>
   </header>
   <div id="body">
     <div id="map">
-      <div id="mapStats">
-        <div class="stat-chip"><div class="stat-val">36</div><div class="stat-lbl">States & UTs</div></div>
-        <div class="stat-chip g"><div class="stat-val">89.2K</div><div class="stat-lbl">Resolved 30d</div></div>
-        <div class="stat-chip s"><div class="stat-val">47.2L</div><div class="stat-lbl">Citizens Active</div></div>
+      <div id="mStats">
+        <div class="sc"><div class="sv">36</div><div class="sl">States & UTs</div></div>
+        <div class="sc g"><div class="sv">89.2K</div><div class="sl">Resolved 30d</div></div>
+        <div class="sc s"><div class="sv">47.2L</div><div class="sl">Citizens Active</div></div>
       </div>
-      <div id="mapLegend">
-        <div class="li"><div class="ld" style="background:#7a1520"></div><span>12K+</span></div>
-        <div class="li"><div class="ld" style="background:#a33020"></div><span>8K+</span></div>
-        <div class="li"><div class="ld" style="background:#8a5010"></div><span>5K+</span></div>
-        <div class="li"><div class="ld" style="background:#2a6040"></div><span>2K+</span></div>
-        <div class="li"><div class="ld" style="background:#1a4060"></div><span>&lt;2K</span></div>
+      <div id="mLeg">
+        <div class="li"><div class="ld2" style="background:#7a1520"></div><span>12K+</span></div>
+        <div class="li"><div class="ld2" style="background:#a33020"></div><span>8K+</span></div>
+        <div class="li"><div class="ld2" style="background:#8a5010"></div><span>5K+</span></div>
+        <div class="li"><div class="ld2" style="background:#2a6040"></div><span>2K+</span></div>
+        <div class="li"><div class="ld2" style="background:#1a4060"></div><span>&lt;2K</span></div>
       </div>
-      <div id="ticker"><span class="tb">LIVE</span><span id="tickerText"></span></div>
+      <div id="ticker"><span class="tb">LIVE</span><span id="tText">Loading...</span></div>
     </div>
     <div id="sidebar">
-      <div id="stateInfo">
-        <div class="sn" id="stateName"></div>
-        <div class="sc" id="stateCount"></div>
-        <div class="ss" id="stateSub"></div>
+      <div id="stInf">
+        <div class="stn" id="stName"></div>
+        <div class="stc" id="stCount"></div>
+        <div class="sts" id="stSub"></div>
         <div id="catBars"></div>
       </div>
       <div class="tabs">
-        <button class="tab-btn active" data-tab="feed">Live Feed</button>
-        <button class="tab-btn" data-tab="report">Report</button>
-        <button class="tab-btn" data-tab="ai">AI Analysis</button>
+        <button class="tbn active" data-tab="feed">Live Feed</button>
+        <button class="tbn" data-tab="report">Report</button>
+        <button class="tbn" data-tab="ai">AI Analysis</button>
       </div>
-      <div class="tab-panel active" id="panel-feed">
-        <div class="filters">
+      <div class="tpn active" id="panel-feed">
+        <div class="filt">
           <button class="fp active" data-cat="all">All</button>
           <button class="fp" data-cat="roads" style="color:#FF7518">🛣️ Roads</button>
           <button class="fp" data-cat="water" style="color:#00B4D8">💧 Water</button>
@@ -152,10 +147,10 @@
           <button class="fp" data-cat="health" style="color:#FF4455">🏥 Health</button>
           <button class="fp" data-cat="corrupt" style="color:#00E5CC">🔍 Corruption</button>
         </div>
-        <div id="issueList"></div>
+        <div id="iList"></div>
       </div>
-      <div class="tab-panel" id="panel-report">
-        <div id="reportPanel">
+      <div class="tpn" id="panel-report">
+        <div id="rPnl">
           <div id="rForm">
             <div class="fg"><label class="fl">Category</label>
               <select class="fsl" id="rCat">
@@ -166,31 +161,32 @@
                 <option value="corrupt">🔍 Corruption / Govt Services</option>
               </select>
             </div>
-            <div class="fg"><label class="fl">Issue Title *</label><input class="fi" id="rTitle" placeholder="e.g. Broken road near village school..." /></div>
-            <div class="fg"><label class="fl">State / District *</label><input class="fi" id="rState" placeholder="e.g. Rajasthan, Jaipur" /></div>
+            <div class="fg"><label class="fl">Issue Title *</label><input class="fi" id="rTitle" placeholder="e.g. Broken road near village school..."/></div>
+            <div class="fg"><label class="fl">State / District *</label><input class="fi" id="rState" placeholder="e.g. Rajasthan, Jaipur"/></div>
             <div class="fg"><label class="fl">Description *</label><textarea class="fta" id="rDesc" placeholder="Describe the problem..."></textarea></div>
             <button class="bts" id="btnSubmit">Submit Issue →</button>
           </div>
           <div id="rSuccess" style="display:none"></div>
         </div>
       </div>
-      <div class="tab-panel" id="panel-ai">
-        <div id="aiPanel">
+      <div class="tpn" id="panel-ai">
+        <div id="aiPnl">
           <div class="ae">
             <div style="font-size:36px">🤖</div>
             <div style="font-family:'Baloo 2',cursive;font-size:13px">AI Issue Analyst</div>
-            <div style="font-size:12px;line-height:1.6;max-width:240px">Select any issue from the Live Feed and click "Analyze with AI"</div>
+            <div style="font-size:12px;color:#4a6080;line-height:1.6;max-width:220px">Click any issue in the Live Feed then click "Analyze with AI"</div>
           </div>
         </div>
       </div>
     </div>
   </div>
 </div>
-
-<script type="module">
-import maplibregl from 'https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.js'
-
-const STATES={
+<script src="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.js"></script>
+<script>
+// ══════════════════════════════════════════
+// DATA
+// ══════════════════════════════════════════
+var STATES = {
   'Uttar Pradesh':{issues:18430,roads:5898,water:3870,power:3317,health:2580,corrupt:2765,trend:'+4.2%'},
   'Maharashtra':{issues:14560,roads:4659,water:3058,power:2621,health:2038,corrupt:2184,trend:'+2.1%'},
   'West Bengal':{issues:11230,roads:3594,water:2358,power:2021,health:1572,corrupt:1685,trend:'+6.8%'},
@@ -226,132 +222,365 @@ const STATES={
   'Chandigarh':{issues:280,roads:90,water:59,power:50,health:39,corrupt:42,trend:'+1.1%'},
   'Andaman & Nicobar':{issues:160,roads:51,water:34,power:29,health:22,corrupt:24,trend:'+0.7%'},
   'Lakshadweep':{issues:45,roads:14,water:9,power:8,health:6,corrupt:8,trend:'+0.1%'},
-  'Dadra & Nagar Haveli':{issues:90,roads:29,water:19,power:16,health:13,corrupt:13,trend:'+0.5%'},
+  'Dadra & Nagar Haveli':{issues:90,roads:29,water:19,power:16,health:13,corrupt:13,trend:'+0.5%'}
+};
+
+var ISSUES = [
+  {id:'i01',title:'NH-48 pothole cluster near Gurugram toll — 2,847 reports',state:'Haryana',district:'Gurugram',cat:'roads',sev:'critical',dept:'NHAI',ts:Date.now()-120000,lat:28.459,lng:77.026},
+  {id:'i02',title:'Contaminated water supply Dharavi Ward 7 — cholera risk',state:'Maharashtra',district:'Mumbai',cat:'water',sev:'emergency',dept:'BMC Water',ts:Date.now()-300000,lat:19.041,lng:72.855},
+  {id:'i03',title:'AIIMS Patna — critical oxygen shortage in ICU ward',state:'Bihar',district:'Patna',cat:'health',sev:'emergency',dept:'Health Ministry',ts:Date.now()-540000,lat:25.604,lng:85.137},
+  {id:'i04',title:'25-hour power cuts in Indore industrial zone',state:'Madhya Pradesh',district:'Indore',cat:'power',sev:'high',dept:'MPEB',ts:Date.now()-840000,lat:22.719,lng:75.857},
+  {id:'i05',title:'Ration card portal offline 14 days — 8,934 families affected',state:'Uttar Pradesh',district:'Lucknow',cat:'corrupt',sev:'high',dept:'Food & Civil Supplies',ts:Date.now()-1380000,lat:26.846,lng:80.946},
+  {id:'i06',title:'Bridge crack on SH-12 Howrah — structural risk',state:'West Bengal',district:'Howrah',cat:'roads',sev:'emergency',dept:'PWD West Bengal',ts:Date.now()-1860000,lat:22.595,lng:88.263},
+  {id:'i07',title:'Bribe demands at land registry offices — Bengaluru',state:'Karnataka',district:'Bengaluru',cat:'corrupt',sev:'high',dept:'ACB Revenue',ts:Date.now()-2700000,lat:13.079,lng:77.590},
+  {id:'i08',title:'Sewage overflow — Jaipur Pink City heritage zone',state:'Rajasthan',district:'Jaipur',cat:'water',sev:'medium',dept:'JDA',ts:Date.now()-3600000,lat:26.924,lng:75.824},
+  {id:'i09',title:'Hospital staff shortage — Varanasi district hospital at 40%',state:'Uttar Pradesh',district:'Varanasi',cat:'health',sev:'high',dept:'MOHFW UP',ts:Date.now()-4200000,lat:25.317,lng:82.973},
+  {id:'i10',title:'Transformer failure — 3 villages dark 48h in Vidarbha',state:'Maharashtra',district:'Amravati',cat:'power',sev:'high',dept:'MSEDCL',ts:Date.now()-5400000,lat:20.932,lng:77.775},
+  {id:'i11',title:'Arsenic 3x safe limit in drinking water — North Bihar',state:'Bihar',district:'Sitamarhi',cat:'water',sev:'critical',dept:'PHED Bihar',ts:Date.now()-7200000,lat:26.593,lng:85.490},
+  {id:'i12',title:'Road cave-in after rain — NH66 Kozhikode',state:'Kerala',district:'Kozhikode',cat:'roads',sev:'critical',dept:'NHAI Kerala',ts:Date.now()-10800000,lat:11.258,lng:75.780},
+  {id:'i13',title:'Street lights off 3 months — Karol Bagh Zone 4, Delhi',state:'Delhi',district:'West Delhi',cat:'roads',sev:'medium',dept:'NDMC',ts:Date.now()-12000000,lat:28.651,lng:77.190},
+  {id:'i14',title:'Coal shortage — Telangana power plant at 40% capacity',state:'Telangana',district:'Nalgonda',cat:'power',sev:'critical',dept:'TSGENCO',ts:Date.now()-25200000,lat:17.050,lng:79.266},
+  {id:'i15',title:'Manual scavengers deployed illegally — Bhopal',state:'Madhya Pradesh',district:'Bhopal',cat:'corrupt',sev:'critical',dept:'Urban Development',ts:Date.now()-36000000,lat:23.259,lng:77.412}
+];
+
+var CC = {roads:'#FF7518',water:'#00B4D8',power:'#FFD700',health:'#FF4455',corrupt:'#00E5CC'};
+var CI = {roads:'🛣️',water:'💧',power:'⚡',health:'🏥',corrupt:'🔍'};
+var CL = {roads:'Roads',water:'Water',power:'Power',health:'Health',corrupt:'Corruption'};
+
+var issues = ISSUES.slice();
+var activeFilter = 'all';
+var selectedId = null;
+var liveCount = 124832;
+var tickerIdx = 0;
+
+// ══════════════════════════════════════════
+// HELPERS
+// ══════════════════════════════════════════
+function timeAgo(ts) {
+  var s = (Date.now()-ts)/1000;
+  if(s<60) return Math.floor(s)+'s ago';
+  if(s<3600) return Math.floor(s/60)+'m ago';
+  if(s<86400) return Math.floor(s/3600)+'h ago';
+  return Math.floor(s/86400)+'d ago';
 }
-const GEO={'Uttar Pradesh':'Uttar Pradesh','Maharashtra':'Maharashtra','West Bengal':'West Bengal','Bihar':'Bihar','Madhya Pradesh':'Madhya Pradesh','NCT of Delhi':'Delhi','Delhi':'Delhi','Tamil Nadu':'Tamil Nadu','Karnataka':'Karnataka','Rajasthan':'Rajasthan','Gujarat':'Gujarat','Andhra Pradesh':'Andhra Pradesh','Telangana':'Telangana','Odisha':'Odisha','Jharkhand':'Jharkhand','Chhattisgarh':'Chhattisgarh','Kerala':'Kerala','Assam':'Assam','Haryana':'Haryana','Punjab':'Punjab','Uttarakhand':'Uttarakhand','Himachal Pradesh':'Himachal Pradesh','Jammu & Kashmir':'Jammu & Kashmir','Jammu and Kashmir':'Jammu & Kashmir','Ladakh':'Ladakh','Goa':'Goa','Manipur':'Manipur','Meghalaya':'Meghalaya','Tripura':'Tripura','Nagaland':'Nagaland','Mizoram':'Mizoram','Arunachal Pradesh':'Arunachal Pradesh','Sikkim':'Sikkim','Puducherry':'Puducherry','Pondicherry':'Puducherry','Chandigarh':'Chandigarh','Andaman and Nicobar Islands':'Andaman & Nicobar','Lakshadweep':'Lakshadweep','Dadra and Nagar Haveli':'Dadra & Nagar Haveli','Dadra & Nagar Haveli and Daman & Diu':'Dadra & Nagar Haveli'}
-const CC={'roads':'#FF7518','water':'#00B4D8','power':'#FFD700','health':'#FF4455','corrupt':'#00E5CC'}
-const CI={'roads':'🛣️','water':'💧','power':'⚡','health':'🏥','corrupt':'🔍'}
-const CL={'roads':'Roads','water':'Water','power':'Power','health':'Health','corrupt':'Corruption'}
-const ISSUES=[
-  {id:'i01',title:'NH-48 pothole cluster near Gurugram toll — 2,847 reports',state:'Haryana',district:'Gurugram',cat:'roads',sev:'critical',dept:'NHAI',ts:Date.now()-2*60000,lat:28.459,lng:77.026},
-  {id:'i02',title:'Contaminated water supply Dharavi Ward 7 — cholera risk',state:'Maharashtra',district:'Mumbai',cat:'water',sev:'emergency',dept:'BMC Water',ts:Date.now()-5*60000,lat:19.041,lng:72.855},
-  {id:'i03',title:'AIIMS Patna — critical oxygen shortage in ICU ward',state:'Bihar',district:'Patna',cat:'health',sev:'emergency',dept:'Health Ministry',ts:Date.now()-9*60000,lat:25.604,lng:85.137},
-  {id:'i04',title:'25-hour power cuts in Indore industrial zone',state:'Madhya Pradesh',district:'Indore',cat:'power',sev:'high',dept:'MPEB',ts:Date.now()-14*60000,lat:22.719,lng:75.857},
-  {id:'i05',title:'Ration card portal offline 14 days — 8,934 families affected',state:'Uttar Pradesh',district:'Lucknow',cat:'corrupt',sev:'high',dept:'Food & Civil Supplies',ts:Date.now()-23*60000,lat:26.846,lng:80.946},
-  {id:'i06',title:'Bridge crack on SH-12 Howrah — structural risk',state:'West Bengal',district:'Howrah',cat:'roads',sev:'emergency',dept:'PWD West Bengal',ts:Date.now()-31*60000,lat:22.595,lng:88.263},
-  {id:'i07',title:'Bribe demands at land registry — Bengaluru',state:'Karnataka',district:'Bengaluru',cat:'corrupt',sev:'high',dept:'ACB / Revenue',ts:Date.now()-45*60000,lat:13.079,lng:77.590},
-  {id:'i08',title:'Sewage overflow — Jaipur Pink City heritage zone',state:'Rajasthan',district:'Jaipur',cat:'water',sev:'medium',dept:'JDA',ts:Date.now()-60*60000,lat:26.924,lng:75.824},
-  {id:'i09',title:'Hospital staff shortage — Varanasi district hospital at 40%',state:'Uttar Pradesh',district:'Varanasi',cat:'health',sev:'high',dept:'MOHFW UP',ts:Date.now()-70*60000,lat:25.317,lng:82.973},
-  {id:'i10',title:'Transformer failure — 3 villages dark 48h in Vidarbha',state:'Maharashtra',district:'Amravati',cat:'power',sev:'high',dept:'MSEDCL',ts:Date.now()-90*60000,lat:20.932,lng:77.775},
-  {id:'i11',title:'Arsenic 3x limit in drinking water — North Bihar',state:'Bihar',district:'Sitamarhi',cat:'water',sev:'critical',dept:'PHED Bihar',ts:Date.now()-120*60000,lat:26.593,lng:85.490},
-  {id:'i12',title:'Road cave-in after rain — NH66 Kozhikode',state:'Kerala',district:'Kozhikode',cat:'roads',sev:'critical',dept:'NHAI Kerala',ts:Date.now()-180*60000,lat:11.258,lng:75.780},
-  {id:'i13',title:'Street lights off 3 months — Karol Bagh Zone 4',state:'Delhi',district:'West Delhi',cat:'roads',sev:'medium',dept:'NDMC',ts:Date.now()-200*60000,lat:28.651,lng:77.190},
-  {id:'i14',title:'Coal shortage — Telangana plant at 40% capacity',state:'Telangana',district:'Nalgonda',cat:'power',sev:'critical',dept:'TSGENCO',ts:Date.now()-420*60000,lat:17.050,lng:79.266},
-  {id:'i15',title:'Manual scavengers deployed illegally — Bhopal',state:'Madhya Pradesh',district:'Bhopal',cat:'corrupt',sev:'critical',dept:'Urban Development',ts:Date.now()-600*60000,lat:23.259,lng:77.412},
-]
+function iColor(n) {
+  return n>12000?'#7a1520':n>8000?'#a33020':n>5000?'#8a5010':n>2000?'#2a6040':n>500?'#1a4060':'#0f2035';
+}
+function switchTab(t) {
+  document.querySelectorAll('.tbn').forEach(function(b){ b.classList.toggle('active', b.getAttribute('data-tab')===t); });
+  document.querySelectorAll('.tpn').forEach(function(p){ p.classList.toggle('active', p.id==='panel-'+t); });
+}
 
-let issues=[...ISSUES],activeFilter='all',selectedIssue=null,liveCount=124832,tickerIdx=0
+// ══════════════════════════════════════════
+// RENDER ISSUE LIST
+// ══════════════════════════════════════════
+function renderIssues() {
+  var f = activeFilter==='all' ? issues : issues.filter(function(i){ return i.cat===activeFilter; });
+  var html = '';
+  for(var i=0;i<f.length;i++) {
+    var iss = f[i];
+    var sel = iss.id === selectedId;
+    html += '<div class="ic'+(sel?' sel':'')+'" data-id="'+iss.id+'">';
+    html += '<div class="ir">';
+    html += '<div class="it">'+CI[iss.cat]+' '+iss.title+'</div>';
+    html += '<span class="sv2 s-'+iss.sev+'">'+iss.sev+'</span>';
+    html += '</div>';
+    html += '<div class="im"><span>📍 '+iss.state+(iss.district?', '+iss.district:'')+'</span><span>🏛️ '+iss.dept+'</span><span>'+timeAgo(iss.ts)+'</span></div>';
+    if(sel) html += '<button class="iab" data-id="'+iss.id+'">🤖 Analyze with AI →</button>';
+    html += '</div>';
+  }
+  document.getElementById('iList').innerHTML = html;
 
-function iColor(n){return n>12000?'#7a1520':n>8000?'#a33020':n>5000?'#8a5010':n>2000?'#2a6040':n>500?'#1a4060':'#0f2035'}
-function timeAgo(ts){const s=(Date.now()-ts)/1000;return s<60?`${~~s}s ago`:s<3600?`${~~(s/60)}m ago`:s<86400?`${~~(s/3600)}h ago`:`${~~(s/86400)}d ago`}
-function switchTab(t){document.querySelectorAll('.tab-btn').forEach(b=>b.classList.toggle('active',b.dataset.tab===t));document.querySelectorAll('.tab-panel').forEach(p=>p.classList.toggle('active',p.id===`panel-${t}`))}
+  var cards = document.getElementById('iList').getElementsByClassName('ic');
+  for(var j=0;j<cards.length;j++) {
+    (function(card) {
+      card.addEventListener('click', function(e) {
+        var btn = e.target;
+        while(btn && btn !== card) {
+          if(btn.classList && btn.classList.contains('iab')) {
+            var id = btn.getAttribute('data-id');
+            for(var k=0;k<issues.length;k++) {
+              if(issues[k].id===id){ analyzeIssue(issues[k]); return; }
+            }
+          }
+          btn = btn.parentNode;
+        }
+        var id = card.getAttribute('data-id');
+        selectedId = (selectedId===id) ? null : id;
+        renderIssues();
+      });
+    })(cards[j]);
+  }
+}
 
-const map=new maplibregl.Map({container:'map',style:{version:8,sources:{carto:{type:'raster',tiles:['https://a.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}.png'],tileSize:256,attribution:'© CartoDB © OSM',maxzoom:19}},layers:[{id:'bg',type:'raster',source:'carto'}]},center:[82.5,22.5],zoom:4.5,minZoom:3,maxZoom:10,attributionControl:false})
-map.addControl(new maplibregl.NavigationControl({showCompass:false}),'top-left')
-map.addControl(new maplibregl.AttributionControl({compact:true}),'bottom-left')
+// ══════════════════════════════════════════
+// MAP
+// ══════════════════════════════════════════
+var map = new maplibregl.Map({
+  container: 'map',
+  style: {
+    version: 8,
+    sources: {
+      carto: {
+        type: 'raster',
+        tiles: ['https://a.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}.png'],
+        tileSize: 256,
+        attribution: '© CartoDB © OSM',
+        maxzoom: 19
+      }
+    },
+    layers: [{ id:'bg', type:'raster', source:'carto' }]
+  },
+  center: [82.5, 22.5],
+  zoom: 4.5,
+  minZoom: 3,
+  maxZoom: 10,
+  attributionControl: false
+});
+map.addControl(new maplibregl.NavigationControl({showCompass:false}), 'top-left');
+map.addControl(new maplibregl.AttributionControl({compact:true}), 'bottom-left');
 
-map.on('load',()=>{
-  map.addSource('india',{type:'geojson',data:'https://raw.githubusercontent.com/geohacker/india/master/state/india_state.geojson',promoteId:'NAME_1'})
-  const cs=[]
-  for(const[n,d]of Object.entries(STATES))cs.push(n,iColor(d.issues))
-  for(const[g,o]of Object.entries(GEO))if(STATES[o])cs.push(g,iColor(STATES[o].issues))
-  map.addLayer({id:'sf',type:'fill',source:'india',paint:{'fill-color':['match',['get','NAME_1'],...cs,'#0f2035'],'fill-opacity':['case',['boolean',['feature-state','hover'],false],0.9,0.75]}})
-  map.addLayer({id:'sb',type:'line',source:'india',paint:{'line-color':'#1e3a5f','line-width':['case',['boolean',['feature-state','selected'],false],2.5,['boolean',['feature-state','hover'],false],1.5,0.8]}})
-  map.addLayer({id:'sh',type:'fill',source:'india',paint:{'fill-color':'#3a6aaa','fill-opacity':['case',['boolean',['feature-state','hover'],false],0.18,0]}})
+map.on('load', function() {
+  // Use raw.githubusercontent.com with a stable commit for reliability
+  var GEO_URL = 'https://raw.githubusercontent.com/Subhash9325/GeoJson-Data-of-Indian-States/master/Indian_States';
 
-  issues.filter(i=>i.lat).forEach(issue=>{
-    const size=issue.sev==='emergency'?14:issue.sev==='critical'?12:issue.sev==='high'?10:8
-    const col=CC[issue.cat]
-    const el=document.createElement('div')
-    el.style.cssText=`width:${size}px;height:${size}px;border-radius:50%;background:${col};border:2px solid ${col}88;box-shadow:0 0 ${size}px ${col}66;cursor:pointer;`
-    new maplibregl.Marker({element:el}).setLngLat([issue.lng,issue.lat]).setPopup(new maplibregl.Popup({offset:12,closeButton:false}).setHTML(`<div style="font-size:12px;max-width:200px"><div style="color:${col};font-size:10px;font-weight:700;text-transform:uppercase;margin-bottom:3px">${CI[issue.cat]} ${issue.cat}</div><div style="line-height:1.4">${issue.title}</div><div style="color:#4a6080;font-size:10px;margin-top:4px">📍 ${issue.state}</div></div>`)).addTo(map)
-  })
+  // Fallback: fetch from multiple sources
+  var urls = [
+    'https://raw.githubusercontent.com/geohacker/india/master/state/india_state.geojson',
+    'https://raw.githubusercontent.com/Subhash9325/GeoJson-Data-of-Indian-States/master/Indian_States'
+  ];
 
-  let hid=null,sid=null
-  map.on('mousemove','sf',e=>{if(e.features?.length){if(hid)map.setFeatureState({source:'india',id:hid},{hover:false});hid=e.features[0].id;map.setFeatureState({source:'india',id:hid},{hover:true});map.getCanvas().style.cursor='pointer'}})
-  map.on('mouseleave','sf',()=>{if(hid){map.setFeatureState({source:'india',id:hid},{hover:false});hid=null}map.getCanvas().style.cursor=''})
-  map.on('click','sf',e=>{
-    if(!e.features?.length)return
-    const gn=e.features[0].properties?.NAME_1,name=GEO[gn]||gn,data=STATES[name]
-    if(sid)map.setFeatureState({source:'india',id:sid},{selected:false})
-    sid=e.features[0].id;map.setFeatureState({source:'india',id:sid},{selected:true})
-    if(!data)return
-    document.getElementById('stateInfo').classList.add('show')
-    document.getElementById('stateName').textContent=name
-    document.getElementById('stateCount').textContent=data.issues.toLocaleString('en-IN')
-    document.getElementById('stateSub').textContent=`Active Issues  ·  ${data.trend.startsWith('+')?'↑':'↓'} ${data.trend} this week`
-    const cats=['roads','water','power','health','corrupt'],max=Math.max(...cats.map(c=>data[c]))
-    document.getElementById('catBars').innerHTML=cats.map(c=>`<div class="cbr"><div class="cbl" style="color:${CC[c]}">${CI[c]} ${CL[c]}</div><div class="cbt"><div class="cbf" style="width:${Math.round(data[c]/max*100)}%;background:${CC[c]}"></div></div><div class="cbv">${data[c].toLocaleString('en-IN')}</div></div>`).join('')
-  })
-})
+  loadGeoJSON(0, urls);
 
-function renderIssues(){
-  const f=activeFilter==='all'?issues:issues.filter(i=>i.cat===activeFilter)
-  document.getElementById('issueList').innerHTML=f.map((issue,idx)=>`<div class="ic${selectedIssue?.id===issue.id?' active':''}" data-idx="${idx}"><div class="ir"><div class="it">${CI[issue.cat]} ${issue.title}</div><span class="sb sev-${issue.sev}">${issue.sev}</span></div><div class="im"><span>📍 ${issue.state}${issue.district?', '+issue.district:''}</span><span>🏛️ ${issue.dept}</span><span>${timeAgo(issue.ts)}</span></div>${selectedIssue?.id===issue.id?`<button class="iab" data-id="${issue.id}">🤖 Analyze with AI →</button>`:''}</div>`).join('')
-  document.getElementById('issueList').querySelectorAll('.ic').forEach((card,_)=>{
-    card.addEventListener('click',e=>{
-      const btn=e.target.closest('.iab')
-      if(btn){const iss=issues.find(i=>i.id===btn.dataset.id);if(iss)analyzeIssue(iss);return}
-      const f2=activeFilter==='all'?issues:issues.filter(i=>i.cat===activeFilter)
-      const iss=f2[parseInt(card.dataset.idx)]
-      selectedIssue=selectedIssue?.id===iss?.id?null:iss
-      renderIssues()
+  // Add issue markers immediately regardless of GeoJSON
+  addMarkers();
+});
+
+function loadGeoJSON(idx, urls) {
+  if(idx >= urls.length) {
+    console.warn('All GeoJSON sources failed, showing markers only');
+    return;
+  }
+  fetch(urls[idx])
+    .then(function(r){ return r.json(); })
+    .then(function(data){ addChoropleth(data); })
+    .catch(function(){ loadGeoJSON(idx+1, urls); });
+}
+
+function addChoropleth(geojsonData) {
+  if(map.getSource('india')) return;
+
+  map.addSource('india', { type:'geojson', data: geojsonData, promoteId:'NAME_1' });
+
+  var cs = [];
+  for(var name in STATES) { cs.push(name, iColor(STATES[name].issues)); }
+  var GEO = {'NCT of Delhi':'Delhi','Jammu and Kashmir':'Jammu & Kashmir','Andaman and Nicobar Islands':'Andaman & Nicobar','Dadra and Nagar Haveli':'Dadra & Nagar Haveli','Dadra & Nagar Haveli and Daman & Diu':'Dadra & Nagar Haveli','Pondicherry':'Puducherry'};
+  for(var geo in GEO) { var our=GEO[geo]; if(STATES[our]) cs.push(geo, iColor(STATES[our].issues)); }
+
+  map.addLayer({ id:'sf', type:'fill', source:'india', paint:{
+    'fill-color': ['match',['get','NAME_1']].concat(cs).concat(['#0f2035']),
+    'fill-opacity': ['case',['boolean',['feature-state','hover'],false],0.9,0.75]
+  }}, 'bg');
+  map.addLayer({ id:'sb', type:'line', source:'india', paint:{
+    'line-color':'#1e3a5f',
+    'line-width':['case',['boolean',['feature-state','selected'],false],2.5,['boolean',['feature-state','hover'],false],1.5,0.7]
+  }});
+  map.addLayer({ id:'sh', type:'fill', source:'india', paint:{
+    'fill-color':'#3a6aaa',
+    'fill-opacity':['case',['boolean',['feature-state','hover'],false],0.2,0]
+  }});
+
+  var GEO_FULL = {'NCT of Delhi':'Delhi','Jammu and Kashmir':'Jammu & Kashmir','Andaman and Nicobar Islands':'Andaman & Nicobar','Dadra and Nagar Haveli':'Dadra & Nagar Haveli','Dadra & Nagar Haveli and Daman & Diu':'Dadra & Nagar Haveli','Pondicherry':'Puducherry'};
+  var hid = null, sidMap = null;
+
+  map.on('mousemove','sf',function(e){
+    if(e.features&&e.features.length){
+      if(hid) map.setFeatureState({source:'india',id:hid},{hover:false});
+      hid = e.features[0].id;
+      map.setFeatureState({source:'india',id:hid},{hover:true});
+      map.getCanvas().style.cursor='pointer';
+    }
+  });
+  map.on('mouseleave','sf',function(){
+    if(hid){map.setFeatureState({source:'india',id:hid},{hover:false});hid=null;}
+    map.getCanvas().style.cursor='';
+  });
+  map.on('click','sf',function(e){
+    if(!e.features||!e.features.length)return;
+    var gn = e.features[0].properties && e.features[0].properties.NAME_1;
+    var name = GEO_FULL[gn]||gn;
+    var data = STATES[name];
+    if(sidMap) map.setFeatureState({source:'india',id:sidMap},{selected:false});
+    sidMap = e.features[0].id;
+    map.setFeatureState({source:'india',id:sidMap},{selected:true});
+    if(!data)return;
+    document.getElementById('stInf').classList.add('show');
+    document.getElementById('stName').textContent = name;
+    document.getElementById('stCount').textContent = data.issues.toLocaleString('en-IN');
+    document.getElementById('stSub').textContent = 'Active Issues · '+(data.trend.charAt(0)==='+' ? '↑' : '↓')+' '+data.trend+' this week';
+    var cats=['roads','water','power','health','corrupt'];
+    var max=0; for(var ci=0;ci<cats.length;ci++){if(data[cats[ci]]>max)max=data[cats[ci]];}
+    var bhtml='';
+    for(var ci=0;ci<cats.length;ci++){
+      var cat=cats[ci];
+      bhtml+='<div class="cbr"><div class="cbl" style="color:'+CC[cat]+'">'+CI[cat]+' '+CL[cat]+'</div><div class="cbt"><div class="cbf" style="width:'+Math.round(data[cat]/max*100)+'%;background:'+CC[cat]+'"></div></div><div class="cbv">'+data[cat].toLocaleString('en-IN')+'</div></div>';
+    }
+    document.getElementById('catBars').innerHTML=bhtml;
+  });
+}
+
+function addMarkers() {
+  for(var i=0;i<issues.length;i++){
+    (function(iss){
+      if(!iss.lat)return;
+      var size=iss.sev==='emergency'?14:iss.sev==='critical'?12:iss.sev==='high'?10:8;
+      var col=CC[iss.cat];
+      var el=document.createElement('div');
+      el.style.cssText='width:'+size+'px;height:'+size+'px;border-radius:50%;background:'+col+';border:2px solid '+col+'88;box-shadow:0 0 '+size+'px '+col+'66;cursor:pointer;z-index:5;';
+      new maplibregl.Marker({element:el})
+        .setLngLat([iss.lng,iss.lat])
+        .setPopup(new maplibregl.Popup({offset:12,closeButton:false}).setHTML(
+          '<div style="font-size:12px;max-width:200px">'+
+          '<div style="color:'+col+';font-size:10px;font-weight:700;text-transform:uppercase;margin-bottom:3px">'+CI[iss.cat]+' '+iss.cat+'</div>'+
+          '<div style="line-height:1.4">'+iss.title+'</div>'+
+          '<div style="color:#4a6080;font-size:10px;margin-top:4px">📍 '+iss.state+'</div></div>'
+        ))
+        .addTo(map);
+    })(issues[i]);
+  }
+}
+
+// ══════════════════════════════════════════
+// AI ANALYSIS
+// ══════════════════════════════════════════
+function analyzeIssue(iss) {
+  switchTab('ai');
+  var panel = document.getElementById('aiPnl');
+  panel.innerHTML = '<div style="text-align:center;padding:40px;color:#4a6080;font-size:13px">⏳ Analyzing with AI...</div>';
+  fetch('https://api.anthropic.com/v1/messages',{
+    method:'POST',
+    headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({
+      model:'claude-sonnet-4-20250514',
+      max_tokens:700,
+      messages:[{role:'user',content:'You are BharatMonitor, India civic tracker. Analyze for citizens:\n\nIssue: '+iss.title+'\nState: '+iss.state+(iss.district?', '+iss.district:'')+'\nCategory: '+iss.cat+', Severity: '+iss.sev+', Dept: '+iss.dept+'\n\nUse this format (plain text, no markdown):\n\nWHAT IS HAPPENING\n2 sentences.\n\nWHO IS AFFECTED\n1 sentence.\n\nWHAT SHOULD BE DONE\n• Step 1\n• Step 2\n• Step 3\n\nRESPONSIBLE AUTHORITY\nDept and escalation.\n\nEXPECTED RESOLUTION\nTimeline.\n\nMax 180 words.'}]
     })
-  })
+  }).then(function(r){return r.json();}).then(function(d){
+    var text = '';
+    if(d.content) for(var i=0;i<d.content.length;i++) text += d.content[i].text||'';
+    if(!text) text='Analysis unavailable.';
+    var headers=['WHAT IS HAPPENING','WHO IS AFFECTED','WHAT SHOULD BE DONE','RESPONSIBLE AUTHORITY','EXPECTED RESOLUTION'];
+    var lines=text.split('\n');
+    var html='<div style="background:#0c1526;border:1px solid #1e3a5f;border-radius:8px;padding:12px;margin-bottom:12px"><div style="font-size:10px;color:#4a6080;text-transform:uppercase;letter-spacing:1px;margin-bottom:4px">Issue Analysis</div><div style="font-size:13px;font-weight:500;line-height:1.4">'+iss.title+'</div><div style="font-size:11px;color:#4a6080;margin-top:4px">📍 '+iss.state+' · '+iss.dept+'</div></div><div style="font-size:12.5px;line-height:1.9">';
+    for(var i=0;i<lines.length;i++){
+      var l=lines[i].trim();
+      if(headers.indexOf(l)>=0) html+='<div style="color:#FF7518;font-weight:700;font-size:11px;letter-spacing:1px;text-transform:uppercase;margin:12px 0 4px">'+l+'</div>';
+      else if(l.charAt(0)==='•') html+='<div style="padding-left:12px;margin:2px 0">'+l+'</div>';
+      else html+='<div style="margin:2px 0">'+l+'</div>';
+    }
+    html+='</div>';
+    panel.innerHTML=html;
+  }).catch(function(){
+    panel.innerHTML='<div style="color:#4a6080;padding:20px;font-size:13px;line-height:1.8">⚠️ AI analysis unavailable.<br><br>To enable: Add <strong style="color:#FF7518">ANTHROPIC_API_KEY</strong> in Vercel → Settings → Environment Variables.</div>';
+  });
 }
 
-async function analyzeIssue(issue){
-  switchTab('ai')
-  const panel=document.getElementById('aiPanel')
-  panel.innerHTML=`<div style="text-align:center;padding:40px;color:#4a6080">⏳ Analyzing with AI...</div>`
-  try{
-    const res=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:700,messages:[{role:'user',content:`You are BharatMonitor — India's public civic issue tracker. Analyze this for Indian citizens:\n\nIssue: ${issue.title}\nState: ${issue.state}${issue.district?', '+issue.district:''}\nCategory: ${issue.cat}, Severity: ${issue.sev}, Dept: ${issue.dept}\n\nRespond in this format (plain text):\n\nWHAT IS HAPPENING\n(2 sentences)\n\nWHO IS AFFECTED\n(1 sentence)\n\nWHAT SHOULD BE DONE\n• Action 1\n• Action 2\n• Action 3\n\nRESPONSIBLE AUTHORITY\n(dept + escalation)\n\nEXPECTED RESOLUTION\n(realistic timeline)\n\nUnder 180 words.`}]})})
-    const data=await res.json()
-    const text=data.content?.map(b=>b.text||'').join('')||'Analysis unavailable.'
-    panel.innerHTML=`<div style="background:#0c1526;border:1px solid #1e3a5f;border-radius:8px;padding:12px;margin-bottom:12px"><div style="font-size:10px;color:#4a6080;text-transform:uppercase;letter-spacing:1px;margin-bottom:4px">Analyzing</div><div style="font-size:13px;font-weight:500;line-height:1.4">${issue.title}</div><div style="font-size:11px;color:#4a6080;margin-top:4px">📍 ${issue.state} · ${issue.dept}</div></div><div style="font-size:12.5px;line-height:1.9;white-space:pre-wrap">${text.split('\n').map(l=>/^(WHAT IS HAPPENING|WHO IS AFFECTED|WHAT SHOULD BE DONE|RESPONSIBLE AUTHORITY|EXPECTED RESOLUTION)$/.test(l.trim())?`<div style="color:#FF7518;font-weight:700;font-size:11px;letter-spacing:1px;text-transform:uppercase;margin:12px 0 4px">${l}</div>`:l.startsWith('•')?`<div style="padding-left:12px;margin:2px 0">${l}</div>`:`<div style="margin:2px 0">${l}</div>`).join('')}</div>`
-  }catch{panel.innerHTML=`<div style="color:#4a6080;padding:20px;font-size:13px">⚠️ AI analysis unavailable. Add ANTHROPIC_API_KEY to Vercel to enable this.</div>`}
+// ══════════════════════════════════════════
+// REPORT FORM
+// ══════════════════════════════════════════
+document.getElementById('btnSubmit').addEventListener('click', function(){
+  var title=document.getElementById('rTitle').value.trim();
+  var desc=document.getElementById('rDesc').value.trim();
+  var state=document.getElementById('rState').value.trim();
+  var cat=document.getElementById('rCat').value;
+  if(!title||!desc||!state){alert('Please fill in all required fields.');return;}
+  var btn=document.getElementById('btnSubmit');
+  btn.disabled=true; btn.textContent='⏳ Processing...';
+  var ticket='BW-'+Math.floor(10000+Math.random()*90000);
+  var sev='high',dept='Relevant Authority',sla=48,msg='Your report has been registered and forwarded.';
+
+  function finish(sev,dept,sla,msg){
+    issues.unshift({id:ticket,title:title,state:state,cat:cat,sev:sev,dept:dept,ts:Date.now(),district:'',lat:null,lng:null});
+    liveCount++;
+    document.getElementById('liveCount').textContent=liveCount.toLocaleString('en-IN');
+    renderIssues();
+    document.getElementById('rForm').style.display='none';
+    document.getElementById('rSuccess').style.display='block';
+    document.getElementById('rSuccess').innerHTML=
+      '<div class="sbox">'+
+      '<div style="font-size:40px;margin-bottom:8px">✅</div>'+
+      '<div style="font-family:\'Baloo 2\',cursive;font-weight:700;font-size:17px;color:#00c853;margin-bottom:4px">Issue Registered!</div>'+
+      '<div style="font-family:\'Baloo 2\',cursive;font-weight:800;font-size:22px;color:#ffd700;margin-bottom:10px">'+ticket+'</div>'+
+      '<div class="sgrid">'+
+      '<div class="scel"><div class="scl">Severity</div><span class="sv2 s-'+sev+'">'+sev.toUpperCase()+'</span></div>'+
+      '<div class="scel"><div class="scl">Department</div><div style="font-size:11px;color:#00B4D8;font-weight:600">'+dept+'</div></div>'+
+      '<div class="scel"><div class="scl">SLA</div><div style="font-size:14px;color:#ffd700;font-weight:700">'+sla+'h</div></div>'+
+      '<div class="scel"><div class="scl">Status</div><div style="font-size:13px;color:#00c853;font-weight:600">Active</div></div>'+
+      '</div>'+
+      '<div style="font-size:12px;color:#4a6080;line-height:1.6;margin-bottom:16px">'+msg+'</div>'+
+      '<button class="btse" id="btnAgain">+ Report Another Issue</button>'+
+      '</div>';
+    document.getElementById('btnAgain').addEventListener('click',function(){
+      document.getElementById('rForm').style.display='block';
+      document.getElementById('rSuccess').style.display='none';
+      ['rTitle','rDesc','rState'].forEach(function(id){document.getElementById(id).value='';});
+      btn.disabled=false; btn.textContent='Submit Issue →';
+    });
+  }
+
+  fetch('https://api.anthropic.com/v1/messages',{
+    method:'POST',
+    headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:300,messages:[{role:'user',content:'Classify this Indian civic issue. Reply ONLY with valid JSON, no other text:\nTitle: '+title+'\nCategory: '+cat+'\nState: '+state+'\nDescription: '+desc+'\n\nJSON format: {"severity":"emergency|critical|high|medium|low","department":"govt dept name","sla_hours":48,"message":"one reassuring sentence to the citizen"}'}]})
+  }).then(function(r){return r.json();}).then(function(d){
+    try{
+      var raw=''; if(d.content) for(var i=0;i<d.content.length;i++) raw+=d.content[i].text||'';
+      var r=JSON.parse(raw.replace(/```json|```/g,'').trim());
+      finish(r.severity||sev, r.department||dept, r.sla_hours||sla, r.message||msg);
+    }catch(e){ finish(sev,dept,sla,msg); }
+  }).catch(function(){ finish(sev,dept,sla,msg); });
+});
+
+// ══════════════════════════════════════════
+// TABS & FILTERS
+// ══════════════════════════════════════════
+document.querySelectorAll('.tbn').forEach(function(b){
+  b.addEventListener('click',function(){ switchTab(b.getAttribute('data-tab')); });
+});
+document.getElementById('btnReport').addEventListener('click',function(){ switchTab('report'); });
+document.querySelectorAll('.fp').forEach(function(p){
+  p.addEventListener('click',function(){
+    activeFilter = p.getAttribute('data-cat');
+    document.querySelectorAll('.fp').forEach(function(x){ x.classList.remove('active'); });
+    p.classList.add('active');
+    renderIssues();
+  });
+});
+
+// ══════════════════════════════════════════
+// LIVE COUNTER & TICKER
+// ══════════════════════════════════════════
+setInterval(function(){
+  liveCount += Math.floor(Math.random()*4+1);
+  document.getElementById('liveCount').textContent = liveCount.toLocaleString('en-IN');
+}, 2800);
+
+function updateTicker(){
+  var iss = issues[tickerIdx++ % issues.length];
+  var el = document.getElementById('tText');
+  el.style.opacity='0';
+  setTimeout(function(){
+    el.textContent = CI[iss.cat]+' '+iss.state+' — '+iss.title;
+    el.style.opacity='1';
+  },300);
 }
+updateTicker();
+setInterval(updateTicker, 4000);
 
-document.getElementById('btnSubmit').addEventListener('click',async()=>{
-  const title=document.getElementById('rTitle').value.trim()
-  const desc=document.getElementById('rDesc').value.trim()
-  const state=document.getElementById('rState').value.trim()
-  const cat=document.getElementById('rCat').value
-  if(!title||!desc||!state){alert('Please fill in all required fields.');return}
-  const btn=document.getElementById('btnSubmit');btn.disabled=true;btn.textContent='⏳ Processing...'
-  const ticket='BW-'+Math.floor(10000+Math.random()*90000)
-  let sev='high',dept='Relevant Authority',sla=48,msg='Your report has been registered.'
-  try{
-    const res=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:300,messages:[{role:'user',content:`Classify this civic issue. Reply ONLY with valid JSON:\nTitle: ${title}, Category: ${cat}, State: ${state}\nReturn: {"severity":"emergency|critical|high|medium|low","department":"dept name","sla_hours":24,"message":"one short sentence to citizen"}`}]})})
-    const d=await res.json()
-    const r=JSON.parse(d.content?.map(b=>b.text||'').join('').replace(/```json|```/g,'').trim())
-    sev=r.severity||sev;dept=r.department||dept;sla=r.sla_hours||sla;msg=r.message||msg
-    issues.unshift({id:ticket,title,state,cat,sev,dept,ts:Date.now(),district:''})
-    liveCount++;document.getElementById('liveCount').textContent=liveCount.toLocaleString('en-IN');renderIssues()
-  }catch{}
-  document.getElementById('rForm').style.display='none'
-  document.getElementById('rSuccess').style.display='block'
-  document.getElementById('rSuccess').innerHTML=`<div class="sbox"><div style="font-size:40px;margin-bottom:8px">✅</div><div style="font-family:'Baloo 2',cursive;font-weight:700;font-size:17px;color:#00c853;margin-bottom:4px">Issue Registered!</div><div style="font-family:'Baloo 2',cursive;font-weight:800;font-size:20px;color:#ffd700;margin-bottom:6px">${ticket}</div><div class="sg"><div class="scel"><div class="scl">Severity</div><span class="sb sev-${sev}">${sev.toUpperCase()}</span></div><div class="scel"><div class="scl">Dept</div><div style="font-size:11px;color:#00B4D8;font-weight:600">${dept}</div></div><div class="scel"><div class="scl">SLA</div><div style="font-size:13px;color:#ffd700;font-weight:600">${sla}h</div></div><div class="scel"><div class="scl">Status</div><div style="font-size:13px;color:#00c853;font-weight:600">Active</div></div></div><div style="font-size:12px;color:#4a6080;line-height:1.6;margin-bottom:14px">${msg}</div><button class="btsec" id="btnAgain">Report Another Issue</button></div>`
-  document.getElementById('btnAgain').addEventListener('click',()=>{document.getElementById('rForm').style.display='block';document.getElementById('rSuccess').style.display='none';document.getElementById('rTitle').value='';document.getElementById('rDesc').value='';document.getElementById('rState').value='';btn.disabled=false;btn.textContent='Submit Issue →'})
-})
-
-document.querySelectorAll('.tab-btn').forEach(b=>b.addEventListener('click',()=>switchTab(b.dataset.tab)))
-document.getElementById('btnReport').addEventListener('click',()=>switchTab('report'))
-document.querySelectorAll('.fp').forEach(p=>p.addEventListener('click',()=>{activeFilter=p.dataset.cat;document.querySelectorAll('.fp').forEach(x=>x.classList.remove('active'));p.classList.add('active');renderIssues()}))
-setInterval(()=>{liveCount+=Math.floor(Math.random()*4+1);document.getElementById('liveCount').textContent=liveCount.toLocaleString('en-IN')},2800)
-function updateTicker(){const i=issues[tickerIdx++%issues.length];const el=document.getElementById('tickerText');el.style.opacity='0';setTimeout(()=>{el.textContent=`${CI[i.cat]} ${i.state} — ${i.title}`;el.style.opacity='1'},200)}
-updateTicker();setInterval(updateTicker,4000)
-renderIssues()
+// ══════════════════════════════════════════
+// INIT
+// ══════════════════════════════════════════
+renderIssues();
 </script>
 </body>
 </html>

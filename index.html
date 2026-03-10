@@ -8,180 +8,182 @@
 <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700;800&family=DM+Sans:wght@400;500&display=swap" rel="stylesheet"/>
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-:root{--bg:#080f1c;--panel:#0c1526;--panel2:#101d30;--border:#182d48;--border2:#1e3a5f;--saffron:#FF6B00;--saffron2:#cc5200;--green:#00c853;--sky:#00b8e6;--gold:#ffd700;--red:#ff1744;--teal:#00ddb8;--purple:#a855f7;--text:#c8d8e8;--muted:#4a6080;--muted2:#2a3f5a;--white:#fff}
-html,body{height:100%;font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);overflow:hidden}
+:root{--bg:#080f1c;--panel:#0c1526;--p2:#101d30;--b1:#182d48;--b2:#1e3a5f;--saf:#FF6B00;--saf2:#cc5200;--grn:#00c853;--sky:#00b8e6;--gld:#ffd700;--red:#ff1744;--tel:#00ddb8;--pur:#a855f7;--tx:#c8d8e8;--mt:#4a6080;--mt2:#2a3f5a;--w:#fff}
+html,body{height:100%;font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--tx);overflow:hidden}
 #app{display:flex;flex-direction:column;height:100vh}
-#header{height:52px;background:var(--panel);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:0 14px;flex-shrink:0;z-index:200;gap:10px}
-.logo{font-family:'Baloo 2',cursive;font-weight:800;font-size:19px;color:var(--white);display:flex;align-items:center;gap:6px;white-space:nowrap}
-.logo span{color:var(--saffron)}
-.hc{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--muted);flex:1;justify-content:center}
-.ld{width:7px;height:7px;border-radius:50%;background:var(--green);animation:pulse 1.5s infinite;flex-shrink:0}
-@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.4;transform:scale(1.3)}}
-#liveCount{color:var(--saffron);font-weight:700}
-#feedStatus{font-size:10px;color:var(--muted);display:flex;align-items:center;gap:4px}
-#feedStatus .fsd{width:6px;height:6px;border-radius:50%;background:var(--muted);flex-shrink:0}
-#feedStatus.live .fsd{background:var(--green);animation:pulse 2s infinite}
-#feedStatus.error .fsd{background:var(--red)}
-#feedStatus.loading .fsd{background:var(--gold);animation:pulse 1s infinite}
-.hright{display:flex;align-items:center;gap:8px}
-.btnr{background:var(--saffron);color:var(--white);border:none;border-radius:7px;padding:7px 14px;font-family:'Baloo 2',cursive;font-weight:700;font-size:13px;cursor:pointer;transition:background .15s;white-space:nowrap}
-.btnr:hover{background:var(--saffron2)}
+#hdr{height:52px;background:var(--panel);border-bottom:1px solid var(--b1);display:flex;align-items:center;justify-content:space-between;padding:0 14px;flex-shrink:0;z-index:200;gap:10px}
+.logo{font-family:'Baloo 2',cursive;font-weight:800;font-size:19px;color:var(--w);display:flex;align-items:center;gap:6px;white-space:nowrap}
+.logo span{color:var(--saf)}
+.hc{display:flex;align-items:center;gap:7px;font-size:12px;color:var(--mt);flex:1;justify-content:center;flex-wrap:wrap}
+.ld{width:7px;height:7px;border-radius:50%;background:var(--grn);animation:pu 1.5s infinite;flex-shrink:0}
+@keyframes pu{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.4;transform:scale(1.3)}}
+#lc{color:var(--saf);font-weight:700}
+#fs{font-size:10px;color:var(--mt);display:flex;align-items:center;gap:4px}
+#fs .fsd{width:6px;height:6px;border-radius:50%;background:var(--mt);flex-shrink:0}
+#fs.live .fsd{background:var(--grn);animation:pu 2s infinite}
+#fs.error .fsd{background:var(--red)}
+#fs.loading .fsd{background:var(--gld);animation:pu 1s infinite}
+.btnr{background:var(--saf);color:var(--w);border:none;border-radius:7px;padding:7px 14px;font-family:'Baloo 2',cursive;font-weight:700;font-size:13px;cursor:pointer;white-space:nowrap}
+.btnr:hover{background:var(--saf2)}
 #body{flex:1;display:flex;overflow:hidden}
 #map{flex:1;position:relative}
-#mStats{position:absolute;top:12px;left:52px;display:flex;gap:8px;z-index:10;pointer-events:none}
-.sc{background:rgba(12,21,38,.94);border:1px solid var(--border);border-radius:7px;padding:5px 11px;border-left:2px solid var(--saffron)}
-.sc.g{border-left-color:var(--green)}.sc.s{border-left-color:var(--sky)}
-.sv{font-family:'Baloo 2',cursive;font-weight:700;font-size:14px;color:var(--saffron);line-height:1}
-.sc.g .sv{color:var(--green)}.sc.s .sv{color:var(--sky)}
-.sl{font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.8px}
-#mLeg{position:absolute;bottom:28px;left:12px;background:rgba(8,15,28,.9);border:1px solid var(--border);border-radius:8px;padding:7px 12px;font-size:10px;display:flex;gap:10px;z-index:10;pointer-events:none}
+#mst{position:absolute;top:12px;left:52px;display:flex;gap:8px;z-index:10;pointer-events:none}
+.sc{background:rgba(12,21,38,.94);border:1px solid var(--b1);border-radius:7px;padding:5px 11px;border-left:2px solid var(--saf)}
+.sc.g{border-left-color:var(--grn)}.sc.s{border-left-color:var(--sky)}
+.sv{font-family:'Baloo 2',cursive;font-weight:700;font-size:14px;color:var(--saf);line-height:1}
+.sc.g .sv{color:var(--grn)}.sc.s .sv{color:var(--sky)}
+.sl{font-size:9px;color:var(--mt);text-transform:uppercase;letter-spacing:.8px}
+#mlg{position:absolute;bottom:28px;left:12px;background:rgba(8,15,28,.9);border:1px solid var(--b1);border-radius:8px;padding:7px 12px;font-size:10px;display:flex;gap:10px;z-index:10;pointer-events:none}
 .li{display:flex;align-items:center;gap:5px}.ld2{width:8px;height:8px;border-radius:50%}
-#ticker{position:absolute;bottom:0;left:0;right:0;background:rgba(8,15,28,.9);border-top:1px solid var(--border);padding:5px 14px;font-size:11.5px;display:flex;align-items:center;gap:10px;z-index:10}
-.tb{background:var(--red);border-radius:3px;padding:1px 6px;font-size:9px;font-weight:700;letter-spacing:1.5px;flex-shrink:0;animation:pulse 1.5s infinite}
-#tText{overflow:hidden;white-space:nowrap;text-overflow:ellipsis;flex:1;transition:opacity .4s}
-#tSrc{font-size:10px;color:var(--muted);flex-shrink:0;white-space:nowrap}
-#sidebar{width:350px;background:var(--panel);border-left:1px solid var(--border);display:flex;flex-direction:column;overflow:hidden;flex-shrink:0}
-.tabs{display:flex;border-bottom:1px solid var(--border);flex-shrink:0}
-.tbn{flex:1;padding:10px 0;background:transparent;border:none;border-bottom:2px solid transparent;color:var(--muted);font-family:'Baloo 2',cursive;font-weight:600;font-size:10.5px;letter-spacing:.3px;cursor:pointer;text-transform:uppercase;transition:all .15s}
-.tbn:hover{color:var(--text)}.tbn.active{color:var(--saffron);border-bottom-color:var(--saffron)}
+#ticker{position:absolute;bottom:0;left:0;right:0;background:rgba(8,15,28,.9);border-top:1px solid var(--b1);padding:5px 14px;font-size:11.5px;display:flex;align-items:center;gap:10px;z-index:10}
+.tb{background:var(--red);border-radius:3px;padding:1px 6px;font-size:9px;font-weight:700;letter-spacing:1.5px;flex-shrink:0;animation:pu 1.5s infinite}
+#tt{overflow:hidden;white-space:nowrap;text-overflow:ellipsis;flex:1;transition:opacity .4s}
+#tsrc{font-size:10px;color:var(--mt);flex-shrink:0}
+#sb{width:350px;background:var(--panel);border-left:1px solid var(--b1);display:flex;flex-direction:column;overflow:hidden;flex-shrink:0}
+.tabs{display:flex;border-bottom:1px solid var(--b1);flex-shrink:0}
+.tbn{flex:1;padding:10px 0;background:transparent;border:none;border-bottom:2px solid transparent;color:var(--mt);font-family:'Baloo 2',cursive;font-weight:600;font-size:10.5px;cursor:pointer;text-transform:uppercase;letter-spacing:.3px;transition:all .15s}
+.tbn:hover{color:var(--tx)}.tbn.active{color:var(--saf);border-bottom-color:var(--saf)}
 .tpn{display:none;flex:1;overflow:hidden;flex-direction:column}
 .tpn.active{display:flex}
-#stInf{background:var(--panel2);border-bottom:1px solid var(--border);padding:12px 14px;display:none;flex-shrink:0}
-#stInf.show{display:block}
-.stn{font-family:'Baloo 2',cursive;font-weight:700;font-size:16px;color:var(--white)}
-.stc{font-family:'Baloo 2',cursive;font-weight:800;font-size:24px;color:var(--saffron);line-height:1}
-.sts{font-size:11px;color:var(--muted);margin-bottom:8px}
+#sti{background:var(--p2);border-bottom:1px solid var(--b1);padding:12px 14px;display:none;flex-shrink:0}
+#sti.show{display:block}
+.stn{font-family:'Baloo 2',cursive;font-weight:700;font-size:16px;color:var(--w)}
+.stc{font-family:'Baloo 2',cursive;font-weight:800;font-size:22px;color:var(--saf);line-height:1}
+.sts{font-size:11px;color:var(--mt);margin-bottom:8px}
 .cbr{display:flex;align-items:center;gap:7px;margin-bottom:5px}
 .cbl{font-size:11px;width:72px;flex-shrink:0}
-.cbt{flex:1;height:4px;background:var(--border2);border-radius:2px;overflow:hidden}
-.cbf{height:100%;border-radius:2px;transition:width .5s ease}
-.cbv{font-size:10px;color:var(--muted);width:38px;text-align:right;flex-shrink:0}
-.filt-row{padding:6px 10px;border-bottom:1px solid var(--border);display:flex;gap:4px;flex-wrap:wrap;flex-shrink:0}
-.fp{padding:3px 9px;border-radius:20px;border:1px solid var(--border);background:transparent;color:var(--muted);font-size:11px;cursor:pointer;font-family:inherit;transition:all .12s;white-space:nowrap}
-.fp:hover{border-color:var(--border2);color:var(--text)}
-.fp.active{background:#FF6B0015;border-color:var(--saffron);color:var(--saffron)}
+.cbt{flex:1;height:4px;background:var(--b2);border-radius:2px;overflow:hidden}
+.cbf{height:100%;border-radius:2px;transition:width .5s}
+.cbv{font-size:10px;color:var(--mt);width:30px;text-align:right;flex-shrink:0}
+.fr{padding:6px 10px;border-bottom:1px solid var(--b1);display:flex;gap:4px;flex-wrap:wrap;flex-shrink:0}
+.fp{padding:3px 9px;border-radius:20px;border:1px solid var(--b1);background:transparent;color:var(--mt);font-size:11px;cursor:pointer;font-family:inherit;white-space:nowrap;transition:all .12s}
+.fp:hover{border-color:var(--b2);color:var(--tx)}
+.fp.active{background:#FF6B0015;border-color:var(--saf);color:var(--saf)}
 .fp[data-cat="water"].active{background:#00b8e615;border-color:var(--sky);color:var(--sky)}
-.fp[data-cat="power"].active{background:#ffd70015;border-color:var(--gold);color:var(--gold)}
+.fp[data-cat="power"].active{background:#ffd70015;border-color:var(--gld);color:var(--gld)}
 .fp[data-cat="health"].active{background:#ff174415;border-color:var(--red);color:var(--red)}
-.fp[data-cat="corrupt"].active{background:#00ddb815;border-color:var(--teal);color:var(--teal)}
-.fp[data-cat="education"].active{background:#a855f715;border-color:var(--purple);color:var(--purple)}
+.fp[data-cat="corrupt"].active{background:#00ddb815;border-color:var(--tel);color:var(--tel)}
+.fp[data-cat="education"].active{background:#a855f715;border-color:var(--pur);color:var(--pur)}
 .fp[data-cat="transport"].active{background:#38bdf815;border-color:#38bdf8;color:#38bdf8}
 .fp[data-cat="safety"].active{background:#f9731615;border-color:#f97316;color:#f97316}
 .fp[data-cat="environment"].active{background:#22c55e15;border-color:#22c55e;color:#22c55e}
-.state-row{padding:5px 10px;border-bottom:1px solid var(--border);display:flex;gap:6px;flex-shrink:0;align-items:center}
-.state-row label{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.8px;flex-shrink:0}
-.state-sel{flex:1;background:var(--panel2);border:1px solid var(--border);border-radius:5px;color:var(--text);font-size:11px;padding:3px 6px;font-family:inherit;outline:none}
-.state-sel:focus{border-color:var(--saffron)}
-#feedMeta{padding:4px 10px;background:rgba(24,45,72,.5);border-bottom:1px solid var(--border);font-size:10px;color:var(--muted);display:flex;justify-content:space-between;align-items:center;flex-shrink:0}
-.refresh-btn{background:transparent;border:1px solid var(--border);border-radius:4px;color:var(--muted);font-size:10px;padding:2px 7px;cursor:pointer;font-family:inherit}
-.refresh-btn:hover{border-color:var(--saffron);color:var(--saffron)}
-#iList{flex:1;overflow-y:auto;scrollbar-width:thin;scrollbar-color:var(--border) transparent}
-#iList::-webkit-scrollbar{width:3px}
-#iList::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px}
-.ic{padding:11px 14px;border-bottom:1px solid #0d1b2e;cursor:pointer;transition:background .1s;border-left:3px solid transparent}
-.ic:hover{background:#0d1b2e}.ic.sel{background:#0f1e34;border-left-color:var(--saffron)}
-.ir{display:flex;justify-content:space-between;align-items:flex-start;gap:8px;margin-bottom:4px}
-.it{font-size:12px;font-weight:500;color:var(--text);line-height:1.4;flex:1}
+.sr{padding:5px 10px;border-bottom:1px solid var(--b1);display:flex;gap:6px;flex-shrink:0;align-items:center}
+.sr label{font-size:10px;color:var(--mt);text-transform:uppercase;letter-spacing:.8px;flex-shrink:0}
+.ssel{flex:1;background:var(--p2);border:1px solid var(--b1);border-radius:5px;color:var(--tx);font-size:11px;padding:3px 6px;font-family:inherit;outline:none}
+.ssel:focus{border-color:var(--saf)}
+#fm{padding:4px 10px;background:rgba(24,45,72,.5);border-bottom:1px solid var(--b1);font-size:10px;color:var(--mt);display:flex;justify-content:space-between;align-items:center;flex-shrink:0}
+.rbtn{background:transparent;border:1px solid var(--b1);border-radius:4px;color:var(--mt);font-size:10px;padding:2px 7px;cursor:pointer;font-family:inherit}
+.rbtn:hover{border-color:var(--saf);color:var(--saf)}
+#il{flex:1;overflow-y:auto;scrollbar-width:thin;scrollbar-color:var(--b1) transparent}
+#il::-webkit-scrollbar{width:3px}
+#il::-webkit-scrollbar-thumb{background:var(--b1);border-radius:2px}
+.ic{padding:10px 14px;border-bottom:1px solid #0d1b2e;cursor:pointer;transition:background .1s;border-left:3px solid transparent}
+.ic:hover{background:#0d1b2e}.ic.sel{background:#0f1e34;border-left-color:var(--saf)}
+.ir{display:flex;justify-content:space-between;align-items:flex-start;gap:8px;margin-bottom:3px}
+.it{font-size:12px;font-weight:500;color:var(--tx);line-height:1.4;flex:1}
 .sv2{font-size:8px;font-weight:700;letter-spacing:1px;padding:2px 5px;border-radius:3px;text-transform:uppercase;white-space:nowrap;flex-shrink:0}
 .s-emergency{background:#ff174420;color:var(--red);border:1px solid #ff174440}
-.s-critical{background:#FF6B0020;color:var(--saffron);border:1px solid #FF6B0040}
-.s-high{background:#ffd70020;color:var(--gold);border:1px solid #ffd70040}
+.s-critical{background:#FF6B0020;color:var(--saf);border:1px solid #FF6B0040}
+.s-high{background:#ffd70020;color:var(--gld);border:1px solid #ffd70040}
 .s-medium{background:#00b8e620;color:var(--sky);border:1px solid #00b8e640}
-.s-low{background:#00ddb820;color:var(--teal);border:1px solid #00ddb840}
-.im{font-size:10.5px;color:var(--muted);display:flex;gap:7px;flex-wrap:wrap;align-items:center}
-.src-badge{font-size:8px;padding:1px 5px;border-radius:3px;font-weight:700;letter-spacing:.5px}
-.src-rss{background:#00b8e618;color:var(--sky);border:1px solid #00b8e630}
-.src-citizen{background:#00ddb818;color:var(--teal);border:1px solid #00ddb830}
-.src-demo{background:#FF6B0018;color:var(--saffron);border:1px solid #FF6B0030}
-.iab{margin-top:8px;width:100%;padding:5px;border:1px solid #FF6B0040;background:#FF6B0010;border-radius:5px;color:var(--saffron);font-size:11px;cursor:pointer;font-family:inherit;transition:background .1s}
+.s-low{background:#00ddb820;color:var(--tel);border:1px solid #00ddb840}
+.im{font-size:10.5px;color:var(--mt);display:flex;gap:7px;flex-wrap:wrap;align-items:center;margin-top:2px}
+.sb2{font-size:8px;padding:1px 5px;border-radius:3px;font-weight:700;letter-spacing:.5px}
+.sb-rss{background:#00b8e618;color:var(--sky);border:1px solid #00b8e630}
+.sb-cit{background:#00ddb818;color:var(--tel);border:1px solid #00ddb830}
+.imth{width:100%;max-height:140px;object-fit:cover;border-radius:5px;margin-top:6px;cursor:default}
+.iab{margin-top:7px;width:100%;padding:5px;border:1px solid #FF6B0040;background:#FF6B0010;border-radius:5px;color:var(--saf);font-size:11px;cursor:pointer;font-family:inherit}
 .iab:hover{background:#FF6B0020}
-.loading-item{padding:12px 14px;border-bottom:1px solid #0d1b2e}
-.skel{background:linear-gradient(90deg,#101d30 25%,#182d48 50%,#101d30 75%);background-size:200% 100%;animation:shimmer 1.5s infinite;border-radius:4px;height:11px;margin-bottom:6px}
-@keyframes shimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}
-#aiPnl{padding:14px;font-size:12.5px;line-height:1.8;color:var(--text);overflow-y:auto;flex:1;scrollbar-width:thin}
-.ae{display:flex;flex-direction:column;align-items:center;justify-content:center;height:200px;color:var(--muted);text-align:center;gap:10px}
-#rPnl{padding:12px 14px;overflow-y:auto;flex:1;scrollbar-width:thin;scrollbar-color:var(--border) transparent}
-#rPnl::-webkit-scrollbar{width:3px}
-.fg{margin-bottom:11px}
-.fl{display:block;font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.8px;margin-bottom:4px}
-.fi,.fsl,.fta{width:100%;background:var(--panel2);border:1px solid var(--border);border-radius:7px;padding:7px 10px;font-size:12px;color:var(--text);font-family:inherit;outline:none;transition:border-color .15s}
-.fi:focus,.fsl:focus,.fta:focus{border-color:var(--saffron)}
-.fi::placeholder,.fta::placeholder{color:var(--muted)}
+.sk{background:linear-gradient(90deg,#101d30 25%,#182d48 50%,#101d30 75%);background-size:200% 100%;animation:sh 1.5s infinite;border-radius:4px;height:11px;margin-bottom:6px}
+@keyframes sh{0%{background-position:200% 0}100%{background-position:-200% 0}}
+.ski{padding:12px 14px;border-bottom:1px solid #0d1b2e}
+#aip{padding:14px;font-size:12.5px;line-height:1.8;color:var(--tx);overflow-y:auto;flex:1;scrollbar-width:thin}
+.ae{display:flex;flex-direction:column;align-items:center;justify-content:center;height:200px;color:var(--mt);text-align:center;gap:10px}
+#rp{padding:12px 14px;overflow-y:auto;flex:1;scrollbar-width:thin;scrollbar-color:var(--b1) transparent}
+#rp::-webkit-scrollbar{width:3px}
+.fg{margin-bottom:10px}
+.fl{display:block;font-size:10px;color:var(--mt);text-transform:uppercase;letter-spacing:.8px;margin-bottom:4px}
+.fi,.fsl,.fta{width:100%;background:var(--p2);border:1px solid var(--b1);border-radius:7px;padding:7px 10px;font-size:12px;color:var(--tx);font-family:inherit;outline:none;transition:border-color .15s}
+.fi:focus,.fsl:focus,.fta:focus{border-color:var(--saf)}
+.fi::placeholder,.fta::placeholder{color:var(--mt)}
 .fsl option{background:var(--panel)}
-.fta{min-height:70px;resize:vertical}
-.bts{width:100%;padding:10px;background:var(--saffron);color:var(--white);border:none;border-radius:7px;font-family:'Baloo 2',cursive;font-weight:700;font-size:14px;cursor:pointer;margin-top:4px;transition:background .15s}
-.bts:hover{background:var(--saffron2)}.bts:disabled{background:var(--muted2);cursor:not-allowed}
-.char-count{font-size:10px;color:var(--muted);text-align:right;margin-top:2px}
-#myPnl{padding:10px 14px;overflow-y:auto;flex:1;scrollbar-width:thin;scrollbar-color:var(--border) transparent}
-#myPnl::-webkit-scrollbar{width:3px}
-.ticket-card{background:var(--panel2);border:1px solid var(--border);border-radius:8px;padding:11px 12px;margin-bottom:10px}
-.ticket-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:5px}
-.ticket-id{font-family:'Baloo 2',cursive;font-weight:700;font-size:14px;color:var(--gold)}
-.ticket-status{font-size:9px;font-weight:700;padding:2px 7px;border-radius:10px;letter-spacing:.5px}
-.st-submitted{background:#00b8e620;color:var(--sky);border:1px solid #00b8e640}
-.ticket-title{font-size:12px;color:var(--text);line-height:1.4;margin-bottom:5px}
-.ticket-meta{font-size:10px;color:var(--muted);display:flex;gap:8px;flex-wrap:wrap;margin-bottom:8px}
-.ticket-actions{display:flex;gap:6px}
-.btn-wa{flex:1;padding:6px;background:#25D36618;border:1px solid #25D36640;border-radius:5px;color:#25D366;font-size:11px;cursor:pointer;font-family:inherit;font-weight:600}
-.btn-wa:hover{background:#25D36628}
-.btn-share{flex:1;padding:6px;background:var(--panel);border:1px solid var(--border);border-radius:5px;color:var(--muted);font-size:11px;cursor:pointer;font-family:inherit}
-.btn-share:hover{border-color:var(--border2);color:var(--text)}
-.no-reports{text-align:center;padding:40px 20px;color:var(--muted);font-size:13px;line-height:2}
-.sbox{text-align:center;padding:16px}
+.fta{min-height:68px;resize:vertical}
+.bts{width:100%;padding:10px;background:var(--saf);color:var(--w);border:none;border-radius:7px;font-family:'Baloo 2',cursive;font-weight:700;font-size:14px;cursor:pointer;transition:background .15s}
+.bts:hover{background:var(--saf2)}.bts:disabled{background:var(--mt2);cursor:not-allowed}
+.cc{font-size:10px;color:var(--mt);text-align:right;margin-top:2px}
+#myp{padding:10px 14px;overflow-y:auto;flex:1;scrollbar-width:thin;scrollbar-color:var(--b1) transparent}
+#myp::-webkit-scrollbar{width:3px}
+.tc{background:var(--p2);border:1px solid var(--b1);border-radius:8px;padding:11px 12px;margin-bottom:10px}
+.tt2{display:flex;justify-content:space-between;align-items:center;margin-bottom:5px}
+.tid{font-family:'Baloo 2',cursive;font-weight:700;font-size:14px;color:var(--gld)}
+.tst{font-size:9px;font-weight:700;padding:2px 7px;border-radius:10px;letter-spacing:.5px;background:#00b8e620;color:var(--sky);border:1px solid #00b8e640}
+.ttl{font-size:12px;color:var(--tx);line-height:1.4;margin-bottom:5px}
+.tmt{font-size:10px;color:var(--mt);display:flex;gap:8px;flex-wrap:wrap;margin-bottom:8px}
+.ta{display:flex;gap:6px}
+.bwa{flex:1;padding:6px;background:#25D36618;border:1px solid #25D36640;border-radius:5px;color:#25D366;font-size:11px;cursor:pointer;font-family:inherit;font-weight:600}
+.bwa:hover{background:#25D36628}
+.bgh{flex:1;padding:6px;background:#6e40c918;border:1px solid #6e40c940;border-radius:5px;color:#a78bfa;font-size:11px;cursor:pointer;font-family:inherit}
+.bgh:hover{background:#6e40c928}
+.bcpy{padding:6px 10px;background:var(--panel);border:1px solid var(--b1);border-radius:5px;color:var(--mt);font-size:11px;cursor:pointer;font-family:inherit}
+.bcpy:hover{border-color:var(--b2);color:var(--tx)}
+.nr{text-align:center;padding:40px 20px;color:var(--mt);font-size:13px;line-height:2}
+.sbox{text-align:center;padding:14px}
 .sgrid{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin:10px 0}
-.scel{background:var(--panel2);border:1px solid var(--border);border-radius:7px;padding:9px}
-.scl{font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.8px;margin-bottom:3px}
-.btse{width:100%;padding:9px;background:transparent;border:1px solid var(--border);border-radius:7px;color:var(--muted);font-size:12px;cursor:pointer;font-family:inherit;margin-top:6px}
-.btse:hover{border-color:var(--border2);color:var(--text)}
-.maplibregl-popup-content{background:var(--panel)!important;border:1px solid var(--border2)!important;border-radius:8px!important;padding:10px 12px!important;color:var(--text)!important;font-family:'DM Sans',sans-serif!important}
+.scel{background:var(--p2);border:1px solid var(--b1);border-radius:7px;padding:9px}
+.scl{font-size:9px;color:var(--mt);text-transform:uppercase;letter-spacing:.8px;margin-bottom:3px}
+.bse{width:100%;padding:9px;background:transparent;border:1px solid var(--b1);border-radius:7px;color:var(--mt);font-size:12px;cursor:pointer;font-family:inherit;margin-top:6px}
+.bse:hover{border-color:var(--b2);color:var(--tx)}
+/* media preview */
+.vwrap{position:relative;padding-top:56.25%;margin-top:7px;border-radius:6px;overflow:hidden}
+.vwrap iframe{position:absolute;top:0;left:0;width:100%;height:100%;border:none}
+/* maplibre */
+.maplibregl-popup-content{background:var(--panel)!important;border:1px solid var(--b2)!important;border-radius:8px!important;padding:10px 12px!important;color:var(--tx)!important;font-family:'DM Sans',sans-serif!important;max-width:240px!important}
 .maplibregl-popup-tip{border-top-color:var(--panel)!important}
-.maplibregl-ctrl-group{background:var(--panel)!important;border:1px solid var(--border)!important}
-.maplibregl-ctrl-group button{background:var(--panel)!important;color:var(--text)!important}
-.maplibregl-ctrl-attrib{background:rgba(8,15,28,.7)!important;color:var(--muted)!important;font-size:10px!important}
+.maplibregl-ctrl-group{background:var(--panel)!important;border:1px solid var(--b1)!important}
+.maplibregl-ctrl-group button{background:var(--panel)!important;color:var(--tx)!important}
+.maplibregl-ctrl-attrib{background:rgba(8,15,28,.7)!important;color:var(--mt)!important;font-size:10px!important}
 </style>
 </head>
 <body>
 <div id="app">
-  <header id="header">
+  <header id="hdr">
     <div class="logo">🇮🇳 Bharat<span>Monitor</span></div>
     <div class="hc">
-      <div class="ld"></div>&nbsp;<span id="liveCount">1,24,832</span>&nbsp;active civic issues&nbsp;·&nbsp;
-      <div id="feedStatus" class="loading"><div class="fsd"></div><span id="feedStatusText">Loading...</span></div>
+      <div class="ld"></div>&nbsp;<span id="lc">0</span>&nbsp;civic issues&nbsp;·&nbsp;
+      <div id="fs" class="loading"><div class="fsd"></div><span id="fst">Loading...</span></div>
     </div>
-    <div class="hright"><button class="btnr" id="btnReport">+ Report Issue</button></div>
+    <div style="display:flex;gap:8px"><button class="btnr" id="btnR">+ Report Issue</button></div>
   </header>
   <div id="body">
     <div id="map">
-      <div id="mStats">
+      <div id="mst">
         <div class="sc"><div class="sv">36</div><div class="sl">States & UTs</div></div>
-        <div class="sc g"><div class="sv" id="citizenCount">0</div><div class="sl">Citizen Reports</div></div>
-        <div class="sc s"><div class="sv" id="rssCount">0</div><div class="sl">News Issues</div></div>
+        <div class="sc g"><div class="sv" id="cc">0</div><div class="sl">Citizen</div></div>
+        <div class="sc s"><div class="sv" id="rc">0</div><div class="sl">News</div></div>
       </div>
-      <div id="mLeg">
-        <div class="li"><div class="ld2" style="background:#7a1520"></div><span>12K+</span></div>
-        <div class="li"><div class="ld2" style="background:#a33020"></div><span>8K+</span></div>
-        <div class="li"><div class="ld2" style="background:#8a5010"></div><span>5K+</span></div>
-        <div class="li"><div class="ld2" style="background:#2a6040"></div><span>2K+</span></div>
-        <div class="li"><div class="ld2" style="background:#1a4060"></div><span>&lt;2K</span></div>
+      <div id="mlg">
+        <div class="li"><div class="ld2" style="background:#7a1520"></div><span>High</span></div>
+        <div class="li"><div class="ld2" style="background:#8a5010"></div><span>Mid</span></div>
+        <div class="li"><div class="ld2" style="background:#1a4060"></div><span>Low</span></div>
       </div>
-      <div id="ticker"><span class="tb">LIVE</span><span id="tText">Loading civic issues...</span><span id="tSrc"></span></div>
+      <div id="ticker"><span class="tb">LIVE</span><span id="tt">Fetching real-time civic data...</span><span id="tsrc"></span></div>
     </div>
-    <div id="sidebar">
-      <div id="stInf">
-        <div class="stn" id="stName"></div>
-        <div class="stc" id="stCount"></div>
-        <div class="sts" id="stSub"></div>
-        <div id="catBars"></div>
+    <div id="sb">
+      <div id="sti">
+        <div class="stn" id="stn"></div>
+        <div class="stc" id="stc"></div>
+        <div class="sts" id="sts"></div>
+        <div id="cb"></div>
       </div>
       <div class="tabs">
         <button class="tbn active" data-tab="feed">Live Feed</button>
         <button class="tbn" data-tab="report">Report</button>
-        <button class="tbn" data-tab="myreports">My Reports</button>
+        <button class="tbn" data-tab="mine">My Reports</button>
         <button class="tbn" data-tab="ai">Analyse</button>
       </div>
       <!-- FEED -->
       <div class="tpn active" id="panel-feed">
-        <div class="filt-row">
+        <div class="fr">
           <button class="fp active" data-cat="all">All</button>
           <button class="fp" data-cat="roads">🛣️</button>
           <button class="fp" data-cat="water">💧</button>
@@ -193,25 +195,25 @@ html,body{height:100%;font-family:'DM Sans',sans-serif;background:var(--bg);colo
           <button class="fp" data-cat="safety">🛡️</button>
           <button class="fp" data-cat="environment">🌿</button>
         </div>
-        <div class="state-row">
+        <div class="sr">
           <label>State:</label>
-          <select class="state-sel" id="stateFilter"><option value="all">All States & UTs</option></select>
+          <select class="ssel" id="sf"><option value="all">All States & UTs</option></select>
         </div>
-        <div id="feedMeta">
-          <span id="lastUpdatedText">Fetching live data...</span>
-          <button class="refresh-btn" id="btnRefresh">↻ Refresh</button>
+        <div id="fm">
+          <span id="lut">Fetching live data...</span>
+          <button class="rbtn" id="btnRef">↻ Refresh</button>
         </div>
-        <div id="iList">
-          <div class="loading-item"><div class="skel" style="width:82%"></div><div class="skel" style="width:55%"></div></div>
-          <div class="loading-item"><div class="skel" style="width:70%"></div><div class="skel" style="width:45%"></div></div>
-          <div class="loading-item"><div class="skel" style="width:88%"></div><div class="skel" style="width:60%"></div></div>
+        <div id="il">
+          <div class="ski"><div class="sk" style="width:82%"></div><div class="sk" style="width:55%"></div></div>
+          <div class="ski"><div class="sk" style="width:70%"></div><div class="sk" style="width:45%"></div></div>
+          <div class="ski"><div class="sk" style="width:88%"></div><div class="sk" style="width:60%"></div></div>
         </div>
       </div>
       <!-- REPORT -->
       <div class="tpn" id="panel-report">
-        <div id="rPnl">
+        <div id="rp">
           <div id="rForm">
-            <div class="fg"><label class="fl">Issue Category *</label>
+            <div class="fg"><label class="fl">Category *</label>
               <select class="fsl" id="rCat">
                 <option value="roads">🛣️ Roads, Potholes & Infrastructure</option>
                 <option value="water">💧 Water Supply & Sanitation</option>
@@ -219,39 +221,44 @@ html,body{height:100%;font-family:'DM Sans',sans-serif;background:var(--bg);colo
                 <option value="health">🏥 Healthcare & Hospitals</option>
                 <option value="corrupt">🔍 Corruption, Bribery & Fake Toll</option>
                 <option value="education">📚 Schools, Colleges & Education</option>
-                <option value="transport">🚌 Public Transport, Traffic & Railways</option>
+                <option value="transport">🚌 Transport, Traffic & Railways</option>
                 <option value="safety">🛡️ Safety, Crime & Law Enforcement</option>
                 <option value="environment">🌿 Environment, Pollution & Waste</option>
                 <option value="other">📋 Other Civic Issues</option>
               </select>
             </div>
             <div class="fg"><label class="fl">State *</label><select class="fsl" id="rState"></select></div>
-            <div class="fg"><label class="fl">District / City *</label><input class="fi" id="rDistrict" placeholder="e.g. Jaipur, Gurugram, Patna..." maxlength="100"/></div>
+            <div class="fg"><label class="fl">District / City *</label><input class="fi" id="rDist" placeholder="e.g. Jaipur, Gurugram, Patna..." maxlength="100"/></div>
             <div class="fg"><label class="fl">Issue Title * (be specific)</label><input class="fi" id="rTitle" placeholder="e.g. Pothole on Main Market Road causing accidents" maxlength="200"/></div>
             <div class="fg">
               <label class="fl">Description * — what, since when, who affected</label>
-              <textarea class="fta" id="rDesc" placeholder="Exact location, since when, how many affected, injuries, danger..." maxlength="800"></textarea>
-              <div class="char-count"><span id="descCount">0</span>/800</div>
+              <textarea class="fta" id="rDesc" placeholder="Exact location, since when, how many affected, danger..." maxlength="800"></textarea>
+              <div class="cc"><span id="dc">0</span>/800</div>
+            </div>
+            <div class="fg">
+              <label class="fl">Evidence — image URL, YouTube link, or photo URL</label>
+              <input class="fi" id="rMedia" placeholder="https://... (image, YouTube, or video URL)" maxlength="500"/>
+              <div id="mediaPreview" style="margin-top:6px"></div>
             </div>
             <div class="fg"><label class="fl">Your Name (optional)</label><input class="fi" id="rName" placeholder="Anonymous if blank" maxlength="80"/></div>
-            <div class="fg"><label class="fl">Mobile (optional — for follow-up)</label><input class="fi" id="rPhone" placeholder="+91 XXXXX XXXXX" maxlength="15" type="tel"/></div>
-            <button class="bts" id="btnSubmit">🚨 Submit Issue Report →</button>
-            <div style="font-size:10px;color:var(--muted);margin-top:8px;text-align:center;line-height:1.6">Your report creates a trackable ticket. Share on WhatsApp to escalate to the responsible government department.</div>
+            <div class="fg"><label class="fl">Mobile (optional)</label><input class="fi" id="rPhone" placeholder="+91 XXXXX XXXXX" maxlength="15" type="tel"/></div>
+            <button class="bts" id="btnSub">🚨 Submit Issue Report →</button>
+            <div style="font-size:10px;color:var(--mt);margin-top:8px;text-align:center;line-height:1.6">Your report creates a trackable public ticket. Share via WhatsApp to escalate to the responsible department.</div>
           </div>
-          <div id="rSuccess" style="display:none"></div>
+          <div id="rSucc" style="display:none"></div>
         </div>
       </div>
       <!-- MY REPORTS -->
-      <div class="tpn" id="panel-myreports">
-        <div id="myPnl"><div id="myReportsList"></div></div>
+      <div class="tpn" id="panel-mine">
+        <div id="myp"><div id="myList"></div></div>
       </div>
       <!-- AI -->
       <div class="tpn" id="panel-ai">
-        <div id="aiPnl">
+        <div id="aip">
           <div class="ae">
             <div style="font-size:34px">📋</div>
-            <div style="font-family:'Baloo 2',cursive;font-size:13px;color:var(--text)">Issue Analyser</div>
-            <div style="font-size:12px;color:#4a6080;line-height:1.6;max-width:240px">Select any issue from Live Feed → click <strong style="color:var(--saffron)">"Analyse Issue →"</strong> to get root cause, responsible authority, and exact steps to take action.</div>
+            <div style="font-family:'Baloo 2',cursive;font-size:13px;color:var(--tx)">Issue Analyser</div>
+            <div style="font-size:12px;color:var(--mt);line-height:1.6;max-width:240px">Pick any issue from Live Feed → click <strong style="color:var(--saf)">"Analyse Issue →"</strong> for root cause, responsible authority & action steps.</div>
           </div>
         </div>
       </div>
@@ -265,88 +272,67 @@ function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').
 
 var ALL_STATES=['Andaman & Nicobar','Andhra Pradesh','Arunachal Pradesh','Assam','Bihar','Chandigarh','Chhattisgarh','Dadra & Nagar Haveli','Delhi','Goa','Gujarat','Haryana','Himachal Pradesh','Jammu & Kashmir','Jharkhand','Karnataka','Kerala','Ladakh','Lakshadweep','Madhya Pradesh','Maharashtra','Manipur','Meghalaya','Mizoram','Nagaland','Odisha','Puducherry','Punjab','Rajasthan','Sikkim','Tamil Nadu','Telangana','Tripura','Uttar Pradesh','Uttarakhand','West Bengal'];
 
-var STATES={
-  'Uttar Pradesh':{issues:18430,roads:5898,water:3870,power:3317,health:2580,corrupt:2765,trend:'+4.2%'},
-  'Maharashtra':{issues:14560,roads:4659,water:3058,power:2621,health:2038,corrupt:2184,trend:'+2.1%'},
-  'West Bengal':{issues:11230,roads:3594,water:2358,power:2021,health:1572,corrupt:1685,trend:'+6.8%'},
-  'Bihar':{issues:9870,roads:3158,water:2073,power:1777,health:1382,corrupt:1480,trend:'+5.1%'},
-  'Madhya Pradesh':{issues:8900,roads:2848,water:1869,power:1602,health:1246,corrupt:1335,trend:'+1.9%'},
-  'Delhi':{issues:8920,roads:2854,water:1873,power:1606,health:1249,corrupt:1338,trend:'+8.3%'},
-  'Tamil Nadu':{issues:8450,roads:2704,water:1775,power:1521,health:1183,corrupt:1267,trend:'-0.8%'},
-  'Karnataka':{issues:7890,roads:2525,water:1657,power:1420,health:1105,corrupt:1183,trend:'+2.7%'},
-  'Rajasthan':{issues:7230,roads:2314,water:1518,power:1301,health:1012,corrupt:1085,trend:'+3.4%'},
-  'Gujarat':{issues:6780,roads:2170,water:1424,power:1220,health:949,corrupt:1017,trend:'+1.2%'},
-  'Andhra Pradesh':{issues:6230,roads:1994,water:1308,power:1121,health:872,corrupt:935,trend:'+2.2%'},
-  'Telangana':{issues:5890,roads:1885,water:1237,power:1060,health:825,corrupt:883,trend:'+3.1%'},
-  'Odisha':{issues:5670,roads:1814,water:1191,power:1021,health:794,corrupt:850,trend:'+1.7%'},
-  'Jharkhand':{issues:4560,roads:1459,water:958,power:821,health:638,corrupt:684,trend:'+2.8%'},
-  'Chhattisgarh':{issues:4320,roads:1382,water:907,power:778,health:605,corrupt:648,trend:'+2.3%'},
-  'Kerala':{issues:4320,roads:1382,water:907,power:778,health:605,corrupt:648,trend:'-1.2%'},
-  'Assam':{issues:3450,roads:1104,water:725,power:621,health:483,corrupt:517,trend:'+4.4%'},
-  'Haryana':{issues:3450,roads:1104,water:725,power:621,health:483,corrupt:517,trend:'+0.9%'},
-  'Punjab':{issues:2340,roads:749,water:491,power:421,health:328,corrupt:351,trend:'+1.5%'},
-  'Uttarakhand':{issues:1120,roads:358,water:235,power:202,health:157,corrupt:168,trend:'+1.1%'},
-  'Himachal Pradesh':{issues:890,roads:285,water:187,power:160,health:125,corrupt:133,trend:'+0.4%'},
-  'Jammu & Kashmir':{issues:1240,roads:397,water:260,power:223,health:174,corrupt:186,trend:'+0.5%'},
-  'Ladakh':{issues:210,roads:67,water:44,power:38,health:29,corrupt:32,trend:'+0.2%'},
-  'Goa':{issues:430,roads:138,water:90,power:77,health:60,corrupt:65,trend:'+1.0%'},
-  'Manipur':{issues:620,roads:198,water:130,power:112,health:87,corrupt:93,trend:'+3.2%'},
-  'Meghalaya':{issues:540,roads:173,water:113,power:97,health:76,corrupt:81,trend:'+2.1%'},
-  'Tripura':{issues:480,roads:154,water:101,power:86,health:67,corrupt:72,trend:'+1.8%'},
-  'Nagaland':{issues:310,roads:99,water:65,power:56,health:43,corrupt:47,trend:'+1.2%'},
-  'Mizoram':{issues:280,roads:90,water:59,power:50,health:39,corrupt:42,trend:'+0.9%'},
-  'Arunachal Pradesh':{issues:390,roads:125,water:82,power:70,health:55,corrupt:58,trend:'+1.5%'},
-  'Sikkim':{issues:120,roads:38,water:25,power:22,health:17,corrupt:18,trend:'+0.3%'},
-  'Puducherry':{issues:310,roads:99,water:65,power:56,health:43,corrupt:47,trend:'+1.4%'},
-  'Chandigarh':{issues:280,roads:90,water:59,power:50,health:39,corrupt:42,trend:'+1.1%'},
-  'Andaman & Nicobar':{issues:160,roads:51,water:34,power:29,health:22,corrupt:24,trend:'+0.7%'},
-  'Lakshadweep':{issues:45,roads:14,water:9,power:8,health:6,corrupt:8,trend:'+0.1%'},
-  'Dadra & Nagar Haveli':{issues:90,roads:29,water:19,power:16,health:13,corrupt:13,trend:'+0.5%'}
+// State centroids for map markers
+var SC={
+  'Uttar Pradesh':{lt:27.57,lg:80.09},'Maharashtra':{lt:19.75,lg:75.71},'Delhi':{lt:28.61,lg:77.20},
+  'Karnataka':{lt:15.31,lg:75.71},'Tamil Nadu':{lt:11.12,lg:78.65},'West Bengal':{lt:22.98,lg:87.85},
+  'Bihar':{lt:25.09,lg:85.31},'Rajasthan':{lt:27.02,lg:74.21},'Gujarat':{lt:22.25,lg:71.19},
+  'Madhya Pradesh':{lt:22.97,lg:78.65},'Telangana':{lt:18.11,lg:79.01},'Andhra Pradesh':{lt:15.91,lg:79.74},
+  'Kerala':{lt:10.85,lg:76.27},'Odisha':{lt:20.95,lg:85.09},'Jharkhand':{lt:23.61,lg:85.27},
+  'Punjab':{lt:31.14,lg:75.34},'Haryana':{lt:29.05,lg:76.08},'Assam':{lt:26.20,lg:92.93},
+  'Uttarakhand':{lt:30.06,lg:79.01},'Himachal Pradesh':{lt:31.10,lg:77.17},
+  'Jammu & Kashmir':{lt:33.77,lg:76.57},'Chhattisgarh':{lt:21.27,lg:81.86},
+  'Goa':{lt:15.29,lg:74.12},'Tripura':{lt:23.94,lg:91.98},'Manipur':{lt:24.66,lg:93.90},
+  'Meghalaya':{lt:25.46,lg:91.36},'Nagaland':{lt:26.15,lg:94.56},'Mizoram':{lt:23.16,lg:92.93},
+  'Arunachal Pradesh':{lt:28.21,lg:94.72},'Sikkim':{lt:27.53,lg:88.51},'Ladakh':{lt:34.22,lg:77.56},
+  'Puducherry':{lt:11.94,lg:79.80},'Chandigarh':{lt:30.73,lg:76.77},
+  'Andaman & Nicobar':{lt:11.74,lg:92.65},'Lakshadweep':{lt:10.56,lg:72.64},
+  'Dadra & Nagar Haveli':{lt:20.18,lg:73.01}
 };
 
-// CIVIC-ONLY RSS FEEDS — no finance, no sports
+// ── FEEDS: Google News RSS (targeted civic queries) + Reddit + Govt ──
+// Google News RSS: always returns results, real-time, no API key needed
 var FEEDS=[
-  {name:'PIB India',      url:'https://pib.gov.in/RssMain.aspx?ModId=6&Lang=1&Regid=3'},
-  {name:'The Hindu',      url:'https://www.thehindu.com/news/national/feeder/default.rss'},
-  {name:'Indian Express', url:'https://indianexpress.com/section/india/feed/'},
-  {name:'NDTV India',     url:'https://feeds.feedburner.com/NDTV-LatestNews'},
-  {name:'Hindustan Times',url:'https://www.hindustantimes.com/feeds/rss/india-news/rssfeed.xml'},
-  {name:'The Wire',       url:'https://thewire.in/feed'},
-  {name:'The Print',      url:'https://theprint.in/feed/'},
-  {name:'Scroll India',   url:'https://scroll.in/feed'},
-  {name:'NHAI',           url:'https://nhai.gov.in/rss.xml'},
-  {name:'MoHFW',          url:'https://mohfw.gov.in/rss.xml'},
-  {name:'Jal Shakti',     url:'https://jalshakti-dowr.gov.in/rss.xml'},
+  {name:'GNews: Roads & Infra',    url:'https://news.google.com/rss/search?q=india+road+pothole+bridge+infrastructure+nhai&hl=en-IN&gl=IN&ceid=IN:en'},
+  {name:'GNews: Water & Sanitation',url:'https://news.google.com/rss/search?q=india+water+supply+sewage+contamination+jal&hl=en-IN&gl=IN&ceid=IN:en'},
+  {name:'GNews: Power & Electricity',url:'https://news.google.com/rss/search?q=india+power+cut+electricity+outage+transformer&hl=en-IN&gl=IN&ceid=IN:en'},
+  {name:'GNews: Health & Hospitals', url:'https://news.google.com/rss/search?q=india+hospital+public+health+doctor+shortage&hl=en-IN&gl=IN&ceid=IN:en'},
+  {name:'GNews: Corruption',         url:'https://news.google.com/rss/search?q=india+corruption+bribe+government+officer+arrested&hl=en-IN&gl=IN&ceid=IN:en'},
+  {name:'GNews: Education',          url:'https://news.google.com/rss/search?q=india+school+college+education+student+government&hl=en-IN&gl=IN&ceid=IN:en'},
+  {name:'GNews: Transport',          url:'https://news.google.com/rss/search?q=india+bus+train+railway+traffic+accident&hl=en-IN&gl=IN&ceid=IN:en'},
+  {name:'GNews: Safety & Crime',     url:'https://news.google.com/rss/search?q=india+crime+police+arrest+safety+public&hl=en-IN&gl=IN&ceid=IN:en'},
+  {name:'GNews: Environment',        url:'https://news.google.com/rss/search?q=india+pollution+waste+environment+garbage+aqi&hl=en-IN&gl=IN&ceid=IN:en'},
+  {name:'PIB India',                 url:'https://pib.gov.in/RssMain.aspx?ModId=6&Lang=1&Regid=3'},
+  {name:'Reddit r/india',            url:'https://www.reddit.com/r/india/search.rss?q=government+civic+infrastructure+corruption&sort=new&restrict_sr=1'},
+  {name:'Reddit r/IndiaSpeaks',      url:'https://www.reddit.com/r/IndiaSpeaks/.rss?limit=15'},
 ];
 
-// STRICT CIVIC FILTER — no sports/finance/entertainment
-var NON_CIVIC=['ipl','cricket','match','score','wicket','batting','bowler','odi','t20','bollywood','film','movie','actor','celebrity','award','sensex','nifty','stock market','share price','mutual fund','ipo','fashion','beauty','recipe','restaurant','bitcoin','crypto','forex','horoscope','astrology','zodiac'];
-var CIVIC_KW=['road','pothole','bridge','highway','water','sewage','drain','electricity','power cut','outage','hospital','doctor','health','bribe','corruption','school','college','student','bus','train','traffic','toll','crime','pollution','waste','garbage','government','minister','collector','police','scheme','panchayat','village','citizen','public','municipal','flood','cyclone','earthquake','disaster','ration','pension','subsidy','complaint'];
-
+// ── CIVIC FILTER: relaxed — only block pure entertainment/finance ──
+// Google News results are already civic-targeted by search query
+var NON_CIVIC_ONLY=['ipl score','cricket score','match scorecard','box office collection','sensex level','nifty level','stock market gain','ipo allotment','recipe tips','beauty tips','makeup tutorial','horoscope today','zodiac sign','film review','movie review','celebrity wedding'];
 function isCivic(title,desc){
   var t=(title+' '+(desc||'')).toLowerCase();
-  for(var i=0;i<NON_CIVIC.length;i++){if(t.includes(NON_CIVIC[i]))return false;}
-  for(var j=0;j<CIVIC_KW.length;j++){if(t.includes(CIVIC_KW[j]))return true;}
-  return false;
+  return !NON_CIVIC_ONLY.some(function(w){return t.includes(w);});
 }
 
+// ── CLASSIFIER ──
 var CAT_KW={
-  roads:['road','pothole','highway','bridge','flyover','nhai','pwd','pavement','street light','construction','overpass','footpath','culvert'],
-  water:['water','sewage','drain','pipeline','contaminated','jal','flood','drinking water','borewell','sanitation','toilet','swachh'],
-  power:['electricity','power cut','outage','transformer','discom','blackout','load shedding','voltage','generator','coal','grid'],
+  roads:['road','pothole','highway','bridge','flyover','nhai','pwd','pavement','street light','construction','nh-','overpass','footpath','culvert'],
+  water:['water','sewage','drain','pipeline','contaminated','jal','flood','drinking water','borewell','sanitation','toilet'],
+  power:['electricity','power cut','outage','transformer','discom','blackout','load shedding','voltage','coal','grid'],
   health:['hospital','doctor','health','medicine','icu','ambulance','clinic','aiims','patient','oxygen','vaccine','disease','dengue','malaria'],
-  corrupt:['bribe','corruption','scam','fraud','illegal','ration','cpgrams','government officer','acb','cbi','lokayukta','embezzle','tender','fake toll','hawala'],
+  corrupt:['bribe','corruption','scam','fraud','illegal','ration','cpgrams','officer','acb','cbi','lokayukta','embezzle','tender','fake toll','hawala'],
   education:['school','college','university','student','teacher','education','exam','syllabus','midday meal','scholarship','dropout','anganwadi','fee'],
-  transport:['bus','train','railway','metro','auto','taxi','traffic','toll','accident','signal','parking','irctc','roadway','drunk driving'],
-  safety:['crime','murder','rape','assault','theft','robbery','kidnap','fire','disaster','riot','mob','lynching','atrocity','illegal'],
-  environment:['pollution','waste','garbage','dump','smoke','air quality','aqi','river','deforestation','mining','plastic','smog','chemical','sewage dump'],
+  transport:['bus','train','railway','metro','auto','taxi','traffic','toll','accident','signal','parking','irctc','drunk driving'],
+  safety:['crime','murder','rape','assault','theft','robbery','kidnap','fire','disaster','riot','mob','lynching','atrocity'],
+  environment:['pollution','waste','garbage','dump','smoke','air quality','aqi','river','deforestation','mining','plastic','smog','chemical'],
   other:['municipal','panchayat','ward','councillor','scheme','portal','certificate','ration card','pension','subsidy'],
 };
 var SEV_KW={
-  emergency:['death','died','killed','fatal','collapse','blast','cyclone','earthquake','oxygen shortage','cholera','epidemic','fire','riot','terror','murder','rape'],
+  emergency:['death','died','killed','fatal','collapse','blast','cyclone','earthquake','cholera','epidemic','fire','riot','terror','murder','rape'],
   critical:['contaminated','outbreak','structural failure','bridge crack','arsenic','no water','blackout','kidnap'],
   high:['pothole','power cut','sewage','bribe','shortage','broken','damaged','overflowing','corruption','accident','crime','pollution'],
-  medium:['complaint','issue','problem','repair','pending','maintenance','delay','protest'],
+  medium:['complaint','issue','problem','repair','pending','maintenance','delay'],
 };
 function classify(text){
   var lower=(text||'').toLowerCase(),cat='other',best=0;
@@ -360,44 +346,39 @@ var CC={roads:'#FF6B00',water:'#00b8e6',power:'#ffd700',health:'#ff2244',corrupt
 var CI={roads:'🛣️',water:'💧',power:'⚡',health:'🏥',corrupt:'🔍',education:'📚',transport:'🚌',safety:'🛡️',environment:'🌿',other:'📋'};
 var CL={roads:'Roads',water:'Water',power:'Power',health:'Health',corrupt:'Corruption',education:'Education',transport:'Transport',safety:'Safety',environment:'Environment',other:'Other'};
 var DEPT={roads:'PWD / NHAI',water:'Jal Board / Municipal Corporation',power:'State DISCOM',health:'State Health Department',corrupt:'Lokayukta / Anti-Corruption Bureau',education:'State Education Department',transport:'State RTO / Railway Ministry',safety:'State Police / District SP',environment:'State Pollution Control Board',other:'Municipal Corporation'};
+var HELPLINES={roads:'NHAI: 1033 | cpgrams.gov.in',water:'Jal Shakti: 1800-180-1551',power:'DISCOM (on bill) | vidyutsaathi.gov.in',health:'National Health: 104',corrupt:'CVC: cvc.gov.in | ACB',education:'EdHelp: 1800-180-1551',transport:'Railway: 139 | IRCTC',safety:'Police: 100 | Women: 1091',environment:'CPCB: 011-43102030',other:'CPGRAMS: cpgrams.gov.in'};
 
 var STATE_KW={
-  'Uttar Pradesh':['uttar pradesh','lucknow','kanpur','agra','varanasi','prayagraj','noida','ghaziabad','meerut','aligarh','mathura','bareilly','gorakhpur'],
-  'Maharashtra':['maharashtra','mumbai','pune','nagpur','nashik','aurangabad','thane','amravati','kolhapur'],
-  'Delhi':['delhi','new delhi','ndmc','rohini','dwarka','karol bagh','connaught'],
-  'Karnataka':['karnataka','bengaluru','bangalore','mysuru','hubli','mangalore','belgaum'],
-  'Tamil Nadu':['tamil nadu','chennai','coimbatore','madurai','trichy','salem','vellore'],
-  'West Bengal':['west bengal','kolkata','howrah','durgapur','asansol','siliguri','malda'],
+  'Uttar Pradesh':['uttar pradesh','lucknow','kanpur','agra','varanasi','prayagraj','noida','ghaziabad','meerut','aligarh','gorakhpur'],
+  'Maharashtra':['maharashtra','mumbai','pune','nagpur','nashik','thane','amravati','kolhapur'],
+  'Delhi':['delhi','new delhi','ndmc','rohini','dwarka','karol bagh'],
+  'Karnataka':['karnataka','bengaluru','bangalore','mysuru','hubli','mangalore'],
+  'Tamil Nadu':['tamil nadu','chennai','coimbatore','madurai','trichy','salem'],
+  'West Bengal':['west bengal','kolkata','howrah','durgapur','asansol','siliguri'],
   'Bihar':['bihar','patna','gaya','muzaffarpur','bhagalpur','sitamarhi','darbhanga'],
-  'Rajasthan':['rajasthan','jaipur','jodhpur','kota','ajmer','bikaner','udaipur','alwar'],
-  'Gujarat':['gujarat','ahmedabad','surat','vadodara','rajkot','gandhinagar','jamnagar'],
+  'Rajasthan':['rajasthan','jaipur','jodhpur','kota','ajmer','bikaner','udaipur'],
+  'Gujarat':['gujarat','ahmedabad','surat','vadodara','rajkot','gandhinagar'],
   'Madhya Pradesh':['madhya pradesh','bhopal','indore','jabalpur','gwalior','ujjain'],
   'Telangana':['telangana','hyderabad','warangal','nizamabad','karimnagar'],
   'Andhra Pradesh':['andhra pradesh','visakhapatnam','vijayawada','guntur','tirupati'],
-  'Kerala':['kerala','thiruvananthapuram','kochi','kozhikode','thrissur','kollam'],
+  'Kerala':['kerala','thiruvananthapuram','kochi','kozhikode','thrissur'],
   'Odisha':['odisha','bhubaneswar','cuttack','rourkela','puri'],
   'Jharkhand':['jharkhand','ranchi','jamshedpur','dhanbad','bokaro'],
   'Punjab':['punjab','ludhiana','amritsar','jalandhar','patiala'],
   'Haryana':['haryana','gurugram','gurgaon','faridabad','panipat','rohtak'],
   'Assam':['assam','guwahati','dibrugarh','silchar','jorhat'],
   'Uttarakhand':['uttarakhand','dehradun','haridwar','roorkee','nainital'],
-  'Himachal Pradesh':['himachal','shimla','dharamsala','mandi','kullu'],
-  'Jammu & Kashmir':['jammu','kashmir','srinagar','udhampur','baramulla'],
+  'Himachal Pradesh':['himachal','shimla','dharamsala','mandi'],
+  'Jammu & Kashmir':['jammu','kashmir','srinagar','baramulla'],
   'Chhattisgarh':['chhattisgarh','raipur','bilaspur','durg','bhilai'],
   'Goa':['goa','panaji','margao','vasco'],
-  'Tripura':['tripura','agartala'],
-  'Manipur':['manipur','imphal'],
-  'Meghalaya':['meghalaya','shillong','tura'],
-  'Nagaland':['nagaland','kohima','dimapur'],
-  'Mizoram':['mizoram','aizawl'],
-  'Arunachal Pradesh':['arunachal','itanagar'],
-  'Sikkim':['sikkim','gangtok'],
-  'Ladakh':['ladakh','leh','kargil'],
-  'Puducherry':['puducherry','pondicherry'],
-  'Chandigarh':['chandigarh'],
-  'Andaman & Nicobar':['andaman','nicobar','port blair'],
-  'Lakshadweep':['lakshadweep','kavaratti'],
-  'Dadra & Nagar Haveli':['dadra','nagar haveli','silvassa'],
+  'Tripura':['tripura','agartala'],'Manipur':['manipur','imphal'],
+  'Meghalaya':['meghalaya','shillong','tura'],'Nagaland':['nagaland','kohima','dimapur'],
+  'Mizoram':['mizoram','aizawl'],'Arunachal Pradesh':['arunachal','itanagar'],
+  'Sikkim':['sikkim','gangtok'],'Ladakh':['ladakh','leh','kargil'],
+  'Puducherry':['puducherry','pondicherry'],'Chandigarh':['chandigarh'],
+  'Andaman & Nicobar':['andaman','port blair'],'Lakshadweep':['lakshadweep'],
+  'Dadra & Nagar Haveli':['dadra','silvassa'],
 };
 function inferState(text){
   var lower=text.toLowerCase();
@@ -405,48 +386,84 @@ function inferState(text){
   return 'India';
 }
 
-var DEMO_ISSUES=[
-  {id:'d01',title:'NH-48 pothole cluster near Gurugram toll — 2,847 vehicles damaged this month',state:'Haryana',district:'Gurugram',cat:'roads',sev:'critical',dept:'NHAI',ts:Date.now()-120000,lat:28.459,lng:77.026,src:'demo'},
-  {id:'d02',title:'Contaminated water supply Dharavi Ward 7 — cholera suspected in 12 families',state:'Maharashtra',district:'Mumbai',cat:'water',sev:'emergency',dept:'BMC Water',ts:Date.now()-300000,lat:19.041,lng:72.855,src:'demo'},
-  {id:'d03',title:'AIIMS Patna — oxygen shortage in ICU, 34 patients at risk',state:'Bihar',district:'Patna',cat:'health',sev:'emergency',dept:'Health Ministry',ts:Date.now()-540000,lat:25.604,lng:85.137,src:'demo'},
-  {id:'d04',title:'25-hour power cuts in Indore industrial zone — businesses losing crores daily',state:'Madhya Pradesh',district:'Indore',cat:'power',sev:'high',dept:'MPEB',ts:Date.now()-840000,lat:22.719,lng:75.857,src:'demo'},
-  {id:'d05',title:'Ration card portal offline 14 days — 8,934 BPL families cannot access food',state:'Uttar Pradesh',district:'Lucknow',cat:'corrupt',sev:'high',dept:'Food & Civil Supplies',ts:Date.now()-1380000,lat:26.846,lng:80.946,src:'demo'},
-  {id:'d06',title:'Fake toll booth operating on NH-44 — collecting money without receipts',state:'Haryana',district:'Sonipat',cat:'corrupt',sev:'critical',dept:'NHAI / Police',ts:Date.now()-2100000,lat:28.99,lng:77.01,src:'demo'},
-  {id:'d07',title:'Government school building crumbling — 240 students studying in open',state:'Rajasthan',district:'Barmer',cat:'education',sev:'critical',dept:'State Education Dept',ts:Date.now()-2700000,lat:25.75,lng:71.39,src:'demo'},
-  {id:'d08',title:'Land registry officer demanding ₹15,000 bribe — Bengaluru North',state:'Karnataka',district:'Bengaluru',cat:'corrupt',sev:'high',dept:'ACB Revenue',ts:Date.now()-3600000,lat:13.079,lng:77.590,src:'demo'},
-  {id:'d09',title:'Sewage overflow flooding heritage lanes — Jaipur Pink City 3rd consecutive day',state:'Rajasthan',district:'Jaipur',cat:'water',sev:'medium',dept:'JDA',ts:Date.now()-4200000,lat:26.924,lng:75.824,src:'demo'},
-  {id:'d10',title:'DTC bus route 423 discontinued without notice — 6,000 commuters stranded',state:'Delhi',district:'West Delhi',cat:'transport',sev:'high',dept:'DTC / Delhi Govt',ts:Date.now()-5400000,lat:28.651,lng:77.190,src:'demo'},
-  {id:'d11',title:'Arsenic 3x safe limit in drinking water — 4 villages North Bihar',state:'Bihar',district:'Sitamarhi',cat:'water',sev:'critical',dept:'PHED Bihar',ts:Date.now()-7200000,lat:26.593,lng:85.490,src:'demo'},
-  {id:'d12',title:'Garbage dump on residential street stinking 3 weeks — no collection',state:'Telangana',district:'Hyderabad',cat:'environment',sev:'medium',dept:'GHMC Sanitation',ts:Date.now()-9000000,lat:17.385,lng:78.486,src:'demo'},
-  {id:'d13',title:'Police demanding ₹500 to register FIR — Kanpur district',state:'Uttar Pradesh',district:'Kanpur',cat:'safety',sev:'high',dept:'UP Police / SP Office',ts:Date.now()-11000000,lat:26.449,lng:80.331,src:'demo'},
-  {id:'d14',title:'Coal shortage Telangana power plant — 40% capacity, rolling cuts expected',state:'Telangana',district:'Nalgonda',cat:'power',sev:'critical',dept:'TSGENCO',ts:Date.now()-14000000,lat:17.050,lng:79.266,src:'demo'},
-  {id:'d15',title:'Bridge crack on SH-12 Howrah — structural assessment pending 2 months',state:'West Bengal',district:'Howrah',cat:'roads',sev:'emergency',dept:'PWD West Bengal',ts:Date.now()-18000000,lat:22.595,lng:88.263,src:'demo'},
-];
+// Coords for map: state centroid + small random offset
+function issueCoords(iss){
+  if(iss.lat&&iss.lng)return{lat:iss.lat,lng:iss.lng};
+  var c=SC[iss.state];if(!c)return null;
+  return{lat:c.lt+(Math.random()-.5)*2.5,lng:c.lg+(Math.random()-.5)*3};
+}
 
-var issues=[],activeFilter='all',activeStateFilter='all',selectedId=null,liveCount=124832,tickerIdx=0,lastFetchTime=null,feedsLoaded=0,seenKeys=new Set(),feedCircuit={};
+// ── APP STATE ──
+var issues=[],activeFilter='all',activeSF='all',selId=null,liveCount=0,tickIdx=0,lastFetch=null,feedsLoaded=0,seenKeys,mapMarkers=[],mapLoaded=false;
 
-var STORE_KEY='bm_reports_v3';
-function loadReports(){try{var d=JSON.parse(localStorage.getItem(STORE_KEY)||'[]');return Array.isArray(d)?d:[];}catch(e){return[];}}
-function saveReports(r){try{localStorage.setItem(STORE_KEY,JSON.stringify(r.filter(function(x){return x.src==='citizen';}).slice(0,100)));}catch(e){}}
+// ── STORAGE ──
+var STORE='bm_v4',SEEN_ST='bm_seen_v2';
+function loadRep(){try{return JSON.parse(localStorage.getItem(STORE)||'[]');}catch(e){return[];}}
+function saveRep(r){try{localStorage.setItem(STORE,JSON.stringify(r.filter(function(x){return x.src==='citizen';}).slice(0,100)));}catch(e){}}
+function loadSeen(){try{return new Set(JSON.parse(localStorage.getItem(SEEN_ST)||'[]'));}catch(e){return new Set();}}
+function saveSeen(s){try{localStorage.setItem(SEEN_ST,JSON.stringify([...s].slice(-1000)));}catch(e){}}
 
-function timeAgo(ts){var s=(Date.now()-ts)/1000;if(s<60)return Math.floor(s)+'s ago';if(s<3600)return Math.floor(s/60)+'m ago';if(s<86400)return Math.floor(s/3600)+'h ago';return Math.floor(s/86400)+'d ago';}
-function iColor(n){return n>12000?'#7a1520':n>8000?'#a33020':n>5000?'#8a5010':n>2000?'#2a6040':n>500?'#1a4060':'#0f2035';}
-function switchTab(t){document.querySelectorAll('.tbn').forEach(function(b){b.classList.toggle('active',b.getAttribute('data-tab')===t);});document.querySelectorAll('.tpn').forEach(function(p){p.classList.toggle('active',p.id==='panel-'+t);});if(t==='myreports')renderMyReports();}
-function srcBadge(s){if(s==='rss')return '<span class="src-badge src-rss">RSS</span>';if(s==='citizen')return '<span class="src-badge src-citizen">CITIZEN</span>';return '<span class="src-badge src-demo">DEMO</span>';}
-function updateCounters(){var c=issues.filter(function(i){return i.src==='citizen';}).length,r=issues.filter(function(i){return i.src==='rss';}).length;document.getElementById('citizenCount').textContent=c;document.getElementById('rssCount').textContent=r;document.getElementById('liveCount').textContent=(liveCount+c).toLocaleString('en-IN');}
+// ── HELPERS ──
+function ago(ts){var s=(Date.now()-ts)/1000;if(s<60)return Math.floor(s)+'s ago';if(s<3600)return Math.floor(s/60)+'m ago';if(s<86400)return Math.floor(s/3600)+'h ago';return Math.floor(s/86400)+'d ago';}
+function iColor(n){return n>500?'#7a1520':n>200?'#a33020':n>100?'#8a5010':n>50?'#2a6040':'#1a4060';}
+function switchTab(t){document.querySelectorAll('.tbn').forEach(function(b){b.classList.toggle('active',b.getAttribute('data-tab')===t);});document.querySelectorAll('.tpn').forEach(function(p){p.classList.toggle('active',p.id==='panel-'+t);});if(t==='mine')renderMine();}
 
+// ── MEDIA RENDERING ──
+function renderMedia(url){
+  if(!url||url.length<8)return'';
+  // YouTube embed
+  var yt=url.match(/(?:youtu\.be\/|youtube\.com\/(?:watch\?v=|embed\/))([a-zA-Z0-9_-]{11})/);
+  if(yt)return'<div class="vwrap"><iframe src="https://www.youtube.com/embed/'+yt[1]+'?rel=0" allowfullscreen loading="lazy"></iframe></div>';
+  // Twitter/X link (can't embed easily without auth, just show link)
+  if(url.includes('twitter.com/')||url.includes('x.com/'))return'<a href="'+esc(url)+'" target="_blank" rel="noopener" style="color:var(--sky);font-size:11px;display:block;margin-top:5px">🐦 View on Twitter/X ↗</a>';
+  // Instagram link
+  if(url.includes('instagram.com/'))return'<a href="'+esc(url)+'" target="_blank" rel="noopener" style="color:#e1306c;font-size:11px;display:block;margin-top:5px">📸 View on Instagram ↗</a>';
+  // Image
+  if(/\.(jpg|jpeg|png|gif|webp)(\?|$)/i.test(url)||url.includes('imgur.com')||url.includes('ibb.co'))
+    return'<img src="'+esc(url)+'" class="imth" alt="Evidence" loading="lazy" onerror="this.style.display=\'none\'"/>';
+  // Generic link
+  return'<a href="'+esc(url)+'" target="_blank" rel="noopener" style="color:var(--sky);font-size:11px;display:block;margin-top:5px">🔗 View Evidence ↗</a>';
+}
+
+// ── COUNTERS ──
+function updateCounters(){
+  var cit=issues.filter(function(i){return i.src==='citizen';}).length;
+  var rss=issues.filter(function(i){return i.src==='rss';}).length;
+  document.getElementById('cc').textContent=cit;
+  document.getElementById('rc').textContent=rss;
+  liveCount=issues.length;
+  document.getElementById('lc').textContent=liveCount.toLocaleString('en-IN');
+}
+
+// ── COMPUTE STATE COUNTS from real issues ──
+function computeStateCounts(){
+  var counts={};
+  issues.forEach(function(iss){
+    if(!iss.state||iss.state==='India')return;
+    if(!counts[iss.state])counts[iss.state]={total:0,roads:0,water:0,power:0,health:0,corrupt:0};
+    counts[iss.state].total++;
+    var c=counts[iss.state];
+    if(c[iss.cat]!==undefined)c[iss.cat]++;
+  });
+  return counts;
+}
+
+// ── RENDER ISSUE LIST ──
 function renderIssues(){
-  var f=issues.filter(function(i){return(activeFilter==='all'||i.cat===activeFilter)&&(activeStateFilter==='all'||i.state===activeStateFilter);});
-  var el=document.getElementById('iList');
-  if(!f.length){el.innerHTML='<div style="padding:30px;text-align:center;color:#4a6080;font-size:13px;line-height:2">No issues found.<br><span style="font-size:11px">Try "All" or a different state.</span></div>';return;}
+  var f=issues.filter(function(i){return(activeFilter==='all'||i.cat===activeFilter)&&(activeSF==='all'||i.state===activeSF);});
+  var el=document.getElementById('il');
+  if(!f.length){el.innerHTML='<div style="padding:30px;text-align:center;color:var(--mt);font-size:13px;line-height:2">No issues found.<br><span style="font-size:11px">Try "All" or refresh.</span></div>';return;}
   var frag=document.createDocumentFragment();
-  f.forEach(function(iss){
-    var sel=iss.id===selectedId,card=document.createElement('div');
+  f.slice(0,100).forEach(function(iss){
+    var sel=iss.id===selId,card=document.createElement('div');
     card.className='ic'+(sel?' sel':'');card.setAttribute('data-id',iss.id);
+    var col=CC[iss.cat]||'#aaa';
     var h='<div class="ir"><div class="it">'+esc(CI[iss.cat]||'📋')+' '+esc(iss.title)+'</div><span class="sv2 s-'+esc(iss.sev)+'">'+esc(iss.sev)+'</span></div>';
-    h+='<div class="im"><span>📍 '+esc(iss.state+(iss.district?', '+iss.district:''))+'</span><span>🏛️ '+esc(iss.dept)+'</span><span>'+esc(timeAgo(iss.ts))+'</span>'+srcBadge(iss.src);
+    h+='<div class="im"><span>📍 '+esc(iss.state+(iss.district?', '+iss.district:''))+'</span><span>🏛️ '+esc(iss.dept)+'</span><span>'+esc(ago(iss.ts))+'</span>';
+    h+='<span class="sb2 '+(iss.src==='citizen'?'sb-cit':'sb-rss')+'">'+(iss.src==='citizen'?'CITIZEN':'NEWS')+'</span>';
     if(iss.link)h+='<a href="'+esc(iss.link)+'" target="_blank" rel="noopener noreferrer" style="color:var(--sky);font-size:10px;text-decoration:none" onclick="event.stopPropagation()">↗</a>';
     h+='</div>';
+    if(iss.imageUrl)h+=renderMedia(iss.imageUrl);
     if(sel)h+='<button class="iab" data-id="'+esc(iss.id)+'">📋 Analyse Issue →</button>';
     card.innerHTML=h;frag.appendChild(card);
   });
@@ -454,174 +471,241 @@ function renderIssues(){
   el.onclick=function(e){
     var btn=e.target.closest('.iab');
     if(btn){e.stopPropagation();var f2=issues.find(function(x){return x.id===btn.getAttribute('data-id');});if(f2)analyzeIssue(f2);return;}
-    var card=e.target.closest('.ic');if(!card)return;
-    selectedId=(selectedId===card.getAttribute('data-id'))?null:card.getAttribute('data-id');
-    renderIssues();
+    var c2=e.target.closest('.ic');if(!c2)return;
+    selId=(selId===c2.getAttribute('data-id'))?null:c2.getAttribute('data-id');renderIssues();
   };
 }
 
-function renderMyReports(){
-  var all=loadReports(),el=document.getElementById('myReportsList');
-  if(!all.length){el.innerHTML='<div class="no-reports">📭<br><br>No reports yet.<br><span style="font-size:11px">Use <strong style="color:var(--saffron)">Report</strong> tab to raise a civic issue.<br>Your ticket appears here for tracking.</span></div>';return;}
-  var html='<div style="padding:6px 0 4px;font-size:11px;color:var(--muted)">'+all.length+' report'+(all.length>1?'s':'')+' submitted</div>';
+// ── ADD MAP MARKERS for issues ──
+var markerPool=[];
+function addIssueMarkers(issList){
+  if(!mapLoaded)return;
+  // Remove old markers
+  markerPool.forEach(function(m){m.remove();});markerPool=[];
+  issList.slice(0,200).forEach(function(iss){
+    var coords=issueCoords(iss);if(!coords)return;
+    var size=iss.sev==='emergency'?14:iss.sev==='critical'?12:iss.sev==='high'?10:8;
+    var col=CC[iss.cat]||'#aaa';
+    var el=document.createElement('div');
+    el.style.cssText='width:'+size+'px;height:'+size+'px;border-radius:50%;background:'+col+';border:2px solid '+col+'88;box-shadow:0 0 '+size+'px '+col+'55;cursor:pointer;opacity:'+(iss.src==='citizen'?'1':'.7')+';';
+    var popup=new maplibregl.Popup({offset:12,closeButton:false}).setHTML(
+      '<div style="font-size:12px"><div style="color:'+col+';font-size:10px;font-weight:700;text-transform:uppercase;margin-bottom:3px">'+esc(CL[iss.cat])+'</div><div style="line-height:1.4;margin-bottom:3px">'+esc(iss.title.slice(0,80)+(iss.title.length>80?'...':''))+'</div><div style="color:var(--mt);font-size:10px">📍 '+esc(iss.state+(iss.district?', '+iss.district:''))+'</div>'+(iss.src==='citizen'?'<div style="margin-top:4px;font-size:9px;color:var(--tel);font-weight:700">🟢 CITIZEN REPORT</div>':'')+'</div>'
+    );
+    var marker=new maplibregl.Marker({element:el}).setLngLat([coords.lng,coords.lat]).setPopup(popup).addTo(map);
+    markerPool.push(marker);
+  });
+}
+
+// ── CHOROPLETH update with real counts ──
+function updateChoropleth(){
+  if(!mapLoaded||!map.getSource('india'))return;
+  var counts=computeStateCounts();
+  // Re-paint fill colours
+  var cs=[];
+  for(var n in counts)cs.push(n,iColor(counts[n].total));
+  var GEO={'NCT of Delhi':'Delhi','Jammu and Kashmir':'Jammu & Kashmir','Andaman and Nicobar Islands':'Andaman & Nicobar','Pondicherry':'Puducherry','Dadra and Nagar Haveli':'Dadra & Nagar Haveli','Dadra & Nagar Haveli and Daman & Diu':'Dadra & Nagar Haveli'};
+  for(var g in GEO){var mapped=GEO[g];if(counts[mapped])cs.push(g,iColor(counts[mapped].total));}
+  if(cs.length)map.setPaintProperty('sf','fill-color',['match',['get','NAME_1']].concat(cs).concat(['#0f2035']));
+}
+
+// ── MY REPORTS ──
+function renderMine(){
+  var all=loadRep(),el=document.getElementById('myList');
+  if(!all.length){el.innerHTML='<div class="nr">📭<br><br>No reports yet.<br><span style="font-size:11px">Use <strong style="color:var(--saf)">Report</strong> tab to raise a civic issue.</span></div>';return;}
+  var html='<div style="padding:6px 0 4px;font-size:11px;color:var(--mt)">'+all.length+' report'+(all.length>1?'s':'')+' submitted</div>';
   all.slice().reverse().forEach(function(r){
-    var wm=encodeURIComponent('🚨 *CIVIC ISSUE — BharatMonitor*\n\n🎟️ Ticket: *'+r.id+'*\n📋 Category: *'+CL[r.cat]+'*\n📍 Location: *'+r.state+(r.district?', '+r.district:'')+'*\n⚠️ Severity: *'+r.sev.toUpperCase()+'*\n🏛️ Dept: *'+r.dept+'*\n\n📝 Issue: '+r.title+'\n\n📖 Details: '+r.desc+'\n\n⏱️ Reported: '+new Date(r.ts).toLocaleString('en-IN')+'\n🔗 BharatMonitor: https://bharatmonitor.vercel.app\n\n_Forward to responsible dept. Demand action within '+r.sla+'h._');
-    html+='<div class="ticket-card"><div class="ticket-top"><span class="ticket-id">'+esc(r.id)+'</span><span class="ticket-status st-submitted">SUBMITTED</span></div>';
-    html+='<div class="ticket-title">'+esc(CI[r.cat]||'📋')+' '+esc(r.title)+'</div>';
-    html+='<div class="ticket-meta"><span>📍 '+esc(r.state+(r.district?', '+r.district:''))+'</span><span>🏛️ '+esc(r.dept)+'</span><span>'+esc(timeAgo(r.ts))+'</span></div>';
-    html+='<div class="ticket-actions"><button class="btn-wa" onclick="window.open(\'https://wa.me/?text='+wm+'\',\'_blank\')">📲 WhatsApp Escalate</button>';
-    html+='<button class="btn-share" onclick="copyT(\''+esc(r.id)+'\',\''+esc(r.title)+'\',\''+esc(r.state)+'\')">📋 Copy</button></div></div>';
+    var wm=encodeURIComponent('🚨 *CIVIC ISSUE — BharatMonitor*\n\n🎟️ Ticket: *'+r.id+'*\n📋 Category: *'+CL[r.cat]+'*\n📍 Location: *'+r.state+(r.district?', '+r.district:'')+'*\n⚠️ Severity: *'+r.sev.toUpperCase()+'*\n🏛️ Dept: *'+r.dept+'*\n\n📝 Issue: '+r.title+'\n\n📖 Details: '+r.desc+'\n☎️ '+HELPLINES[r.cat]+'\n\n⏱️ '+new Date(r.ts).toLocaleString('en-IN')+'\n🔗 https://bharatmonitor.vercel.app\n\n_Forward to responsible dept. Demand action within '+r.sla+'h._');
+    html+='<div class="tc"><div class="tt2"><span class="tid">'+esc(r.id)+'</span><span class="tst">SUBMITTED</span></div>';
+    html+='<div class="ttl">'+esc(CI[r.cat]||'📋')+' '+esc(r.title)+'</div>';
+    if(r.mediaUrl)html+=renderMedia(r.mediaUrl);
+    html+='<div class="tmt"><span>📍 '+esc(r.state+(r.district?', '+r.district:''))+'</span><span>🏛️ '+esc(r.dept)+'</span><span>'+esc(ago(r.ts))+'</span></div>';
+    html+='<div class="ta">';
+    html+='<button class="bwa" onclick="window.open(\'https://wa.me/?text='+wm+'\',\'_blank\')">📲 WhatsApp</button>';
+    if(r.ghUrl)html+='<button class="bgh" onclick="window.open(\''+esc(r.ghUrl)+'\',\'_blank\')">⚙️ GitHub</button>';
+    html+='<button class="bcpy" onclick="copyT(\''+esc(r.id)+'\',\''+esc(r.title)+'\',\''+esc(r.state)+'\')">📋</button>';
+    html+='</div></div>';
   });
   el.innerHTML=html;
 }
-window.copyT=function(id,title,state){var t='Ticket: '+id+'\n'+title+'\nLocation: '+state+'\nBharatMonitor: https://bharatmonitor.vercel.app';if(navigator.clipboard)navigator.clipboard.writeText(t).then(function(){alert('Copied!');});};
+window.copyT=function(id,title,state){var t='Ticket: '+id+'\n'+title+'\nLocation: '+state+'\nBharatMonitor: https://bharatmonitor.vercel.app';navigator.clipboard&&navigator.clipboard.writeText(t).then(function(){alert('Copied!');});};
 
+// ── RSS FETCH (dedup via localStorage) ──
+var fcircuit={};
 function fetchFeed(feed){
-  var d=feed.url.replace(/https?:\/\//,'').split('/')[0];
-  if((feedCircuit[d]||0)>=3)return Promise.resolve(null);
+  var dom=feed.url.replace(/https?:\/\//,'').split('/')[0].replace(/^www\./,'');
+  if((fcircuit[dom]||0)>=3)return Promise.resolve([]);
   return fetch('/api/rss?url='+encodeURIComponent(feed.url))
     .then(function(r){return r.json();})
-    .then(function(data){
-      if(!data.ok||!Array.isArray(data.items)){feedCircuit[d]=(feedCircuit[d]||0)+1;return null;}
-      feedCircuit[d]=0;feedsLoaded++;
-      var ni=[];
-      data.items.forEach(function(item,i){
-        if(!item.title||item.title.length<15)return;
-        if(!isCivic(item.title,item.description||''))return;
-        var key=item.title.slice(0,60).toLowerCase().replace(/\s+/g,' ');
-        if(seenKeys.has(key))return;seenKeys.add(key);
-        var cls=classify(item.title+' '+(item.description||''));
+    .then(function(d){
+      if(!d.ok||!Array.isArray(d.items)){fcircuit[dom]=(fcircuit[dom]||0)+1;return[];}
+      fcircuit[dom]=0;feedsLoaded++;
+      return d.items.map(function(item,i){
+        if(!item.title||item.title.length<10)return null;
+        if(!isCivic(item.title,item.description||''))return null;
+        // Strip "- Source Name" from Google News titles
+        var title=item.title.replace(/\s-\s[^-]+$/,'').trim();
+        if(!title||title.length<10)return null;
+        var key=title.slice(0,60).toLowerCase().replace(/\s+/g,' ');
+        if(seenKeys.has(key))return null;
+        seenKeys.add(key);
+        var cls=classify(title+' '+(item.description||''));
         var ts=item.pubDate?new Date(item.pubDate).getTime():Date.now();
         if(isNaN(ts))ts=Date.now();
-        ni.push({id:'rss-'+Date.now()+'-'+i,title:item.title,state:inferState(item.title+' '+(item.description||'')),district:'',cat:cls.cat,sev:cls.sev,dept:DEPT[cls.cat]||'Relevant Authority',ts:ts,lat:null,lng:null,src:'rss',link:item.link||'',source:feed.name,desc:item.description||''});
-      });
-      return ni;
+        return{id:'rss-'+Date.now()+'-'+Math.random().toString(36).slice(2),title:title,state:inferState(title+' '+(item.description||'')),district:'',cat:cls.cat,sev:cls.sev,dept:DEPT[cls.cat]||'Relevant Authority',ts:ts,src:'rss',link:item.link||'',desc:item.description||'',imageUrl:item.imageUrl||''};
+      }).filter(Boolean);
     })
-    .catch(function(){feedCircuit[d]=(feedCircuit[d]||0)+1;return null;});
+    .catch(function(){fcircuit[dom]=(fcircuit[dom]||0)+1;return[];});
 }
+
+function setFS(s,t){document.getElementById('fs').className=s;document.getElementById('fst').textContent=t;}
+function setLU(){var e=document.getElementById('lut');e.textContent=lastFetch?'Updated '+lastFetch.toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'}):'Fetching...';}
 
 function fetchAllFeeds(){
-  setFeedStatus('loading','Fetching civic feeds...');feedsLoaded=0;
-  Promise.allSettled(FEEDS.map(fetchFeed)).then(function(results){
+  setFS('loading','Fetching live civic data...');feedsLoaded=0;
+  // Also fetch GitHub citizen reports
+  var ghPromise=fetch('/api/issues').then(function(r){return r.json();}).then(function(d){return d.issues||[];}).catch(function(){return[];});
+  var rssPromise=Promise.allSettled(FEEDS.map(fetchFeed)).then(function(results){
     var fresh=[];results.forEach(function(r){if(r.status==='fulfilled'&&Array.isArray(r.value))fresh=fresh.concat(r.value);});
-    fresh.sort(function(a,b){return b.ts-a.ts;});
-    var stored=loadReports();
-    if(fresh.length>0){issues=fresh.concat(stored);setFeedStatus('live',feedsLoaded+' feeds live');}
-    else{if(!issues.filter(function(i){return i.src!=='citizen';}).length)issues=DEMO_ISSUES.slice().concat(stored);setFeedStatus('error','Using demo data');}
-    renderIssues();updateCounters();lastFetchTime=new Date();updateLastUpdated();
+    return fresh;
+  });
+  Promise.all([rssPromise,ghPromise]).then(function(all){
+    var rssItems=all[0],ghItems=all[1];
+    // Merge: GitHub citizen reports + RSS, deduplicate by ID
+    var localReps=loadRep();
+    var combined={};
+    // GitHub reports first (source of truth)
+    ghItems.forEach(function(i){combined[i.id]=i;});
+    // Local-only reports not yet on GitHub
+    localReps.forEach(function(i){if(!combined[i.id])combined[i.id]=i;});
+    // RSS
+    rssItems.forEach(function(i){combined[i.id]=i;});
+    issues=Object.values(combined).sort(function(a,b){return b.ts-a.ts;});
+    saveSeen(seenKeys);
+    setFS('live',feedsLoaded+' feeds live');
+    lastFetch=new Date();setLU();
+    updateCounters();renderIssues();updateChoropleth();
+    addIssueMarkers(issues);
+    updateTicker();
   });
 }
-function setFeedStatus(s,t){document.getElementById('feedStatus').className=s;document.getElementById('feedStatusText').textContent=t;}
-function updateLastUpdated(){var e=document.getElementById('lastUpdatedText');e.textContent=lastFetchTime?'Updated '+lastFetchTime.toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'}):'Fetching...';}
 
+// ── ANALYSE ISSUE ──
+function analyzeIssue(iss){
+  switchTab('ai');var panel=document.getElementById('aip');
+  panel.innerHTML='<div style="text-align:center;padding:40px;color:var(--mt);font-size:13px;line-height:2">⏳ Analysing...<br><span style="font-size:11px">Finding authority, steps & timeline</span></div>';
+  fetch('/api/analyze',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({title:iss.title,state:iss.state,district:iss.district||'',category:iss.cat,severity:iss.sev,department:iss.dept})})
+  .then(function(r){return r.json();}).then(function(d){
+    if(d.error){panel.innerHTML='<div style="color:var(--mt);padding:20px;font-size:13px">⚠️ Analysis unavailable. Try again.</div>';return;}
+    renderAnalysis(panel,iss,d.text||'',d.source);
+  }).catch(function(){panel.innerHTML='<div style="color:var(--mt);padding:20px;font-size:13px">⚠️ Could not connect.</div>';});
+}
+function renderAnalysis(panel,iss,text,source){
+  var HEADS=['WHAT IS HAPPENING','WHO IS AFFECTED','WHAT SHOULD BE DONE','RESPONSIBLE AUTHORITY','EXPECTED RESOLUTION'];
+  var badge=source==='ai'?'<span style="background:#00b8e620;border:1px solid #00b8e640;color:var(--sky);font-size:9px;padding:1px 6px;border-radius:3px;font-weight:700">AI</span>':'<span style="background:#FF6B0020;border:1px solid #FF6B0040;color:var(--saf);font-size:9px;padding:1px 6px;border-radius:3px;font-weight:700">KEYWORD</span>';
+  var html='<div style="background:var(--p2);border:1px solid var(--b2);border-radius:8px;padding:12px;margin-bottom:12px"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:5px"><div style="font-size:10px;color:var(--mt);text-transform:uppercase;letter-spacing:.8px">Analysis</div>'+badge+'</div><div style="font-size:12.5px;font-weight:500;line-height:1.4">'+esc(iss.title)+'</div><div style="font-size:11px;color:var(--mt);margin-top:4px">📍 '+esc(iss.state+(iss.district?', '+iss.district:''))+' · '+esc(iss.dept)+'</div></div><div style="font-size:12.5px;line-height:1.9">';
+  text.split('\n').forEach(function(line){var l=line.trim();if(!l)return;if(HEADS.indexOf(l)>=0)html+='<div style="color:var(--saf);font-weight:700;font-size:11px;letter-spacing:.8px;text-transform:uppercase;margin:12px 0 4px">'+esc(l)+'</div>';else if(l.charAt(0)==='•')html+='<div style="padding-left:12px;margin:2px 0">'+esc(l)+'</div>';else html+='<div style="margin:2px 0">'+esc(l)+'</div>';});
+  panel.innerHTML=html+'</div>';
+}
+
+// ── REPORT FORM ──
+document.getElementById('rDesc').addEventListener('input',function(){document.getElementById('dc').textContent=this.value.length;});
+
+// Live media preview
+document.getElementById('rMedia').addEventListener('input',function(){
+  document.getElementById('mediaPreview').innerHTML=renderMedia(this.value.trim());
+});
+
+document.getElementById('btnSub').addEventListener('click',function(){
+  var cat=document.getElementById('rCat').value,state=document.getElementById('rState').value,dist=document.getElementById('rDist').value.trim(),title=document.getElementById('rTitle').value.trim(),desc=document.getElementById('rDesc').value.trim(),name=document.getElementById('rName').value.trim(),phone=document.getElementById('rPhone').value.trim(),media=document.getElementById('rMedia').value.trim();
+  if(!state){alert('Please select your state.');return;}
+  if(!dist){alert('Please enter your district or city.');return;}
+  if(!title){alert('Please enter an issue title.');return;}
+  if(!desc||desc.length<15){alert('Please add more detail (at least 15 characters).');return;}
+  var btn=this;btn.disabled=true;btn.textContent='⏳ Registering...';
+  var kw=classify(title+' '+desc);
+  var ticket='BM-'+new Date().getFullYear().toString().slice(-2)+'-'+Math.floor(10000+Math.random()*90000);
+  fetch('/api/submit',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({category:cat,state:state,district:dist,title:title,desc:desc,name:name,phone:phone,severity:kw.sev,dept:DEPT[cat],mediaUrl:media,sla:DEPT[cat]==='State Police / District SP'?24:48})})
+  .then(function(r){return r.json();}).then(function(r){doFinish(r);}).catch(function(){doFinish({ok:true,ticket:ticket,severity:kw.sev,department:DEPT[cat],sla_hours:48,message:'Registered locally.'});})
+  .finally(function(){btn.disabled=false;btn.textContent='🚨 Submit Issue Report →';});
+
+  function doFinish(r){
+    var ni={id:r.ticket||ticket,title:title,state:state,district:dist,cat:cat,sev:r.severity||kw.sev,dept:r.department||DEPT[cat],ts:Date.now(),src:'citizen',link:r.issueUrl||'',desc:desc,mediaUrl:media,sla:r.sla_hours||48,ghUrl:r.issueUrl||'',status:'submitted'};
+    var stored=loadRep();stored.push(ni);saveRep(stored);
+    issues.unshift(ni);updateCounters();renderIssues();addIssueMarkers(issues);updateChoropleth();
+    var wm=encodeURIComponent('🚨 *CIVIC ISSUE — BharatMonitor*\n\n🎟️ Ticket: *'+(r.ticket||ticket)+'*\n📋 Category: *'+CL[cat]+'*\n📍 Location: *'+state+', '+dist+'*\n⚠️ Severity: *'+(r.severity||kw.sev).toUpperCase()+'*\n🏛️ Dept: *'+(r.department||DEPT[cat])+'*\n\n📝 Issue: '+title+'\n📖 Details: '+desc+'\n☎️ '+HELPLINES[cat]+'\n\n🕐 Submitted: '+new Date().toLocaleString('en-IN')+'\n🔗 https://bharatmonitor.vercel.app'+(r.issueUrl?'\n⚙️ Track: '+r.issueUrl:'')+'\n\n_Forward to responsible dept. Demand action within '+(r.sla_hours||48)+'h._');
+    document.getElementById('rForm').style.display='none';
+    var s=document.getElementById('rSucc');s.style.display='block';
+    var ghSection=r.issueUrl?'<a href="'+esc(r.issueUrl)+'" target="_blank" rel="noopener" style="display:block;padding:8px;background:#6e40c918;border:1px solid #6e40c940;border-radius:7px;color:#a78bfa;font-size:12px;text-decoration:none;margin-bottom:6px">⚙️ Track on GitHub Issues →</a>':'<div style="font-size:11px;color:var(--mt);margin-bottom:8px;padding:8px;background:var(--p2);border-radius:7px">To enable cross-user tracking, add <code style="color:var(--saf)">GITHUB_TOKEN</code> + <code style="color:var(--saf)">GITHUB_REPO</code> to Vercel.</div>';
+    s.innerHTML='<div class="sbox"><div style="font-size:38px;margin-bottom:6px">✅</div><div style="font-family:\'Baloo 2\',cursive;font-weight:700;font-size:16px;color:var(--grn);margin-bottom:3px">Registered!</div><div style="font-family:\'Baloo 2\',cursive;font-weight:800;font-size:20px;color:var(--gld);margin-bottom:10px">'+esc(r.ticket||ticket)+'</div><div class="sgrid"><div class="scel"><div class="scl">Severity</div><span class="sv2 s-'+esc(r.severity||kw.sev)+'">'+esc((r.severity||kw.sev).toUpperCase())+'</span></div><div class="scel"><div class="scl">Dept</div><div style="font-size:10px;color:var(--sky);font-weight:600;line-height:1.3">'+esc(r.department||DEPT[cat])+'</div></div><div class="scel"><div class="scl">SLA</div><div style="font-size:14px;color:var(--gld);font-weight:700">'+(r.sla_hours||48)+'h</div></div><div class="scel"><div class="scl">Status</div><div style="font-size:12px;color:var(--grn);font-weight:600">Active</div></div></div>'+ghSection+'<button class="bts" style="margin-bottom:8px;background:#25D366" onclick="window.open(\'https://wa.me/?text='+wm+'\',\'_blank\')">📲 Escalate on WhatsApp →</button><button class="bse" id="btnVR">📋 View My Reports</button><button class="bse" id="btnAg" style="margin-top:6px">+ Another Issue</button></div>';
+    document.getElementById('btnVR').onclick=function(){document.getElementById('rForm').style.display='block';s.style.display='none';switchTab('mine');};
+    document.getElementById('btnAg').onclick=function(){document.getElementById('rForm').style.display='block';s.style.display='none';['rTitle','rDesc','rDist','rName','rPhone','rMedia'].forEach(function(id){document.getElementById(id).value='';});document.getElementById('dc').textContent='0';document.getElementById('mediaPreview').innerHTML='';};
+  }
+});
+
+// ── MAP ──
 var map=new maplibregl.Map({container:'map',style:{version:8,sources:{carto:{type:'raster',tiles:['https://a.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}.png'],tileSize:256,attribution:'© CartoDB © OSM',maxzoom:19}},layers:[{id:'bg',type:'raster',source:'carto'}]},center:[82.5,22.5],zoom:4.5,minZoom:3,maxZoom:10,attributionControl:false});
 map.addControl(new maplibregl.NavigationControl({showCompass:false}),'top-left');
 map.addControl(new maplibregl.AttributionControl({compact:true}),'bottom-left');
 map.on('load',function(){
-  fetch('https://raw.githubusercontent.com/geohacker/india/master/state/india_state.geojson').then(function(r){return r.json();}).then(addChoropleth).catch(function(){});
-  DEMO_ISSUES.filter(function(i){return i.lat;}).forEach(function(iss){
-    var size=iss.sev==='emergency'?14:iss.sev==='critical'?12:iss.sev==='high'?10:8,col=CC[iss.cat]||'#aaa',el=document.createElement('div');
-    el.style.cssText='width:'+size+'px;height:'+size+'px;border-radius:50%;background:'+col+';border:2px solid '+col+'88;box-shadow:0 0 '+size+'px '+col+'55;cursor:pointer;';
-    new maplibregl.Marker({element:el}).setLngLat([iss.lng,iss.lat]).setPopup(new maplibregl.Popup({offset:12,closeButton:false}).setHTML('<div style="font-size:12px;max-width:220px"><div style="color:'+col+';font-size:10px;font-weight:700;text-transform:uppercase;margin-bottom:3px">'+esc(CL[iss.cat])+'</div><div style="line-height:1.4">'+esc(iss.title)+'</div><div style="color:#4a6080;font-size:10px;margin-top:4px">📍 '+esc(iss.state)+'</div></div>')).addTo(map);
-  });
+  mapLoaded=true;
+  fetch('https://raw.githubusercontent.com/geohacker/india/master/state/india_state.geojson').then(function(r){return r.json();}).then(function(geo){
+    map.addSource('india',{type:'geojson',data:geo,promoteId:'NAME_1'});
+    map.addLayer({id:'sf',type:'fill',source:'india',paint:{'fill-color':['match',['get','NAME_1'],'India','#0f2035','#1a4060'],'fill-opacity':['case',['boolean',['feature-state','hover'],false],0.9,0.75]}});
+    map.addLayer({id:'sb2',type:'line',source:'india',paint:{'line-color':'#1e3a5f','line-width':['case',['boolean',['feature-state','selected'],false],2.5,['boolean',['feature-state','hover'],false],1.5,0.7]}});
+    var hid=null,sid2=null;
+    map.on('mousemove','sf',function(e){if(e.features&&e.features.length){if(hid)map.setFeatureState({source:'india',id:hid},{hover:false});hid=e.features[0].id;map.setFeatureState({source:'india',id:hid},{hover:true});map.getCanvas().style.cursor='pointer';}});
+    map.on('mouseleave','sf',function(){if(hid){map.setFeatureState({source:'india',id:hid},{hover:false});hid=null;}map.getCanvas().style.cursor='';});
+    map.on('click','sf',function(e){
+      if(!e.features||!e.features.length)return;
+      var GEO2={'NCT of Delhi':'Delhi','Jammu and Kashmir':'Jammu & Kashmir','Andaman and Nicobar Islands':'Andaman & Nicobar','Pondicherry':'Puducherry','Dadra and Nagar Haveli':'Dadra & Nagar Haveli','Dadra & Nagar Haveli and Daman & Diu':'Dadra & Nagar Haveli'};
+      var gn=e.features[0].properties&&e.features[0].properties.NAME_1,name=GEO2[gn]||gn;
+      if(sid2)map.setFeatureState({source:'india',id:sid2},{selected:false});
+      sid2=e.features[0].id;map.setFeatureState({source:'india',id:sid2},{selected:true});
+      var stateIssues=issues.filter(function(i){return i.state===name;});
+      var counts=computeStateCounts();var data=counts[name];
+      document.getElementById('sti').classList.add('show');
+      document.getElementById('stn').textContent=name;
+      document.getElementById('stc').textContent=(data?data.total:0).toLocaleString('en-IN');
+      document.getElementById('sts').textContent='Active Issues · '+stateIssues.filter(function(i){return i.src==='citizen';}).length+' citizen reports';
+      if(data){
+        var cats=['roads','water','power','health','corrupt'],max=0;
+        cats.forEach(function(c){if((data[c]||0)>max)max=data[c]||0;});
+        document.getElementById('cb').innerHTML=cats.map(function(cat){return'<div class="cbr"><div class="cbl" style="color:'+CC[cat]+'">'+CI[cat]+' '+CL[cat]+'</div><div class="cbt"><div class="cbf" style="width:'+(max?Math.round((data[cat]||0)/max*100):0)+'%;background:'+CC[cat]+'"></div></div><div class="cbv">'+(data[cat]||0)+'</div></div>';}).join('');
+      }
+      activeSF=name;document.getElementById('sf').value=name;renderIssues();
+    });
+    updateChoropleth();
+    addIssueMarkers(issues);
+  }).catch(function(){});
 });
 
-function addChoropleth(geo){
-  if(map.getSource('india'))return;
-  map.addSource('india',{type:'geojson',data:geo,promoteId:'NAME_1'});
-  var cs=[];for(var n in STATES)cs.push(n,iColor(STATES[n].issues));
-  var GEO={'NCT of Delhi':'Delhi','Jammu and Kashmir':'Jammu & Kashmir','Andaman and Nicobar Islands':'Andaman & Nicobar','Pondicherry':'Puducherry','Dadra and Nagar Haveli':'Dadra & Nagar Haveli','Dadra & Nagar Haveli and Daman & Diu':'Dadra & Nagar Haveli'};
-  for(var g in GEO){if(STATES[GEO[g]])cs.push(g,iColor(STATES[GEO[g]].issues));}
-  map.addLayer({id:'sf',type:'fill',source:'india',paint:{'fill-color':['match',['get','NAME_1']].concat(cs).concat(['#0f2035']),'fill-opacity':['case',['boolean',['feature-state','hover'],false],0.9,0.75]}});
-  map.addLayer({id:'sb',type:'line',source:'india',paint:{'line-color':'#1e3a5f','line-width':['case',['boolean',['feature-state','selected'],false],2.5,['boolean',['feature-state','hover'],false],1.5,0.7]}});
-  var hid=null,sid2=null;
-  map.on('mousemove','sf',function(e){if(e.features&&e.features.length){if(hid)map.setFeatureState({source:'india',id:hid},{hover:false});hid=e.features[0].id;map.setFeatureState({source:'india',id:hid},{hover:true});map.getCanvas().style.cursor='pointer';}});
-  map.on('mouseleave','sf',function(){if(hid){map.setFeatureState({source:'india',id:hid},{hover:false});hid=null;}map.getCanvas().style.cursor='';});
-  map.on('click','sf',function(e){
-    if(!e.features||!e.features.length)return;
-    var GEO2={'NCT of Delhi':'Delhi','Jammu and Kashmir':'Jammu & Kashmir','Andaman and Nicobar Islands':'Andaman & Nicobar','Pondicherry':'Puducherry','Dadra and Nagar Haveli':'Dadra & Nagar Haveli'};
-    var gn=e.features[0].properties&&e.features[0].properties.NAME_1,name=GEO2[gn]||gn,data=STATES[name];
-    if(sid2)map.setFeatureState({source:'india',id:sid2},{selected:false});
-    sid2=e.features[0].id;map.setFeatureState({source:'india',id:sid2},{selected:true});
-    if(!data)return;
-    document.getElementById('stInf').classList.add('show');
-    document.getElementById('stName').textContent=name;
-    document.getElementById('stCount').textContent=data.issues.toLocaleString('en-IN');
-    document.getElementById('stSub').textContent='Active Issues · '+(data.trend.charAt(0)==='+' ? '↑' : '↓')+' '+data.trend+' this week';
-    var cats=['roads','water','power','health','corrupt'],max=0;
-    cats.forEach(function(c){if(data[c]>max)max=data[c];});
-    document.getElementById('catBars').innerHTML=cats.map(function(cat){return '<div class="cbr"><div class="cbl" style="color:'+CC[cat]+'">'+CI[cat]+' '+CL[cat]+'</div><div class="cbt"><div class="cbf" style="width:'+Math.round(data[cat]/max*100)+'%;background:'+CC[cat]+'"></div></div><div class="cbv">'+data[cat].toLocaleString('en-IN')+'</div></div>';}).join('');
-    activeStateFilter=name;document.getElementById('stateFilter').value=name;renderIssues();
-  });
+// ── TICKER ──
+function updateTicker(){
+  if(!issues.length)return;
+  var iss=issues[tickIdx++%issues.length],el=document.getElementById('tt'),s=document.getElementById('tsrc');
+  el.style.opacity='0';setTimeout(function(){el.textContent=(CI[iss.cat]||'📋')+' '+iss.state+(iss.district?', '+iss.district:'')+' — '+iss.title;s.textContent=iss.src==='citizen'?'🟢 Citizen':'📰 News';el.style.opacity='1';},300);
 }
-
-function analyzeIssue(iss){
-  switchTab('ai');var panel=document.getElementById('aiPnl');
-  panel.innerHTML='<div style="text-align:center;padding:40px;color:#4a6080;font-size:13px;line-height:2">⏳ Analysing...<br><span style="font-size:11px">Finding authority, steps & timeline</span></div>';
-  fetch('/api/analyze',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({title:iss.title,state:iss.state,district:iss.district||'',category:iss.cat,severity:iss.sev,department:iss.dept})})
-  .then(function(r){return r.json();}).then(function(d){
-    if(d.error){panel.innerHTML='<div style="color:#4a6080;padding:20px;font-size:13px">⚠️ Analysis unavailable. Try again.</div>';return;}
-    renderAnalysis(panel,iss,d.text||'',d.source);
-  }).catch(function(){panel.innerHTML='<div style="color:#4a6080;padding:20px;font-size:13px">⚠️ Could not connect.</div>';});
-}
-function renderAnalysis(panel,iss,text,source){
-  var HEADS=['WHAT IS HAPPENING','WHO IS AFFECTED','WHAT SHOULD BE DONE','RESPONSIBLE AUTHORITY','EXPECTED RESOLUTION'];
-  var badge=source==='ai'?'<span style="background:#00b8e620;border:1px solid #00b8e640;color:#00b8e6;font-size:9px;padding:1px 6px;border-radius:3px;font-weight:700">AI POWERED</span>':'<span style="background:#FF6B0020;border:1px solid #FF6B0040;color:#FF6B00;font-size:9px;padding:1px 6px;border-radius:3px;font-weight:700">KEYWORD ANALYSIS</span>';
-  var html='<div style="background:#0c1526;border:1px solid #1e3a5f;border-radius:8px;padding:12px;margin-bottom:12px"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:5px"><div style="font-size:10px;color:#4a6080;text-transform:uppercase;letter-spacing:.8px">Analysis</div>'+badge+'</div><div style="font-size:12.5px;font-weight:500;line-height:1.4">'+esc(iss.title)+'</div><div style="font-size:11px;color:#4a6080;margin-top:4px">📍 '+esc(iss.state+(iss.district?', '+iss.district:''))+' · '+esc(iss.dept)+'</div></div><div style="font-size:12.5px;line-height:1.9">';
-  text.split('\n').forEach(function(line){var l=line.trim();if(!l)return;if(HEADS.indexOf(l)>=0)html+='<div style="color:#FF6B00;font-weight:700;font-size:11px;letter-spacing:.8px;text-transform:uppercase;margin:12px 0 4px">'+esc(l)+'</div>';else if(l.charAt(0)==='•')html+='<div style="padding-left:12px;margin:2px 0">'+esc(l)+'</div>';else html+='<div style="margin:2px 0">'+esc(l)+'</div>';});
-  panel.innerHTML=html+'</div>';
-}
-
-document.getElementById('rDesc').addEventListener('input',function(){document.getElementById('descCount').textContent=this.value.length;});
-
-document.getElementById('btnSubmit').addEventListener('click',function(){
-  var cat=document.getElementById('rCat').value,state=document.getElementById('rState').value,dist=document.getElementById('rDistrict').value.trim(),title=document.getElementById('rTitle').value.trim(),desc=document.getElementById('rDesc').value.trim(),name=document.getElementById('rName').value.trim(),phone=document.getElementById('rPhone').value.trim();
-  if(!state||state===''){alert('Please select your state.');return;}
-  if(!dist){alert('Please enter your district or city.');return;}
-  if(!title){alert('Please enter an issue title.');return;}
-  if(!desc||desc.length<20){alert('Please add more detail (at least 20 characters).');return;}
-  var btn=this;btn.disabled=true;btn.textContent='⏳ Processing...';
-  var ticket='BM-'+new Date().getFullYear().toString().slice(-2)+'-'+Math.floor(10000+Math.random()*90000);
-  var kw=classify(title+' '+desc);
-  var CONTACTS={roads:'NHAI: 1033 | PWD helpline | cpgrams.gov.in',water:'Jal Shakti: 1800-180-1551 | Municipal Corporation',power:'DISCOM helpline (on bill) | vidyutsaathi.gov.in',health:'National Health: 104 | District CMO',corrupt:'CVC: cvc.gov.in | Lokayukta | ACB',education:'State Education Dept | 1800-180-1551',transport:'RTO | Railway: 139 | IRCTC helpdesk',safety:'Police: 100 | Women: 1091 | District SP',environment:'State PCB | CPCB: 011-43102030',other:'CPGRAMS: cpgrams.gov.in | Collector office'};
-  fetch('/api/classify',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({title:title,desc:desc,state:state,category:cat})})
-  .then(function(r){return r.json();}).then(function(r){doFinish(r);}).catch(function(){doFinish({severity:kw.sev,department:DEPT[cat]||'Relevant Authority',sla_hours:48,message:'Your complaint has been registered.'});})
-  .finally(function(){btn.disabled=false;btn.textContent='🚨 Submit Issue Report →';});
-
-  function doFinish(r){
-    var ni={id:ticket,title:title,state:state,district:dist,cat:cat,sev:r.severity||kw.sev,dept:r.department||DEPT[cat],ts:Date.now(),lat:null,lng:null,src:'citizen',link:'',desc:desc,name:name,phone:phone,status:'submitted',sla:r.sla_hours||48,msg:r.message||''};
-    var stored=loadReports();stored.push(ni);localStorage.setItem(STORE_KEY,JSON.stringify(stored.slice(-100)));
-    issues.unshift(ni);liveCount++;updateCounters();renderIssues();
-    var wm=encodeURIComponent('🚨 *CIVIC ISSUE REPORT — BharatMonitor*\n\n🎟️ Ticket: *'+ticket+'*\n📋 Category: *'+CL[cat]+'*\n📍 Location: *'+state+', '+dist+'*\n⚠️ Severity: *'+ni.sev.toUpperCase()+'*\n🏛️ Dept: *'+ni.dept+'*\n\n📝 Issue: '+title+'\n\n📖 Details: '+desc+'\n\n☎️ Contact: '+(CONTACTS[cat]||'Contact relevant authority')+'\n\n⏱️ Reported: '+new Date().toLocaleString('en-IN')+'\n🔗 BharatMonitor: https://bharatmonitor.vercel.app\n\n_Forward to responsible dept. Demand action within '+ni.sla+' hours._');
-    document.getElementById('rForm').style.display='none';
-    var s=document.getElementById('rSuccess');s.style.display='block';
-    s.innerHTML='<div class="sbox"><div style="font-size:38px;margin-bottom:6px">✅</div><div style="font-family:\'Baloo 2\',cursive;font-weight:700;font-size:16px;color:var(--green);margin-bottom:3px">Issue Registered!</div><div style="font-family:\'Baloo 2\',cursive;font-weight:800;font-size:20px;color:var(--gold);margin-bottom:10px">'+esc(ticket)+'</div><div class="sgrid"><div class="scel"><div class="scl">Severity</div><span class="sv2 s-'+esc(ni.sev)+'">'+esc(ni.sev.toUpperCase())+'</span></div><div class="scel"><div class="scl">Department</div><div style="font-size:10px;color:var(--sky);font-weight:600;line-height:1.3">'+esc(ni.dept)+'</div></div><div class="scel"><div class="scl">SLA</div><div style="font-size:14px;color:var(--gold);font-weight:700">'+esc(String(ni.sla))+'h</div></div><div class="scel"><div class="scl">Status</div><div style="font-size:12px;color:var(--green);font-weight:600">Active</div></div></div><div style="font-size:12px;color:var(--muted);margin-bottom:12px;line-height:1.6">'+esc(r.message||'Your issue is registered and tracked.')+'</div><button class="bts" style="margin-bottom:8px;background:#25D366" onclick="window.open(\'https://wa.me/?text='+wm+'\',\'_blank\')">📲 Escalate on WhatsApp →</button><div style="font-size:11px;color:#4a6080;margin-bottom:10px">Share your ticket on WhatsApp to notify the responsible department and demand resolution.</div><button class="btse" id="btnViewR">📋 View My Reports</button><button class="btse" id="btnAgain" style="margin-top:6px">+ Report Another Issue</button></div>';
-    document.getElementById('btnViewR').onclick=function(){document.getElementById('rForm').style.display='block';s.style.display='none';switchTab('myreports');};
-    document.getElementById('btnAgain').onclick=function(){document.getElementById('rForm').style.display='block';s.style.display='none';['rTitle','rDesc','rDistrict','rName','rPhone'].forEach(function(id){document.getElementById(id).value='';});document.getElementById('descCount').textContent='0';};
-  }
-});
-
-document.querySelectorAll('.tbn').forEach(function(b){b.addEventListener('click',function(){switchTab(b.getAttribute('data-tab'));});});
-document.getElementById('btnReport').addEventListener('click',function(){switchTab('report');});
-document.querySelectorAll('.fp').forEach(function(p){p.addEventListener('click',function(){activeFilter=p.getAttribute('data-cat');document.querySelectorAll('.fp').forEach(function(x){x.classList.remove('active');});p.classList.add('active');renderIssues();});});
-document.getElementById('stateFilter').addEventListener('change',function(){activeStateFilter=this.value;renderIssues();});
-document.getElementById('btnRefresh').addEventListener('click',function(){seenKeys=new Set(loadReports().map(function(r){return r.title.slice(0,60).toLowerCase();}));fetchAllFeeds();});
-
-function updateTicker(){if(!issues.length)return;var iss=issues[tickerIdx++%issues.length],el=document.getElementById('tText'),s=document.getElementById('tSrc');el.style.opacity='0';setTimeout(function(){el.textContent=(CI[iss.cat]||'📋')+' '+iss.state+(iss.district?', '+iss.district:'')+' — '+iss.title;s.textContent=iss.src==='citizen'?'🟢 Citizen':'📰 News';el.style.opacity='1';},300);}
 setInterval(updateTicker,5000);
-setInterval(function(){liveCount+=Math.floor(Math.random()*2);updateCounters();},20000);
-setInterval(updateLastUpdated,30000);
-setInterval(function(){seenKeys=new Set(loadReports().map(function(r){return r.title.slice(0,60).toLowerCase();}));fetchAllFeeds();},5*60*1000);
+setInterval(setLU,30000);
+// Auto-refresh every 5 min
+setInterval(function(){fetchAllFeeds();},5*60*1000);
 
-// INIT
+// ── EVENT BINDINGS ──
+document.querySelectorAll('.tbn').forEach(function(b){b.addEventListener('click',function(){switchTab(b.getAttribute('data-tab'));});});
+document.getElementById('btnR').addEventListener('click',function(){switchTab('report');});
+document.querySelectorAll('.fp').forEach(function(p){p.addEventListener('click',function(){activeFilter=p.getAttribute('data-cat');document.querySelectorAll('.fp').forEach(function(x){x.classList.remove('active');});p.classList.add('active');renderIssues();});});
+document.getElementById('sf').addEventListener('change',function(){activeSF=this.value;renderIssues();});
+document.getElementById('btnRef').addEventListener('click',function(){seenKeys=loadSeen();fetchAllFeeds();});
+
+// ── INIT ──
 ALL_STATES.forEach(function(s){
-  var o1=document.createElement('option');o1.value=s;o1.textContent=s;document.getElementById('stateFilter').appendChild(o1);
-  var o2=document.createElement('option');o2.value=s;o2.textContent=s;document.getElementById('rState').appendChild(o2);
+  [document.getElementById('sf'),document.getElementById('rState')].forEach(function(el){var o=document.createElement('option');o.value=s;o.textContent=s;el.appendChild(o);});
 });
-var stored=loadReports();
-issues=DEMO_ISSUES.slice().concat(stored);
-DEMO_ISSUES.forEach(function(i){seenKeys.add(i.title.slice(0,60).toLowerCase());});
-renderIssues();updateCounters();updateTicker();
+seenKeys=loadSeen();
+// Load local reports to show immediately
+var localReps=loadRep();
+if(localReps.length){issues=localReps.sort(function(a,b){return b.ts-a.ts;});updateCounters();renderIssues();}
+// Fetch live data
 fetchAllFeeds();
 </script>
 </body>

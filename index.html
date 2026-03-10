@@ -1292,16 +1292,18 @@ function renderVideos() {
   videosLoaded = true;
   var el = document.getElementById('vContent');
 
-  // ── Channel list — 8 channels, all playable simultaneously ──────
+  // ── Channel list — 8 international channels with permanent live stream video IDs ──
+  // Using direct video IDs (not channel IDs) — these are permanent 24/7 live streams
+  // that allow embedding. Indian channels block iframe embedding by policy.
   var CHANNELS = [
-    { id:'abp',        name:'ABP News',            lang:'HI', chId:'UCRWFSbif-RFENbBrSiez1DA', color:'#1565C0' },
-    { id:'indiatoday', name:'India Today',          lang:'EN', chId:'UCYPvAwZP8pZhSMW8qs7cVCw', color:'#00838F' },
-    { id:'firstpost',  name:'Firstpost',            lang:'EN', chId:'UCz8QaiQxApLq8sLNcszYyJw', color:'#BF360C' },
-    { id:'zee',        name:'Zee News',             lang:'HI', chId:'UCIvaYmXn910QMdemBG3v1pQ', color:'#7B1FA2' },
-    { id:'toi',        name:'Times of India',       lang:'EN', chId:'UCckHqySbfy5FcPP6MD_S-Yg', color:'#C62828' },
-    { id:'aajtak',     name:'Aaj Tak',              lang:'HI', chId:'UCt4t-jeY85JegMlZ-E5UWtA', color:'#FF6B00' },
-    { id:'timesnownb', name:'Times Now Navbharat',  lang:'HI', chId:'UCMk9Tdc-d1BIcAFaSppiVkw', color:'#F57F17' },
-    { id:'cnbctv18',   name:'CNBC-TV18',            lang:'EN', chId:'UCmRbHAgG2k2vDUvb3xsEunQ', color:'#0277BD' },
+    { id:'aljazeeraen', name:'Al Jazeera English', lang:'EN', vidId:'nSOn_g4EMAU', color:'#00838F' },
+    { id:'dwnews',      name:'DW News',            lang:'EN', vidId:'vfqk2MXVMVE', color:'#E53935' },
+    { id:'france24',    name:'France 24 English',  lang:'EN', vidId:'h3MuIUNCCLI', color:'#1565C0' },
+    { id:'skynews',     name:'Sky News',            lang:'EN', vidId:'9Auq9mYxFEE', color:'#0277BD' },
+    { id:'bloomberg',   name:'Bloomberg TV',        lang:'EN', vidId:'dp8PhLsUcFE', color:'#F57F17' },
+    { id:'euronews',    name:'Euronews',            lang:'EN', vidId:'DWDUn5q3iPs', color:'#7B1FA2' },
+    { id:'trtworld',    name:'TRT World',           lang:'EN', vidId:'n0frSbFcNmk', color:'#BF360C' },
+    { id:'nhkworld',    name:'NHK World Japan',     lang:'EN', vidId:'8i0UXNC7y7o', color:'#2E7D32' },
   ];
 
   // Track which windows are currently playing
@@ -1335,7 +1337,7 @@ function renderVideos() {
       html += '<span style="width:6px;height:6px;border-radius:50%;background:' + ch.color + ';flex-shrink:0;animation:pu 1.5s infinite"></span>';
       html += '<span style="font-size:9px;font-weight:700;color:' + ch.color + ';flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">' + esc(ch.name) + '</span>';
       html += '<span style="font-size:7px;color:#3a5060;font-weight:600">' + ch.lang + '</span>';
-      html += '<a href="https://youtube.com/@' + ch.id + '/streams" target="_blank" rel="noopener" '
+      html += '<a href="https://youtube.com/watch?v=' + ch.vidId + '" target="_blank" rel="noopener" '
         + 'style="font-size:8px;color:var(--mt);text-decoration:none;opacity:.6;flex-shrink:0" '
         + 'onclick="event.stopPropagation()">↗</a>';
       html += '</div>';
@@ -1344,7 +1346,7 @@ function renderVideos() {
       html += '<div style="position:relative;padding-top:56.25%;background:#000;flex-shrink:0">';
 
       // Placeholder (shown before click)
-      html += '<div id="ph-' + ch.id + '" class="winPh" data-id="' + ch.id + '" data-chid="' + ch.chId + '" '
+      html += '<div id="ph-' + ch.id + '" class="winPh" data-id="' + ch.id + '" data-vid="' + ch.vidId + '" '
         + 'style="position:absolute;top:0;left:0;width:100%;height:100%;display:flex;flex-direction:column;'
         + 'align-items:center;justify-content:center;gap:6px;cursor:pointer;background:#040b16">';
       html += '<div style="width:34px;height:34px;border-radius:50%;background:' + ch.color + ';display:flex;align-items:center;justify-content:center;font-size:14px">▶</div>';
@@ -1362,7 +1364,7 @@ function renderVideos() {
 
     // ── Notice ────────────────────────────────────────────────────
     html += '<div style="padding:5px 12px;font-size:9.5px;color:#3a5060;background:var(--p2);border-top:1px solid var(--b1);flex-shrink:0;line-height:1.5">';
-    html += '💡 YouTube may ask "Sign in to confirm age" for some streams — click ↗ to open directly on YouTube.';
+    html += '💡 International public broadcasters — these allow embedding. Click ↗ to open on YouTube if a window doesn\'t load.';
     html += '</div>';
 
     el.innerHTML = html;
@@ -1370,13 +1372,13 @@ function renderVideos() {
     // Wire placeholder clicks
     el.querySelectorAll('.winPh').forEach(function(ph) {
       ph.addEventListener('click', function() {
-        loadWindow(this.getAttribute('data-id'), this.getAttribute('data-chid'));
+        loadWindow(this.getAttribute('data-id'), this.getAttribute('data-vid'));
       });
     });
   }
 
   // Load iframe into a window
-  function loadWindow(id, chId) {
+  function loadWindow(id, vidId) {
     if (playing[id]) return;
     playing[id] = true;
     var ph = document.getElementById('ph-' + id);
@@ -1384,8 +1386,8 @@ function renderVideos() {
     if (!ph || !fr) return;
     ph.style.display = 'none';
     fr.style.display = 'block';
-    var src = 'https://www.youtube.com/embed/live_stream?channel=' + chId
-      + '&autoplay=1&rel=0&modestbranding=1';
+    var src = 'https://www.youtube.com/embed/' + vidId
+      + '?autoplay=1&rel=0&modestbranding=1';
     fr.innerHTML = '<iframe src="' + src + '" style="width:100%;height:100%;border:none"'
       + ' allow="autoplay;encrypted-media;fullscreen" allowfullscreen></iframe>';
   }
@@ -1393,7 +1395,7 @@ function renderVideos() {
   // Expose playAll globally
   window.playAll = function() {
     for (var i = 0; i < CHANNELS.length; i++) {
-      loadWindow(CHANNELS[i].id, CHANNELS[i].chId);
+      loadWindow(CHANNELS[i].id, CHANNELS[i].vidId);
     }
     var btn = document.getElementById('playAllBtn');
     if (btn) { btn.textContent = '⏸ All Playing'; btn.style.background = '#2a5040'; }

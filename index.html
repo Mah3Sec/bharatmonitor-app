@@ -1106,11 +1106,9 @@ function initClusterLayers() {
 
 function addIssueMarkers(issList) {
   if (!mapLoaded) return;
-  if (!map.getSource('issues-src')) {
-    initClusterLayers();
-  }
-  var geoData = buildGeoJSON(issList);
-  map.getSource('issues-src').setData(geoData);
+  var src = map.getSource('issues-src');
+  if (!src) { initClusterLayers(); src = map.getSource('issues-src'); }
+  if (src) src.setData(buildGeoJSON(issList));
 }
 
 // ── CHOROPLETH ────────────────────────────────────────────────────
@@ -1502,6 +1500,7 @@ map = new maplibregl.Map({
   container: 'map',
   style: {
     version: 8,
+    glyphs: 'https://demotiles.maplibre.org/font/{fontstack}/{range}.pbf',
     sources: {carto: {type:'raster',tiles:['https://a.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}.png'],tileSize:256,attribution:'© CartoDB © OSM',maxzoom:19}},
     layers: [{id:'bg',type:'raster',source:'carto'}]
   },
@@ -1562,6 +1561,7 @@ map.on('load', function() {
         renderIssues();
       });
       updateChoropleth();
+      initClusterLayers();
       addIssueMarkers(issues);
     })
     .catch(function(){});

@@ -956,41 +956,161 @@ function renderIssues() {
   };
 }
 
-// ── MAP MARKERS ───────────────────────────────────────────────────
-var markerPool = [];
-function addIssueMarkers(issList) {
-  if (!mapLoaded) return;
-  markerPool.forEach(function(m){ m.remove(); });
-  markerPool = [];
-  // For map: always show citizen reports, only show RSS if they have a real city
+// ── MAP MARKERS — GeoJSON clustering ─────────────────────────────
+// Removes individual dot overlap by grouping nearby issues into clusters.
+// Click a cluster → zoom in to expand. Click a single dot → popup.
+
+var clusterPopup = new maplibregl.Popup({ closeButton: true, maxWidth: '260px' });
+
+function buildGeoJSON(issList) {
+  var features = [];
   var shown = issList.filter(function(iss) {
-    if (iss.src === 'citizen') return true; // always show citizen
-    // RSS: only show if title mentions a known city
+    if (iss.src === 'citizen') return true;
     var city = extractCityFromText((iss.title || '') + ' ' + (iss.state || ''));
     return city && DC[city];
-  }).slice(0, 300);
-
+  });
   for (var i = 0; i < shown.length; i++) {
     var iss = shown[i];
     var coords = issueCoords(iss);
     if (!coords) continue;
-    var size = iss.sev === 'emergency' ? 14 : iss.sev === 'critical' ? 12 : iss.sev === 'high' ? 10 : 8;
-    var col = CC[iss.cat] || '#aaa';
-    var el = document.createElement('div');
-    var isNew = (Date.now() - iss.ts) < 300000; // new if < 5 min old
-    el.style.cssText = 'width:' + size + 'px;height:' + size + 'px;border-radius:50%;background:' + col + ';border:2px solid ' + col + '88;box-shadow:0 0 ' + size + 'px ' + col + '55;cursor:pointer;opacity:' + (iss.src === 'citizen' ? '1' : '.7') + ';transition:transform .2s;';
-    if (iss.src === 'citizen' && isNew) el.className = 'marker-new';
-    var popup = new maplibregl.Popup({offset:12, closeButton:false}).setHTML(
-      '<div style="font-size:12px">' +
-      '<div style="color:' + col + ';font-size:10px;font-weight:700;text-transform:uppercase;margin-bottom:3px">' + esc(CL[iss.cat]) + '</div>' +
-      '<div style="line-height:1.4;margin-bottom:3px">' + esc(iss.title.slice(0,80)) + '</div>' +
-      '<div style="color:#4a6080;font-size:10px">📍 ' + esc(iss.state + (iss.district ? ', ' + iss.district : '')) + '</div>' +
-      (iss.src === 'citizen' ? '<div style="margin-top:4px;font-size:9px;color:#00ddb8;font-weight:700">🟢 CITIZEN REPORT</div>' : '') +
-      '</div>'
-    );
-    var marker = new maplibregl.Marker({element: el}).setLngLat([coords.lng, coords.lat]).setPopup(popup).addTo(map);
-    markerPool.push(marker);
+    features.push({
+      type: 'Feature',
+      geometry: { type: 'Point', coordinates: [coords.lng, coords.lat] },
+      properties: {
+        id:       iss.id,
+        title:    iss.title ? iss.title.slice(0, 80) : '',
+        cat:      iss.cat || 'other',
+        sev:      iss.sev || 'medium',
+        state:    iss.state || '',
+        district: iss.district || '',
+        src:      iss.src || 'rss',
+        col:      CC[iss.cat] || '#aaa',
+        isNew:    (Date.now() - (iss.ts || 0)) < 300000 ? 1 : 0
+      }
+    });
   }
+  return { type: 'FeatureCollection', features: features };
+}
+
+function initClusterLayers() {
+  if (!mapLoaded) return;
+
+  // Remove existing layers/source if refreshing
+  ['issue-points','issue-points-labels','clusters','cluster-count'].forEach(function(id) {
+    if (map.getLayer(id)) map.removeLayer(id);
+  });
+  if (map.getSource('issues-src')) map.removeSource('issues-src');
+
+  map.addSource('issues-src', {
+    type: 'geojson',
+    data: { type: 'FeatureCollection', features: [] },
+    cluster: true,
+    clusterMaxZoom: 10,   // expand clusters below zoom 10
+    clusterRadius: 45     // px radius to group into one cluster
+  });
+
+  // ── Cluster bubble ──────────────────────────────────────────────
+  map.addLayer({
+    id: 'clusters',
+    type: 'circle',
+    source: 'issues-src',
+    filter: ['has', 'point_count'],
+    paint: {
+      'circle-color': [
+        'step', ['get', 'point_count'],
+        '#1a6090',   // 1–9
+        10,  '#c07020',  // 10–49
+        50,  '#8a1020'   // 50+
+      ],
+      'circle-radius': [
+        'step', ['get', 'point_count'],
+        16,   // 1–9
+        10, 22,
+        50, 30
+      ],
+      'circle-stroke-width': 2,
+      'circle-stroke-color': 'rgba(255,255,255,0.2)',
+      'circle-opacity': 0.92
+    }
+  });
+
+  // ── Cluster count label ─────────────────────────────────────────
+  map.addLayer({
+    id: 'cluster-count',
+    type: 'symbol',
+    source: 'issues-src',
+    filter: ['has', 'point_count'],
+    layout: {
+      'text-field': '{point_count_abbreviated}',
+      'text-font': ['Noto Sans Bold'],
+      'text-size': 12
+    },
+    paint: { 'text-color': '#fff' }
+  });
+
+  // ── Individual unclustered dots ─────────────────────────────────
+  map.addLayer({
+    id: 'issue-points',
+    type: 'circle',
+    source: 'issues-src',
+    filter: ['!', ['has', 'point_count']],
+    paint: {
+      'circle-radius': [
+        'match', ['get', 'sev'],
+        'emergency', 9,
+        'critical',  7,
+        'high',      6,
+        5
+      ],
+      'circle-color': ['get', 'col'],
+      'circle-stroke-width': ['case', ['==', ['get', 'src'], 'citizen'], 2, 1],
+      'circle-stroke-color': 'rgba(255,255,255,0.35)',
+      'circle-opacity': ['case', ['==', ['get', 'src'], 'citizen'], 1.0, 0.7]
+    }
+  });
+
+  // ── Click cluster → zoom in ─────────────────────────────────────
+  map.on('click', 'clusters', function(e) {
+    var features = map.queryRenderedFeatures(e.point, { layers: ['clusters'] });
+    if (!features.length) return;
+    var cId = features[0].properties.cluster_id;
+    map.getSource('issues-src').getClusterExpansionZoom(cId, function(err, zoom) {
+      if (err) return;
+      map.easeTo({ center: features[0].geometry.coordinates, zoom: zoom + 0.5 });
+    });
+  });
+
+  // ── Click single point → popup ──────────────────────────────────
+  map.on('click', 'issue-points', function(e) {
+    var p = e.features[0].properties;
+    var col = p.col || '#aaa';
+    clusterPopup
+      .setLngLat(e.features[0].geometry.coordinates)
+      .setHTML(
+        '<div style="font-size:12px;padding:2px 0">' +
+        '<div style="color:' + col + ';font-size:9px;font-weight:700;text-transform:uppercase;margin-bottom:4px;letter-spacing:.5px">' + esc(CL[p.cat] || p.cat) + ' · ' + p.sev.toUpperCase() + '</div>' +
+        '<div style="line-height:1.45;margin-bottom:5px;color:#d0e0f0">' + esc(p.title) + '</div>' +
+        '<div style="color:#4a6080;font-size:10px">📍 ' + esc(p.state + (p.district ? ', ' + p.district : '')) + '</div>' +
+        (p.src === 'citizen' ? '<div style="margin-top:5px;font-size:9px;color:#00ddb8;font-weight:700">🟢 CITIZEN REPORT</div>' : '<div style="margin-top:5px;font-size:9px;color:#4a7090">📰 NEWS FEED</div>') +
+        '</div>'
+      )
+      .addTo(map);
+  });
+
+  // ── Cursor changes ──────────────────────────────────────────────
+  map.on('mouseenter', 'clusters',     function() { map.getCanvas().style.cursor = 'pointer'; });
+  map.on('mouseleave', 'clusters',     function() { map.getCanvas().style.cursor = ''; });
+  map.on('mouseenter', 'issue-points', function() { map.getCanvas().style.cursor = 'pointer'; });
+  map.on('mouseleave', 'issue-points', function() { map.getCanvas().style.cursor = ''; });
+}
+
+function addIssueMarkers(issList) {
+  if (!mapLoaded) return;
+  if (!map.getSource('issues-src')) {
+    initClusterLayers();
+  }
+  var geoData = buildGeoJSON(issList);
+  map.getSource('issues-src').setData(geoData);
 }
 
 // ── CHOROPLETH ────────────────────────────────────────────────────

@@ -1,141 +1,78 @@
-import type { Issue } from '../types'
+// api/issues.ts — Vercel Edge Function
+// Fetches citizen reports from GitHub Issues
+// Public repo — no auth needed to READ, only to write (submit.ts handles writes)
+export const config = { runtime: 'edge' }
 
-// Realistic demo issues shown on initial load (before RSS feeds are fetched)
-// In production these get replaced by real RSS + citizen reports
-export const DEMO_ISSUES: Issue[] = [
-  {
-    id: 'd001',
-    title: 'NH-48 pothole cluster near Gurugram toll — 2,847 reports filed',
-    state: 'Haryana', district: 'Gurugram',
-    category: 'roads', severity: 'critical', reports: 2847,
-    department: 'NHAI', status: 'Escalated',
-    timestamp: new Date(Date.now() - 2 * 60000),
-    lat: 28.459, lng: 77.026, source: 'demo',
-  },
-  {
-    id: 'd002',
-    title: 'Contaminated water supply Dharavi Ward 7 — cholera risk identified',
-    state: 'Maharashtra', district: 'Mumbai',
-    category: 'water', severity: 'emergency', reports: 1923,
-    department: 'BMC Water', status: 'Under Review',
-    timestamp: new Date(Date.now() - 5 * 60000),
-    lat: 19.041, lng: 72.855, source: 'demo',
-  },
-  {
-    id: 'd003',
-    title: 'AIIMS Patna — critical oxygen shortage in ICU ward',
-    state: 'Bihar', district: 'Patna',
-    category: 'health', severity: 'emergency', reports: 412,
-    department: 'Health Ministry', status: 'Notified',
-    timestamp: new Date(Date.now() - 9 * 60000),
-    lat: 25.604, lng: 85.137, source: 'demo',
-  },
-  {
-    id: 'd004',
-    title: '25-hour rolling power cuts in Indore industrial zone — businesses halted',
-    state: 'Madhya Pradesh', district: 'Indore',
-    category: 'power', severity: 'high', reports: 3201,
-    department: 'MPEB', status: 'Assigned',
-    timestamp: new Date(Date.now() - 14 * 60000),
-    lat: 22.719, lng: 75.857, source: 'demo',
-  },
-  {
-    id: 'd005',
-    title: 'Ration card portal offline for 14 days — 8,934 families affected',
-    state: 'Uttar Pradesh', district: 'Lucknow',
-    category: 'corrupt', severity: 'high', reports: 8934,
-    department: 'Food & Civil Supplies', status: 'Escalated',
-    timestamp: new Date(Date.now() - 23 * 60000),
-    lat: 26.846, lng: 80.946, source: 'demo',
-  },
-  {
-    id: 'd006',
-    title: 'Bridge crack on SH-12 Howrah — structural risk, vehicles diverted',
-    state: 'West Bengal', district: 'Howrah',
-    category: 'roads', severity: 'emergency', reports: 238,
-    department: 'PWD West Bengal', status: 'Notified',
-    timestamp: new Date(Date.now() - 31 * 60000),
-    lat: 22.595, lng: 88.263, source: 'demo',
-  },
-  {
-    id: 'd007',
-    title: 'Bribe demands at land registry offices — Bengaluru North zone',
-    state: 'Karnataka', district: 'Bengaluru',
-    category: 'corrupt', severity: 'high', reports: 674,
-    department: 'ACB / Revenue Dept.', status: 'Under Investigation',
-    timestamp: new Date(Date.now() - 45 * 60000),
-    lat: 13.079, lng: 77.590, source: 'demo',
-  },
-  {
-    id: 'd008',
-    title: 'Open sewage overflow flooding heritage lanes — Jaipur Pink City',
-    state: 'Rajasthan', district: 'Jaipur',
-    category: 'water', severity: 'medium', reports: 1105,
-    department: 'JDA', status: 'Assigned',
-    timestamp: new Date(Date.now() - 60 * 60000),
-    lat: 26.924, lng: 75.824, source: 'demo',
-  },
-  {
-    id: 'd009',
-    title: 'Hospital staff shortage — district hospital Varanasi running at 40%',
-    state: 'Uttar Pradesh', district: 'Varanasi',
-    category: 'health', severity: 'high', reports: 892,
-    department: 'MOHFW UP', status: 'Under Review',
-    timestamp: new Date(Date.now() - 70 * 60000),
-    lat: 25.317, lng: 82.973, source: 'demo',
-  },
-  {
-    id: 'd010',
-    title: 'Transformer failure — 3 villages dark for 48h in Vidarbha region',
-    state: 'Maharashtra', district: 'Amravati',
-    category: 'power', severity: 'high', reports: 1342,
-    department: 'MSEDCL', status: 'Assigned',
-    timestamp: new Date(Date.now() - 90 * 60000),
-    lat: 20.932, lng: 77.775, source: 'demo',
-  },
-  {
-    id: 'd011',
-    title: 'Arsenic level 3x permissible limit in drinking water — North Bihar',
-    state: 'Bihar', district: 'Sitamarhi',
-    category: 'water', severity: 'critical', reports: 567,
-    department: 'PHED Bihar', status: 'Escalated',
-    timestamp: new Date(Date.now() - 120 * 60000),
-    lat: 26.593, lng: 85.490, source: 'demo',
-  },
-  {
-    id: 'd012',
-    title: 'Road cave-in after heavy rain — NH66 Kozhikode stretch',
-    state: 'Kerala', district: 'Kozhikode',
-    category: 'roads', severity: 'critical', reports: 788,
-    department: 'NHAI Kerala', status: 'Notified',
-    timestamp: new Date(Date.now() - 180 * 60000),
-    lat: 11.258, lng: 75.780, source: 'demo',
-  },
-  {
-    id: 'd013',
-    title: 'Street lights non-functional for 3 months — Karol Bagh Zone 4',
-    state: 'Delhi', district: 'West Delhi',
-    category: 'roads', severity: 'medium', reports: 2310,
-    department: 'NDMC', status: 'Pending',
-    timestamp: new Date(Date.now() - 200 * 60000),
-    lat: 28.651, lng: 77.190, source: 'demo',
-  },
-  {
-    id: 'd014',
-    title: 'Coal shortage at Telangana power plant — operating at 40% capacity',
-    state: 'Telangana', district: 'Nalgonda',
-    category: 'power', severity: 'critical', reports: 445,
-    department: 'TSGENCO', status: 'Under Review',
-    timestamp: new Date(Date.now() - 420 * 60000),
-    lat: 17.050, lng: 79.266, source: 'demo',
-  },
-  {
-    id: 'd015',
-    title: 'Manual scavengers still deployed in violation of law — Bhopal',
-    state: 'Madhya Pradesh', district: 'Bhopal',
-    category: 'corrupt', severity: 'critical', reports: 234,
-    department: 'Urban Development Dept.', status: 'Under Investigation',
-    timestamp: new Date(Date.now() - 600 * 60000),
-    lat: 23.259, lng: 77.412, source: 'demo',
-  },
-]
+const CORS=['https://bharatmonitor.vercel.app','http://localhost:5173','http://localhost:3000']
+function cors(o:string|null){const a=o&&CORS.includes(o)?o:CORS[0];return{'Access-Control-Allow-Origin':a}}
+
+function extractField(body:string,field:string):string{
+  const m=body.match(new RegExp(`\\|\\s*\\*\\*${field}\\*\\*\\s*\\|\\s*([^|\\n]+)`))
+  return m?m[1].trim().replace(/`/g,''):''
+}
+
+const CAT_MAP:Record<string,string>={roads:'roads',water:'water',power:'power',health:'health',corrupt:'corrupt',education:'education',transport:'transport',safety:'safety',environment:'environment',other:'other'}
+const SEV_MAP:Record<string,string>={emergency:'emergency',critical:'critical',high:'high',medium:'medium',low:'low'}
+
+export default async function handler(req:Request):Promise<Response>{
+  const origin=req.headers.get('origin'),c=cors(origin)
+  if(req.method==='OPTIONS')return new Response(null,{status:204,headers:c})
+
+  const repo=(typeof process!=='undefined'?process.env.GITHUB_REPO:undefined) as string|undefined
+  const token=(typeof process!=='undefined'?process.env.GITHUB_TOKEN:undefined) as string|undefined
+
+  if(!repo)return new Response(JSON.stringify({ok:true,issues:[]}),{headers:{...c,'Content-Type':'application/json'}})
+
+  try{
+    const url=`https://api.github.com/repos/${repo}/issues?state=open&per_page=50&sort=created&direction=desc`
+    const headers:Record<string,string>={'Accept':'application/vnd.github.v3+json'}
+    if(token)headers['Authorization']=`token ${token}`
+
+    const res = await fetch(url,{headers,signal:AbortSignal.timeout(8000)})
+    if(!res.ok)throw new Error(`GitHub ${res.status}`)
+    const data:any[] = await res.json()
+
+    const issues = data
+      .filter((i:any)=>i.body&&i.title)
+      .map((i:any)=>{
+        const body=i.body||''
+        const cat   = CAT_MAP[extractField(body,'Category').toLowerCase()] || 'other'
+        const sev   = SEV_MAP[extractField(body,'Severity').toLowerCase()] || 'medium'
+        const state = extractField(body,'State') || 'India'
+        const dist  = extractField(body,'District')
+        const dept  = extractField(body,'Department') || 'Relevant Authority'
+        const ticket= extractField(body,'Ticket')
+        const sla   = parseInt(extractField(body,'SLA'))||48
+        // Strip [CAT][STATE] prefix from title
+        const titleClean = i.title.replace(/^\[[^\]]+\]\[[^\]]+\]\s*/,'')
+        // Extract description
+        const descMatch = body.match(/### Description\n([\s\S]*?)(?:\n###|\n---)/)?.[1]?.trim()||''
+        // Extract media URL
+        const imgMatch = body.match(/!\[Evidence\]\(([^)]+)\)/)?.[1]
+                      || body.match(/🔗 (https?:\/\/[^\s\n]+)/)?.[1]
+                      || ''
+
+        return{
+          id:'gh-'+i.number,
+          ghNumber:i.number,
+          ghUrl:i.html_url,
+          ticket: ticket||('BM-'+String(i.number).padStart(5,'0')),
+          title:titleClean,
+          state,district:dist,cat,sev,dept,
+          ts:new Date(i.created_at).getTime(),
+          src:'citizen',link:i.html_url,
+          desc:descMatch,
+          imageUrl:imgMatch,
+          sla,
+        }
+      })
+
+    return new Response(JSON.stringify({ok:true,issues}),{
+      headers:{...c,'Content-Type':'application/json','Cache-Control':'public, max-age=60, stale-while-revalidate=30'}
+    })
+  }catch(e){
+    return new Response(JSON.stringify({ok:false,issues:[],error:String(e)}),{
+      headers:{...c,'Content-Type':'application/json'}
+    })
+  }
+}
